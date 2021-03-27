@@ -12,7 +12,5 @@ export class Router extends Routable<ExpressRouter> {
     const self: typeof Router = this.constructor;
 
     this.setup_methods();
-    // @ts-ignore
-    // self.methods.map(e => this.express_router[e.http_method](e.path, this[e.object_method]));
   }
 }

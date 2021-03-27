@@ -38,7 +38,6 @@ export abstract class Routable<T extends ExpressRoutable> extends MethodHolder {
   }
 
   protected setup_methods() {
-    // console.log(`Constructor_name: ${this.constructor.name}`, this.get_added_methods());  ///, this.get_static().methods);
     this.get_added_methods().forEach((e: MethodEntry) => {
       // @ts-ignore
       this.routable_object[e.http_method](e.path, this[e.object_method])

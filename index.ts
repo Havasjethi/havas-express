@@ -4,4 +4,5 @@ import { Router } from "./src/router";
 
 export {
   Get, Post, Method,
-  App, Router};
+  App, Router
+};

@@ -1,6 +1,5 @@
-import {App} from "./app";
-import {ExpressHttpMethod} from "./types/native_http_methods";
-import {MethodHolder} from "./classes/method_holder";
+import {ExpressHttpMethod} from "../types/native_http_methods";
+import {MethodHolder} from "../classes/method_holder";
 
 export function Get (path: string = '/') {
   return function (target: MethodHolder, propertyKey: string, descriptor: PropertyDescriptor) {

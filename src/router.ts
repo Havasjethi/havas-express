@@ -1,5 +1,6 @@
-import {ExpressRoutable, MethodHolder, Routable} from "./classes/method_holder";
+import {ExpressRoutable, MethodHolder} from "./classes/method_holder";
 import {Router as ExpressRouter} from "express";
+import {Routable} from "./classes/routable";
 
 export class Router extends Routable<ExpressRouter> {
   public static path: string = '/';
@@ -10,7 +11,7 @@ export class Router extends Routable<ExpressRouter> {
     // @ts-ignore
     const self: typeof Router = this.constructor;
 
-    this.map_methods();
+    this.setup_methods();
     // @ts-ignore
     // self.methods.map(e => this.express_router[e.http_method](e.path, this[e.object_method]));
   }

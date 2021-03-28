@@ -3,6 +3,7 @@ import {Routable} from "./classes/routable";
 
 export abstract class App extends Routable<express.Application> {
   public static path: string = '/';
+  public static host: string = 'localhost';
   public static port: number;
   public static auto_start: boolean;
 
@@ -22,9 +23,13 @@ export abstract class App extends Routable<express.Application> {
       if (!self.port) {
         throw new Error('Port number in not defined!');
       }
-
-      // @ts-ignore
-      this.routable_object.listen(self.port, self.host, () => console.log(`App is active: http://${self.host}:${self.port}`));
+      this.start_app();
     }
+  }
+
+  start_app () {
+    const self = this.get_static();
+
+    this.routable_object.listen(self.port, self.host, () => console.log(`App is active: http://${self.host}:${self.port}`));
   }
 }

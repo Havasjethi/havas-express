@@ -31,7 +31,7 @@ export abstract class MethodHolder {
 
   public get_added_methods(): MethodEntry[] {
     const self = this.get_static();
-    return self.methods[self.name];
+    return self.methods[self.name] ?? [];
   }
 
   public get_static(): typeof MethodHolder {

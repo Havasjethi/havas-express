@@ -18,12 +18,14 @@ export abstract class Routable<T extends ExpressRoutable> extends MethodHolder {
     this.routable_object = routable_object;
   }
 
-  public append<T extends ExpressRoutable>(other: Routable<T>) {
+  public append<T extends ExpressRoutable>(other: Routable<T>): this {
     // @ts-ignore
     this.get_routable().use(
       other.get_path(),
       other.get_routable()
     );
+
+    return this;
   }
 
   public append_to<T extends ExpressRoutable>(path: string, container: Routable<T>): this {
@@ -40,7 +42,7 @@ export abstract class Routable<T extends ExpressRoutable> extends MethodHolder {
   protected setup_methods() {
     this.get_added_methods().forEach((e: MethodEntry) => {
       // @ts-ignore
-      this.routable_object[e.http_method](e.path, this[e.object_method])
+      this.routable_object[e.http_method](e.path, (...args) => this[e.object_method](...args))
     });
   }
 }

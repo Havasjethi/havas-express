@@ -1,4 +1,3 @@
-import {ExpressRoutable, MethodHolder} from "./classes/method_holder";
 import {Router as ExpressRouter} from "express";
 import {Routable} from "./classes/routable";
 

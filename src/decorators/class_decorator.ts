@@ -18,8 +18,8 @@ export function Path(path: string) {
 
 interface HostParams {
   port_number: number | string;
-  host: string;
-  auto_start: boolean;
+  host?: string;
+  auto_start?: boolean;
 }
 
 export function Host({

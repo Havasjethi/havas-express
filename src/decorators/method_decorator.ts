@@ -26,5 +26,7 @@ export function Method (method: ExpressHttpMethod, path: string) {
 }
 
 function add_function (target: MethodHolder, method_name: string, method_type: ExpressHttpMethod, path: string) {
-  target.get_static().add_method(method_name, method_type, path);
+  target
+    .get_static()
+    .add_method(method_name, method_type, path);
 }

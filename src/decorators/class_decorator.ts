@@ -16,10 +16,16 @@ export function Path(path: string) {
   }
 }
 
+interface HostParams {
+  port_number: number | string;
+  host: string;
+  auto_start: boolean;
+}
+
 export function Host({
                        port_number = -1,
                        host = 'localhost',
-                       auto_start = true} = {}) {
+                       auto_start = true}: HostParams) {
   return <T extends { new (...args: any[]): {} }>(constructor: T) => {
     //@ts-ignore
     constructor.port = port_number;

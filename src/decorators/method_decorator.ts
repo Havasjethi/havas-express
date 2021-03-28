@@ -13,6 +13,12 @@ export function Post (path: string) {
   };
 }
 
+export function Delete (path: string) {
+  return function (target: MethodHolder, propertyKey: string, descriptor: PropertyDescriptor) {
+    add_function(target, propertyKey, 'delete', path);
+  };
+}
+
 export function Method (method: ExpressHttpMethod, path: string) {
   return function (target: MethodHolder, propertyKey: string, descriptor: PropertyDescriptor) {
     add_function(target, propertyKey, method, path);

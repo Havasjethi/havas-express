@@ -1,5 +1,5 @@
 import {ExpressRoutable, MethodHolder} from "./method_holder";
-import {MethodEntry} from "../interfaces/method_entry";
+import {MethodEntry, Middleware} from "../interfaces/method_entry";
 
 export abstract class Routable<T extends ExpressRoutable> extends MethodHolder {
   public routable_object: T;
@@ -42,7 +42,14 @@ export abstract class Routable<T extends ExpressRoutable> extends MethodHolder {
   protected setup_methods() {
     this.get_added_methods().forEach((e: MethodEntry) => {
       // @ts-ignore
-      this.routable_object[e.http_method](e.path, (...args) => this[e.object_method](...args))
+      this.routable_object[e.http_method](
+        e.path,
+        // @ts-ignore
+        ...(e.middlewares.map((middleware: Middleware) => typeof middleware === 'function'
+          ? middleware
+          : middleware.handle.bind(middleware))), // VS  (req: any, res: any, next: any) => middleware.handle(req, res, next))),
+        // @ts-ignore
+        (...args) => this[e.object_method](...args))
     });
   }
 }

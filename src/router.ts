@@ -7,9 +7,6 @@ export class Router extends Routable<ExpressRouter> {
   constructor() {
     super(ExpressRouter());
 
-    // @ts-ignore
-    const self: typeof Router = this.constructor;
-
     this.setup_methods();
   }
 }

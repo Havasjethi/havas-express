@@ -1,6 +1,6 @@
 import {ExpressHttpMethod} from "../types/native_http_methods";
 import express from "express";
-import {MethodEntry} from "../interfaces/method_entry";
+import {MethodEntry, Middleware} from "../interfaces/method_entry";
 
 export type ExpressRoutable = express.Router | express.Application;
 
@@ -11,13 +11,15 @@ export abstract class MethodHolder {
    * @param method_name - PropertyKey
    * @param http_method - Get / Post / ..
    * @param path - Relative path to Routable
+   * @param middlewares
    */
-  public static add_method(method_name: string, http_method: ExpressHttpMethod, path: string = '/'): typeof MethodHolder {
+  public static add_method(method_name: string, http_method: ExpressHttpMethod, path: string = '/', middlewares: Middleware[] = []): typeof MethodHolder {
     const class_name = this.name;
     const method_entry: MethodEntry = {
       object_method: method_name,
       http_method,
-      path
+      path,
+      middlewares,
     };
 
     if (!this.methods[class_name]) {

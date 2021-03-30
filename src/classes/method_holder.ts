@@ -1,8 +1,9 @@
 import {ExpressHttpMethod} from "../types/native_http_methods";
-import express from "express";
+import express, {IRouter} from "express";
 import {MethodEntry, Middleware} from "../interfaces/method_entry";
 
-export type ExpressRoutable = express.Router | express.Application;
+// export type ExpressRoutable = express.Router | express.Application;
+export type ExpressRoutable = IRouter;
 
 export abstract class MethodHolder {
   private static methods: {[class_name: string]: MethodEntry[]} = {};

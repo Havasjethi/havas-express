@@ -1,13 +1,26 @@
 import {ExpressRoutable, MethodHolder} from "./method_holder";
-import {MethodEntry, Middleware} from "../interfaces/method_entry";
+import {MethodEntry, Middleware, MiddlewareFunction} from "../interfaces/method_entry";
+import {ExpressHttpMethod} from "../types/native_http_methods";
+
+interface RegistrableMiddleware {
+  path: string;
+  method?: ExpressHttpMethod;
+  middleware_functions: MiddlewareFunction[];
+}
 
 export abstract class Routable<T extends ExpressRoutable> extends MethodHolder {
   public routable_object: T;
   public path: string = '/';
+  protected middlewares: RegistrableMiddleware[] = [];
 
   public get_routable(): T {
     return this.routable_object;
   };
+
+  public add_constructor_middleware (middleware: RegistrableMiddleware) {
+    this.middlewares.push(middleware);
+    console.log(this.middlewares);
+  }
 
   public get_path(): string {
     return this.path;
@@ -40,6 +53,12 @@ export abstract class Routable<T extends ExpressRoutable> extends MethodHolder {
   }
 
   protected setup_methods() {
+    console.log('MiddleWares', this.middlewares);
+    this.middlewares.forEach(e => e.method !== undefined
+      ? this.get_routable()[e.method](e.path, ...e.middleware_functions)
+      : this.get_routable().use(e.path, ...e.middleware_functions)
+    );
+
     this.get_added_methods().forEach((e: MethodEntry) => {
       // @ts-ignore
       this.routable_object[e.http_method](

@@ -1,5 +1,5 @@
 import {ExpressRequest, ExpressResponse} from "../index";
-import {Middleware} from "./interfaces/method_entry";
+import {Middleware, MiddlewareEntry} from "./interfaces/method_entry";
 import {after_create, class_extender} from "./decorators/util";
 import {Routable} from "./classes/routable";
 import {ExpressRoutable} from "./classes/method_holder";
@@ -35,5 +35,13 @@ export function MethodSpecificMiddlewares<R extends ExpressRoutable>(method: Exp
 
   return class_extender<Routable<R>, any>((created_element) => {
     created_element.add_constructor_middleware({method, path: '/', middleware_functions });
+  });
+}
+
+export function ComplexMiddleware<R extends ExpressRoutable>({method, path, middlewares}: MiddlewareEntry) {
+  const middleware_functions = middlewares.map((e: Middleware) => (typeof e === 'function') ? e : e.handle.bind(e));
+
+  return class_extender<Routable<R>, any>((created_element) => {
+    created_element.add_constructor_middleware({method, path, middleware_functions });
   });
 }

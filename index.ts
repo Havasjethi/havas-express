@@ -4,8 +4,8 @@ import { Router } from "./src/router";
 import { Host, Path } from "./src/decorators/class_decorator";
 import { Response, Request, ParamsDictionary } from "express-serve-static-core";
 import { ParsedQs } from 'qs';
-import {MethodSpecificMiddlewares, MiddlewareObject, PipeMiddleware, RoutableMiddlewares } from "./src/middleware";
-import express from "express";
+import {ComplexMiddleware, MethodSpecificMiddlewares, MiddlewareObject, PipeMiddleware, RoutableMiddlewares } from "./src/middleware";
+import express, { Router as ExpressRouter } from "express";
 
 type ExpressRequest = Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>; // Request vs IRouterHandler
 type ExpressResponse = Response<any, Record<string, any>, number>;  // Response vs IRouterHandler
@@ -17,5 +17,6 @@ export {
   Path, Host,
   ExpressRequest, ExpressResponse,
   MiddlewareObject, PipeMiddleware,
-  RoutableMiddlewares, MethodSpecificMiddlewares
+  RoutableMiddlewares, MethodSpecificMiddlewares, ComplexMiddleware
+  ,ExpressRouter
 };

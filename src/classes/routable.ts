@@ -11,7 +11,10 @@ interface RegistrableMiddleware {
 export abstract class Routable<T extends ExpressRoutable> extends MethodHolder {
   public routable_object: T;
   public path: string = '/';
+  public children_routable: Routable<any>[] = [];
   protected middlewares: RegistrableMiddleware[] = [];
+
+  public abstract remove_layers(): void;
 
   public get_routable(): T {
     return this.routable_object;
@@ -32,6 +35,8 @@ export abstract class Routable<T extends ExpressRoutable> extends MethodHolder {
   }
 
   public append<T extends ExpressRoutable>(other: Routable<T>): this {
+    this.children_routable.push(other);
+
     // @ts-ignore
     this.get_routable().use(
       other.get_path(),
@@ -52,8 +57,10 @@ export abstract class Routable<T extends ExpressRoutable> extends MethodHolder {
     return this;
   }
 
-  protected setup_methods() {
-    console.log('MiddleWares', this.middlewares);
+  /**
+   * Add endpoints
+   */
+  public setup_methods(): void {
     this.middlewares.forEach(e => e.method !== undefined
       ? this.get_routable()[e.method](e.path, ...e.middleware_functions)
       : this.get_routable().use(e.path, ...e.middleware_functions)

@@ -22,7 +22,6 @@ export abstract class Routable<T extends ExpressRoutable> extends MethodHolder {
 
   public add_constructor_middleware (middleware: RegistrableMiddleware) {
     this.middlewares.push(middleware);
-    console.log(this.middlewares);
   }
 
   public get_path(): string {

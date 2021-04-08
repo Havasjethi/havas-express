@@ -1,5 +1,9 @@
 import {Routable} from "../classes/routable";
 
+/**
+ * TODO :: Rewrite with `class_extender` Problem: App.auto_start
+ * @param path
+ */
 export function Path(path: string) {
   return <T extends { new (...args: any[]): Routable<any> }>(constructorFunction: T) => {
     let newConstructorFunction: any = function (...args: any[]) {

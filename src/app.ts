@@ -37,7 +37,7 @@ export abstract class App extends Routable<express.Application> {
       next_layer
         .splice(0)
         .forEach(e => {
-          e.setup_methods();
+          e.setup_layers();
           next_layer.push(...e.children_routable)
         });
     }

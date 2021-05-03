@@ -18,7 +18,7 @@ export abstract class PipeMiddleware extends MiddlewareObject{
     next();
   }
 
-  abstract handle_method(req: ExpressRequest, res: ExpressResponse): any;
+  public abstract handle_method(req: ExpressRequest, res: ExpressResponse): any;
 }
 
 export function RoutableMiddlewares<R extends ExpressRoutable>(...middlewares: Middleware[]) {

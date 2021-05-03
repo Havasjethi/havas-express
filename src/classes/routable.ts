@@ -59,11 +59,19 @@ export abstract class Routable<T extends ExpressRoutable> extends MethodHolder {
   /**
    * Add endpoints
    */
-  public setup_methods(): void {
-    this.middlewares.forEach(e => e.method !== undefined
+  public setup_layers(): void {
+    this.setup_middlewares(this.middlewares);
+    this.setup_methods(this.get_added_methods());
+  }
+
+  protected setup_middlewares(middlewares: RegistrableMiddleware[]): void {
+    middlewares.forEach(e => e.method !== undefined
       ? this.get_routable()[e.method](e.path, ...e.middleware_functions)
       : this.get_routable().use(e.path, ...e.middleware_functions)
     );
+  }
+
+  protected setup_methods(added_methods: MethodEntry[]): void {
 
     this.get_added_methods().forEach((e: MethodEntry) => {
       // @ts-ignore

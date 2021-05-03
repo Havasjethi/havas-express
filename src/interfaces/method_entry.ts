@@ -33,5 +33,6 @@ export interface MethodEntry {
   object_method: string; // keyof <Current Object?>
   path: string;
   middlewares: Middleware[];
-  method_parameters: MethodParameterEntry<any>[]
+  method_parameters: MethodParameterEntry<any>[];
+  use_wrapper: boolean;
 }

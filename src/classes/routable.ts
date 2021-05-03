@@ -21,8 +21,10 @@ export abstract class Routable<T extends ExpressRoutable> extends MethodHolder {
   public routable_object: T;
   public path: string = '/';
   public children_routable: Routable<any>[] = [];
+  public parent: Routable<any> | null= null;
   protected middlewares: RegistrableMiddleware[] = [];
 
+  protected result_wrapper: ((o: {result: any, request: ExpressRequest, response: ExpressResponse, next: Function}) => any) | null = null;
   protected methods: { [method_name: string]: MethodEntry };
   protected method_parameters: { [method_name: string]: MethodParameterEntry<any>[] };
 
@@ -52,6 +54,14 @@ export abstract class Routable<T extends ExpressRoutable> extends MethodHolder {
     }
   }
 
+  public set_result_wrapper (wrapper_function: Routable<any>['result_wrapper']) {
+    this.result_wrapper = wrapper_function;
+  }
+
+  public get_result_wrapper (): Routable<any>['result_wrapper'] {
+    return this.result_wrapper ?? this.parent?.get_result_wrapper() ?? null;
+  }
+
   public add_method(method_name: string, http_method: ExpressHttpMethod, path: string = '/', middlewares: Middleware[] = []) {
     this.initialize();
     const method_entry: MethodEntry = {
@@ -60,6 +70,7 @@ export abstract class Routable<T extends ExpressRoutable> extends MethodHolder {
       path,
       middlewares,
       method_parameters: this.method_parameters[method_name] ?? [],
+      use_wrapper: true, // Todo :: Is it possible to guess the user's behaviour?
     };
 
     if (this.methods[method_name]) {
@@ -114,17 +125,15 @@ export abstract class Routable<T extends ExpressRoutable> extends MethodHolder {
   public append<T extends ExpressRoutable>(other: Routable<T>): this {
     this.children_routable.push(other);
 
-    // @ts-ignore
-    this.get_routable().use(
-      other.get_path(),
-      other.get_routable()
-    );
+    this.get_routable().use(other.get_path(), other.get_routable());
+
+    other.parent = this;
 
     return this;
   }
 
-  public append_to<T extends ExpressRoutable>(path: string, container: Routable<T>): this {
-    container.get_routable().use(container.get_routable());
+  public append_to<T extends ExpressRoutable>(container: Routable<T>): this {
+    container.append(this);
 
     return this;
   }
@@ -172,11 +181,11 @@ export abstract class Routable<T extends ExpressRoutable> extends MethodHolder {
    * @protected
    */
   protected method_creator (e: MethodEntry): any {
-    return (req: ExpressRequest, res: ExpressResponse, next: CallableFunction) => {
+    return (request: ExpressRequest, response: ExpressResponse, next: CallableFunction) => {
       const parameters: any[] = [];
 
       if (e.method_parameters.length === 0) {
-        parameters.push(req, res, next);
+        parameters.push(request, response, next);
       } else {
         // TODO :: Parameter placement ? What if the first parameter is not 0.th
         e.method_parameters.sort((a,b) => a.parameter_index > b.parameter_index ? 1 : -1);
@@ -188,11 +197,11 @@ export abstract class Routable<T extends ExpressRoutable> extends MethodHolder {
         e.method_parameters.forEach((parameter: MethodParameterEntry<any>) => {
           switch (parameter.parameter_type) {
             case "request":
-              parameters.push(req);
+              parameters.push(request);
               return;
 
             case "response":
-              parameters.push(res);
+              parameters.push(response);
               return;
 
             case "next":
@@ -206,23 +215,29 @@ export abstract class Routable<T extends ExpressRoutable> extends MethodHolder {
 
           switch (parameter.parameter_type) {
             case "path":
-              parameters.push(req.params[parameter.extra_data.variable_path]);
+              parameters.push(request.params[parameter.extra_data.variable_path]);
               break;
             case "query":
-              parameters.push(req.query[parameter.extra_data.variable_path]);
+              parameters.push(request.query[parameter.extra_data.variable_path]);
               break;
             case "body":
-              parameters.push(req.body[parameter.extra_data.variable_path]);
+              parameters.push(request.body[parameter.extra_data.variable_path]);
               break;
             case "parameter":
-              parameters.push(req.params[parameter.extra_data.variable_path]);
+              parameters.push(request.params[parameter.extra_data.variable_path]);
               break;
           }
         });
       }
 
+      const wrapper = this.get_result_wrapper();
+
       //@ts-ignore
-      this[e.object_method](...parameters);
+      const result = this[e.object_method](...parameters);
+
+      if (wrapper && !response.headersSent) { // They could call the next function, and we send a response :(
+        wrapper({result, request, response, next});
+      }
     };
   }
 }

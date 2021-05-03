@@ -1,13 +1,8 @@
 
-export function after_create<Type>(after_create: (a: Type) => void) {
-  return class_extender<Type, any>(after_create);
-}
+export type Constructor<T = any> = new(...constr_arguments: any[]) => T;
 
-export function class_extender<
-  ExtendedClass,
-  Constructor extends { new(...constr_arguments: any[]): ExtendedClass} = any
-  >(after_construct: (created_element: ExtendedClass) => void) {
-  return function (old_class: Constructor) {
+export function class_extender<ExtendedClass> (after_construct: (created_element: ExtendedClass) => void) {
+  return function (old_class: Constructor<ExtendedClass>) {
 
     const new_class: any = function (...args: any[]) {
       const new_constructor: any = () => new old_class(...args);

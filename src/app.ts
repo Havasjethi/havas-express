@@ -2,10 +2,10 @@ import express from "express";
 import {Routable} from "./classes/routable";
 
 export abstract class App extends Routable<express.Application> {
-  public static path: string = '/';
-  public static host: string = 'localhost';
-  public static port: number;
-  public static auto_start: boolean;
+  public path: string = '/';
+  public host: string = 'localhost';
+  public port: number = -1;
+  // public static auto_start: boolean;
 
   public get_static(): typeof App {
     // @ts-ignore
@@ -14,14 +14,14 @@ export abstract class App extends Routable<express.Application> {
 
   constructor() {
     super(express());
-    const self = this.get_static();
 
-    if (self.auto_start) {
-      if (!self.port) {
-        throw new Error('Port number in not defined!');
-      }
-      this.start_app();
-    }
+    // const self = this.get_static();
+    // if (self.auto_start) {
+    //   if (!self.port) {
+    //     throw new Error('Port number in not defined!');
+    //   }
+    //   this.start_app();
+    // }
   }
 
   remove_layers(): void {
@@ -42,6 +42,9 @@ export abstract class App extends Routable<express.Application> {
         });
     }
 
-    this.routable_object.listen(self.port, self.host, () => console.log(`App is active: http://${self.host}:${self.port}`));
+    this.routable_object.listen(
+      this.port,
+      this.host,
+      () => console.log(`App is active: http://${this.host}:${this.port}`));
   }
 }

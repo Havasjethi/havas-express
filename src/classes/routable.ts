@@ -1,4 +1,3 @@
-import {MethodHolder} from "./method_holder";
 import {
   MethodEntry, MethodParameterData,
   MethodParameterEntry, MethodParameterType,
@@ -17,7 +16,7 @@ interface RegistrableMiddleware {
   middleware_functions: MiddlewareFunction[];
 }
 
-export abstract class Routable<T extends ExpressRoutable> extends MethodHolder {
+export abstract class Routable<T extends ExpressRoutable> {
   public routable_object: T;
   public path: string = '/';
   public children_routable: Routable<any>[] = [];
@@ -29,7 +28,6 @@ export abstract class Routable<T extends ExpressRoutable> extends MethodHolder {
   protected method_parameters: { [method_name: string]: MethodParameterEntry<any>[] };
 
   protected constructor(routable_object: T) {
-    super();
     this.routable_object = routable_object;
 
     //@ts-ignore

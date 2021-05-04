@@ -5,23 +5,9 @@ export abstract class App extends Routable<express.Application> {
   public path: string = '/';
   public host: string = 'localhost';
   public port: number = -1;
-  // public static auto_start: boolean;
-
-  public get_static(): typeof App {
-    // @ts-ignore
-    return this.constructor;
-  }
 
   constructor() {
     super(express());
-
-    // const self = this.get_static();
-    // if (self.auto_start) {
-    //   if (!self.port) {
-    //     throw new Error('Port number in not defined!');
-    //   }
-    //   this.start_app();
-    // }
   }
 
   remove_layers(): void {
@@ -29,8 +15,6 @@ export abstract class App extends Routable<express.Application> {
   }
 
   start_app () {
-    const self = this.get_static();
-
     const next_layer: Routable<any>[] = [ this ];
 
     while (next_layer.length) {

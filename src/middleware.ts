@@ -1,6 +1,6 @@
 import {ExpressRequest, ExpressResponse} from "../index";
 import {Middleware, MiddlewareEntry} from "./interfaces/method_entry";
-import { class_extender} from "./decorators/util";
+import { class_extender} from "./util/class_decorator_util";
 import {ExpressRoutable, Routable} from "./classes/routable";
 import {ExpressHttpMethod} from "./types/native_http_methods";
 

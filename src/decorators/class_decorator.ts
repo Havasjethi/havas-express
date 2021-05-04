@@ -1,16 +1,13 @@
-import {Routable} from "../classes/routable";
-import {class_extender} from "./util";
-import {App} from "../app";
+import { Routable } from "../classes/routable";
+import { Constructor, extender, SetProperty } from "../util/class_decorator_util";
+import { App } from "../app";
 
-/**
- * @param path
- */
-export function Path(path: string) {
-  return class_extender<Routable<any>>(object => object.set_path(path));
+export function Path <T extends Routable<any>>(path: string) {
+  return SetProperty<T>(object => object.set_path(path));
 }
 
 export function ResultWrapper(result_wrapper_method: Routable<any>["result_wrapper"]) {
-  return class_extender<Routable<any>>(element => {
+  return SetProperty<Routable<any>>(element => {
     element.set_result_wrapper(result_wrapper_method);
   });
 }
@@ -26,10 +23,18 @@ export function Host({
                        host = 'localhost',
                        auto_start = true
                      }: HostParams) {
+  return (class_definition: Constructor<App>) => {
+    const constructor = extender.add_set_property(class_definition, (app) => {
+      app.port = typeof (port_number) === 'string' ? parseInt(port_number, 10) : port_number;
+      app.host = host;
+    });
 
-  return class_extender<App>((app) => {
-    app.port = typeof(port_number) === 'string' ? parseInt(port_number, 10) : port_number;
-    app.host = host;
-    // app.auto_start = auto_start;
-  });
+    if (auto_start) {
+      extender.add_after_initialization(class_definition, (app) => {
+        app.start_app();
+      });
+    }
+
+    return constructor;
+  }
 }

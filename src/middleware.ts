@@ -19,11 +19,12 @@ export abstract class PipeMiddleware extends MiddlewareObject{
   public abstract handle_method(req: ExpressRequest, res: ExpressResponse): any;
 }
 
-export function RoutableMiddlewares<R extends ExpressRoutable>(...middlewares: Middleware[]) {
+// TODO :: Remove usage of `class_extender`
+
+export function UseMiddleware<R extends ExpressRoutable>(...middlewares: Middleware[]) {
   const middleware_functions = middlewares.map((e: Middleware) => (typeof e === 'function') ? e : e.handle.bind(e));
 
   return class_extender<Routable<R>>((created_element) => {
-    // TODO :: Fix Problem: Middlewares are added after initialization => The Layers added to the end of the array
     created_element.add_constructor_middleware({path: '/', middleware_functions });
   });
 }

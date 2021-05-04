@@ -4,7 +4,7 @@ import { extender, BeforeCreate, SetProperty, AfterCreate } from "./src/util/cla
 import { App } from "./src/app";
 import { Router } from "./src/router";
 import { Host, Path, ResultWrapper } from "./src/decorators/class_decorator";
-import { ComplexMiddleware, MethodSpecificMiddlewares, MiddlewareObject, PipeMiddleware, RoutableMiddlewares } from "./src/middleware";
+import { ComplexMiddleware, MethodSpecificMiddlewares, MiddlewareObject, PipeMiddleware, UseMiddleware } from "./src/middleware";
 
 import express from "express";
 import { Response, Request, ParamsDictionary, Router as ExpressRouter } from "express-serve-static-core";
@@ -26,5 +26,5 @@ export {
   Path, Host, ResultWrapper,
   ExpressRequest, ExpressResponse,
   MiddlewareObject, PipeMiddleware,
-  RoutableMiddlewares, MethodSpecificMiddlewares, ComplexMiddleware,
+  UseMiddleware, MethodSpecificMiddlewares, ComplexMiddleware,
 };

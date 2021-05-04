@@ -16,6 +16,13 @@ interface RegistrableMiddleware {
   middleware_functions: MiddlewareFunction[];
 }
 
+export interface ResultWrapperParameters {
+  result: any;
+  request: ExpressRequest;
+  response: ExpressResponse;
+  next: Function;
+}
+
 export abstract class Routable<T extends ExpressRoutable> {
   public routable_object: T;
   public path: string = '/';
@@ -23,7 +30,7 @@ export abstract class Routable<T extends ExpressRoutable> {
   public parent: Routable<any> | null= null;
   protected middlewares: RegistrableMiddleware[] = [];
 
-  protected result_wrapper: ((o: {result: any, request: ExpressRequest, response: ExpressResponse, next: Function}) => any) | null = null;
+  protected result_wrapper: ((o: ResultWrapperParameters) => any) | null = null;
   protected methods: { [method_name: string]: MethodEntry };
   protected method_parameters: { [method_name: string]: MethodParameterEntry<any>[] };
 

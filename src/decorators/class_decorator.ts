@@ -23,7 +23,7 @@ export function Host({
                        host = 'localhost',
                        auto_start = true
                      }: HostParams) {
-  return (class_definition: Constructor<App>) => {
+  return (class_definition: Constructor<App>): Constructor<App> | any => {
     const constructor = extender.add_set_property(class_definition, (app) => {
       app.port = typeof (port_number) === 'string' ? parseInt(port_number, 10) : port_number;
       app.host = host;

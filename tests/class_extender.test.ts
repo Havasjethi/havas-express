@@ -1,4 +1,4 @@
-import { BeforeCreate, SetProperty, AfterCreate } from "../src/decorators/util";
+import { BeforeCreate, SetProperty, AfterCreate, extender, Constructor } from "../src/decorators/util";
 
 function Subtractor<T extends A>(value: number) {
   return SetProperty<T>((instance) => {
@@ -21,18 +21,24 @@ function PrintAfterCreate(print_object = true) {
 }
 
 // @Subtractor(3)
-// @Adder(4)
+@Adder(4)
 @PrintAfterCreate()
+@(<T>(some: Constructor<T>) => {
+  extender.add_after_initialization(some, e => console.log('Heyy,', e));
+})
 // @ts-ignore
 class A {
   b: number = 13;
 }
 
-@SetProperty((instance: B) => instance.name = 'Set_Property')
+@SetProperty((instance: B) => {
+  console.log('B-@SetProperty Called')
+  instance.name = 'Set_Property'
+})
 @PrintAfterCreate()
 // @ts-ignore
 class B {
-  name: string = '';
+  name: string | undefined;
 }
 
 new A();

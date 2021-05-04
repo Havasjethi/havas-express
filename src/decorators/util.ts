@@ -38,15 +38,11 @@ export class ClassExtender {
   }
 
   get_or_initialize<T>(original_constructor: Constructor<T>): StoredItem<T> {
-    const class_name = original_constructor.name;
+    const class_name = original_constructor.prototype.constructor.name;
 
     if (!this.decorations[class_name]) {
       this.decorations[class_name] = this.initialize(original_constructor);
     }
-    console.log({
-      class_name,
-      returned: this.decorations[class_name],
-    });
 
     return this.decorations[class_name];
   }
@@ -61,7 +57,6 @@ export class ClassExtender {
     };
 
     const new_class: any = function (...args: any[]) {
-
       const new_constructor: (() => T) = () => {
         const new_instance = new original_constructor(...args);
         stored_item.set_properties.forEach(fnc => fnc(new_instance));

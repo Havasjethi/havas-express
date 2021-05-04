@@ -3,7 +3,6 @@ import {class_extender} from "./util";
 import {App} from "../app";
 
 /**
- * TODO :: Rewrite with `class_extender` Problem: App.auto_start
  * @param path
  */
 export function Path(path: string) {

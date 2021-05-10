@@ -19,6 +19,14 @@ export const Next = (target: TargetType, method_name: string, parameter_index: n
 //         Only found solution: stackoverflow.com/questions/1007981
 //
 
+export const Cookie = (name: string) => {
+  return (target: TargetType, method_name: string, parameter_index: number) => {
+    target.add_method_parameter(method_name, 'cookie', parameter_index, {
+      variable_path: name
+    });
+  }
+}
+
 export const Body = (name: string) => {
   return (target: TargetType, method_name: string, parameter_index: number) => {
     target.add_method_parameter(method_name, 'body', parameter_index, {

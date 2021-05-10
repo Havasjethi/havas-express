@@ -231,6 +231,11 @@ export abstract class Routable<T extends ExpressRoutable> {
             case "parameter":
               parameters.push(request.params[parameter.extra_data.variable_path]);
               break;
+            case "cookie":
+              parameters.push(request.cookies[parameter.extra_data.variable_path]);
+              // TODO :: How to tell the difference?
+              // parameters.push(request.signedCookies[parameter.extra_data.variable_path]);
+              break;
           }
         });
       }

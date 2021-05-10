@@ -23,6 +23,30 @@ export function Delete (path: string = '/', ...middlewares: Middleware[]) {
   };
 }
 
+export function Put (path: string = '/', ...middlewares: Middleware[]) {
+  return function (target: Routable<any>, propertyKey: string, descriptor: PropertyDescriptor) {
+    add_function(target, propertyKey, 'put', path, middlewares);
+  };
+}
+
+export function Option (path: string = '/', ...middlewares: Middleware[]) {
+  return function (target: Routable<any>, propertyKey: string, descriptor: PropertyDescriptor) {
+    add_function(target, propertyKey, 'options', path, middlewares);
+  };
+}
+
+export function Head (path: string = '/', ...middlewares: Middleware[]) {
+  return function (target: Routable<any>, propertyKey: string, descriptor: PropertyDescriptor) {
+    add_function(target, propertyKey, 'head', path, middlewares);
+  };
+}
+
+export function Patch (path: string = '/', ...middlewares: Middleware[]) {
+  return function (target: Routable<any>, propertyKey: string, descriptor: PropertyDescriptor) {
+    add_function(target, propertyKey, 'patch', path, middlewares);
+  };
+}
+
 export function Method (method: ExpressHttpMethod, path: string, ...middlewares: Middleware[]) {
   return function (target: Routable<any>, propertyKey: string, descriptor: PropertyDescriptor) {
     add_function(target, propertyKey, method, path, middlewares);

@@ -1,5 +1,5 @@
-import { Delete, Get, Method, Post } from "./src/decorators/method_decorator";
-import { Body, RequestObj, ResponseObj, PathVariable, Param, Query, Next } from "./src/decorators/method_paramter_decorators";
+import { Delete, Get, Method, Post, Put, Option, Head, Patch } from "./src/decorators/method_decorator";
+import { Body, RequestObj, ResponseObj, PathVariable, Param, Query, Next, Cookie } from "./src/decorators/method_paramter_decorators";
 import { extender, BeforeCreate, SetProperty, AfterCreate } from "./src/util/class_decorator_util";
 import { App } from "./src/app";
 import { Router } from "./src/router";
@@ -19,8 +19,8 @@ const LifecycleClassDecorators = {
 
 export default express;
 export {
-  Get, Post, Delete, Method,
-  RequestObj, ResponseObj, Next, Body, PathVariable, Param, Query,
+  Get, Post, Delete, Put, Option, Head, Patch, Method,
+  RequestObj, ResponseObj, Next, Body, PathVariable, Param, Query, Cookie,
   LifecycleClassDecorators,
   App, Router,
   Path, Host, ResultWrapper,

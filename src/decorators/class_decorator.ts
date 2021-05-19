@@ -21,7 +21,7 @@ interface HostParams {
 export function Host({
                        port_number = -1,
                        host = 'localhost',
-                       auto_start = true
+                       auto_start = false,
                      }: HostParams) {
   return (class_definition: Constructor<App>): Constructor<App> | any => {
     const constructor = extender.add_set_property(class_definition, (app) => {

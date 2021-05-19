@@ -28,6 +28,7 @@ export abstract class Routable<T extends ExpressRoutable> {
   public path: string = '/';
   public children_routable: Routable<any>[] = [];
   public parent: Routable<any> | null= null;
+  protected layers_initialized: boolean = false;
   protected middlewares: RegistrableMiddleware[] = [];
 
   protected result_wrapper: ((o: ResultWrapperParameters) => any) | null = null;
@@ -113,11 +114,33 @@ export abstract class Routable<T extends ExpressRoutable> {
       extra_data
     });
   }
-
-
   public get_routable(): T {
     return this.routable_object;
   };
+
+  public get_initialized_routable (): T {
+    if (!this.layers_initialized) {
+      this.initialize_layers();
+    }
+
+    return this.routable_object;
+  }
+
+  protected initialize_layers () {
+    this.layers_initialized = true;
+    const next_layer: Routable<any>[] = [ this ];
+    let max_depth = 50; // Lazy way handling circular structure in routable hierarchy
+
+    while (next_layer.length && --max_depth > 0) {
+      next_layer
+        .splice(0)
+        .forEach(e => {
+          e.setup_layers();
+          next_layer.push(...e.children_routable)
+        });
+    }
+  }
+
 
   public add_constructor_middleware(middleware: RegistrableMiddleware) {
     this.middlewares.push(middleware);
@@ -129,8 +152,6 @@ export abstract class Routable<T extends ExpressRoutable> {
 
   public append<T extends ExpressRoutable>(other: Routable<T>): this {
     this.children_routable.push(other);
-
-    this.get_routable().use(other.get_path(), other.get_routable());
 
     other.parent = this;
 
@@ -158,6 +179,7 @@ export abstract class Routable<T extends ExpressRoutable> {
   public setup_layers(): void {
     this.setup_middlewares(this.middlewares);
     this.setup_methods(this.get_added_methods());
+    this.children_routable.forEach((e: Routable<any>) => this.get_routable().use(e.get_path(), e.get_routable()));
   }
 
   protected setup_middlewares(middlewares: RegistrableMiddleware[]): void {
@@ -220,17 +242,18 @@ export abstract class Routable<T extends ExpressRoutable> {
 
           switch (parameter.parameter_type) {
             case "path":
-              parameters.push(request.params[parameter.extra_data.variable_path]);
-              break;
-            case "query":
-              parameters.push(request.query[parameter.extra_data.variable_path]);
-              break;
-            case "body":
-              parameters.push(request.body[parameter.extra_data.variable_path]);
-              break;
             case "parameter":
               parameters.push(request.params[parameter.extra_data.variable_path]);
               break;
+
+            case "query":
+              parameters.push(request.query[parameter.extra_data.variable_path]);
+              break;
+
+            case "body":
+              parameters.push(request.body[parameter.extra_data.variable_path]);
+              break;
+
             case "cookie":
               parameters.push(request.cookies[parameter.extra_data.variable_path]);
               // TODO :: How to tell the difference?

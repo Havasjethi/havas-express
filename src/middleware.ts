@@ -12,10 +12,8 @@ export abstract class MiddlewareObject {
 export abstract class PipeMiddleware extends MiddlewareObject{
 
   handle(req: ExpressRequest, res: ExpressResponse, next: Function) {
-    const rv = this.handle_method(req, res);
-    if (rv) {
-      next();
-    }
+    this.handle_method(req, res);
+    next();
   }
 
   /**
@@ -23,7 +21,7 @@ export abstract class PipeMiddleware extends MiddlewareObject{
    * @param req
    * @param res
    */
-  public abstract handle_method(req: ExpressRequest, res: ExpressResponse): void | boolean;
+  public abstract handle_method(req: ExpressRequest, res: ExpressResponse): void;
 }
 
 // TODO :: Remove usage of `class_extender`

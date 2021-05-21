@@ -24,7 +24,7 @@ export abstract class App extends Routable<express.Application> {
 
   start_app () {
     if (!this.layers_initialized) {
-      this.initialize_layers();
+      this.setup_layers();
     }
 
     this.running_server = this.routable_object.listen(

@@ -3,7 +3,7 @@ import { Constructor, extender, SetProperty } from "../util/class_decorator_util
 import { App } from "../app";
 
 export function Path <T extends Routable<any>>(path: string) {
-  return SetProperty<T>(object => object.set_path(path));
+  return SetProperty(object => object.set_path(path));
 }
 
 export function ResultWrapper(result_wrapper_method: Routable<any>["result_wrapper"]) {

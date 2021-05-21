@@ -55,7 +55,6 @@ class Router1 extends Router {
 
   @Post('/cookie_extract')
   cookie_extract (@Cookie('user_name') c1: any) {
-    console.log()
     return c1;
   }
 

@@ -21,11 +21,9 @@ class TestApp extends App {
     res.send({any: 13});
   }
 }
+
 @Path('/router')
-@ResultWrapper(({result, response}) => {
-  response.status(200);
-  response.json({data: result});
-})
+@ResultWrapper(({response, result}) => response.send({data: result}))
 class TestRouter extends Router {
 
   @Get('/')
@@ -39,7 +37,7 @@ class TestRouter extends Router {
   }
 }
 
-const test_router = new TestRouter();
 export const test_app_instance = new TestApp();
+const test_router = new TestRouter();
 test_app_instance.append(test_router);
 test_app_instance.start_stop_logging = false;

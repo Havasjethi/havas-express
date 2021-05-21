@@ -18,6 +18,7 @@ export class ClassExtender {
   }
 
   get_or_initialize<T>(original_constructor: Constructor<T>): StoredItem<T> {
+    // @ts-ignore
     const class_name = original_constructor.prototype.constructor.name;
 
     if (!this.decorations[class_name]) {
@@ -37,8 +38,10 @@ export class ClassExtender {
     };
 
     const new_class: any = function (...args: any[]) {
+      // @ts-ignore
       const new_constructor: (() => T) = () => {
         const new_instance = new original_constructor(...args);
+        // @ts-ignore
         stored_item.set_properties.forEach(fnc => fnc(new_instance));
 
         return new_instance;
@@ -60,7 +63,9 @@ export class ClassExtender {
     return stored_item;
   }
 
-  add_before_initialization<T>(original_constructor: Constructor<T>, before_initialization: CreationLifecycleMethods<T>['before_initialization'][0]) {
+  add_before_initialization<T>
+  (original_constructor: Constructor<T>, before_initialization: any |CreationLifecycleMethods<T>['before_initialization'][0])
+  : any{
     const stored_item = this.get_or_initialize<T>(original_constructor);
     stored_item.before_initialization.push(before_initialization);
     return stored_item.new_constructor;

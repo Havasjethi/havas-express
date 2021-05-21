@@ -120,27 +120,11 @@ export abstract class Routable<T extends ExpressRoutable> {
 
   public get_initialized_routable (): T {
     if (!this.layers_initialized) {
-      this.initialize_layers();
+      this.setup_layers();
     }
 
     return this.routable_object;
   }
-
-  protected initialize_layers () {
-    this.layers_initialized = true;
-    const next_layer: Routable<any>[] = [ this ];
-    let max_depth = 50; // Lazy way handling circular structure in routable hierarchy
-
-    while (next_layer.length && --max_depth > 0) {
-      next_layer
-        .splice(0)
-        .forEach(e => {
-          e.setup_layers();
-          next_layer.push(...e.children_routable)
-        });
-    }
-  }
-
 
   public add_constructor_middleware(middleware: RegistrableMiddleware) {
     this.middlewares.push(middleware);
@@ -152,7 +136,6 @@ export abstract class Routable<T extends ExpressRoutable> {
 
   public append<T extends ExpressRoutable>(other: Routable<T>): this {
     this.children_routable.push(other);
-
     other.parent = this;
 
     return this;
@@ -179,13 +162,22 @@ export abstract class Routable<T extends ExpressRoutable> {
   public setup_layers(): void {
     this.setup_middlewares(this.middlewares);
     this.setup_methods(this.get_added_methods());
-    this.children_routable.forEach((e: Routable<any>) => this.get_routable().use(e.get_path(), e.get_routable()));
+    this.children_routable.forEach((child: Routable<ExpressRoutable>) => {
+      if (!child.layers_initialized) {
+        child.setup_layers();
+      }
+
+      this.get_routable().use(child.get_path(), child.get_routable())
+    });
+    this.layers_initialized = true;
   }
 
   protected setup_middlewares(middlewares: RegistrableMiddleware[]): void {
+    const routable = this.get_routable();
+    console.log(middlewares);
     middlewares.forEach(e => e.method !== undefined
-      ? this.get_routable()[e.method](e.path, ...e.middleware_functions)
-      : this.get_routable().use(e.path, ...e.middleware_functions)
+      ? routable[e.method](e.path, ...e.middleware_functions)
+      : routable.use(e.path, ...e.middleware_functions)
     );
   }
 

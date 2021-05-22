@@ -6,7 +6,6 @@
   "types": "lib/index.d.js",
   "scripts": {
     "test": "jest",
-    "preinstall": "tsc",
     "prepublish": "tsc"
   },
   "author": "",

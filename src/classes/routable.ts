@@ -28,9 +28,12 @@ export abstract class Routable<T extends ExpressRoutable> {
   public path: string = '/';
   public children_routable: Routable<any>[] = [];
   public parent: Routable<any> | null= null;
+  protected layers_initialized: boolean = false;
   protected middlewares: RegistrableMiddleware[] = [];
 
   protected result_wrapper: ((o: ResultWrapperParameters) => any) | null = null;
+
+  // TODO :: Refactor this later
   protected methods: { [method_name: string]: MethodEntry };
   protected method_parameters: { [method_name: string]: MethodParameterEntry<any>[] };
 
@@ -87,14 +90,6 @@ export abstract class Routable<T extends ExpressRoutable> {
     return this;
   }
 
-  /**
-   * TODO :: Add juicy stuff ( Generic + Optional types )
-   *
-   * @param method_name
-   * @param parameter_type
-   * @param index
-   * @param extra_data
-   */
   public add_method_parameter<T extends MethodParameterType>(
     method_name: string,
     parameter_type: T,
@@ -113,11 +108,17 @@ export abstract class Routable<T extends ExpressRoutable> {
       extra_data
     });
   }
-
-
   public get_routable(): T {
     return this.routable_object;
   };
+
+  public get_initialized_routable (): T {
+    if (!this.layers_initialized) {
+      this.setup_layers();
+    }
+
+    return this.routable_object;
+  }
 
   public add_constructor_middleware(middleware: RegistrableMiddleware) {
     this.middlewares.push(middleware);
@@ -129,9 +130,6 @@ export abstract class Routable<T extends ExpressRoutable> {
 
   public append<T extends ExpressRoutable>(other: Routable<T>): this {
     this.children_routable.push(other);
-
-    this.get_routable().use(other.get_path(), other.get_routable());
-
     other.parent = this;
 
     return this;
@@ -158,12 +156,22 @@ export abstract class Routable<T extends ExpressRoutable> {
   public setup_layers(): void {
     this.setup_middlewares(this.middlewares);
     this.setup_methods(this.get_added_methods());
+    this.children_routable.forEach((child: Routable<ExpressRoutable>) => {
+      if (!child.layers_initialized) {
+        child.setup_layers();
+      }
+
+      this.get_routable().use(child.get_path(), child.get_routable())
+    });
+    this.layers_initialized = true;
   }
 
   protected setup_middlewares(middlewares: RegistrableMiddleware[]): void {
+    const routable = this.get_routable();
+    console.log(middlewares);
     middlewares.forEach(e => e.method !== undefined
-      ? this.get_routable()[e.method](e.path, ...e.middleware_functions)
-      : this.get_routable().use(e.path, ...e.middleware_functions)
+      ? routable[e.method](e.path, ...e.middleware_functions)
+      : routable.use(e.path, ...e.middleware_functions)
     );
   }
 
@@ -220,17 +228,18 @@ export abstract class Routable<T extends ExpressRoutable> {
 
           switch (parameter.parameter_type) {
             case "path":
-              parameters.push(request.params[parameter.extra_data.variable_path]);
-              break;
-            case "query":
-              parameters.push(request.query[parameter.extra_data.variable_path]);
-              break;
-            case "body":
-              parameters.push(request.body[parameter.extra_data.variable_path]);
-              break;
             case "parameter":
               parameters.push(request.params[parameter.extra_data.variable_path]);
               break;
+
+            case "query":
+              parameters.push(request.query[parameter.extra_data.variable_path]);
+              break;
+
+            case "body":
+              parameters.push(request.body[parameter.extra_data.variable_path]);
+              break;
+
             case "cookie":
               parameters.push(request.cookies[parameter.extra_data.variable_path]);
               // TODO :: How to tell the difference?
@@ -245,7 +254,7 @@ export abstract class Routable<T extends ExpressRoutable> {
       //@ts-ignore
       const result = this[e.object_method](...parameters);
 
-      if (wrapper && !response.headersSent) { // They could call the next function, and we send a response :(
+      if (wrapper && !response.headersSent) { // What happens if they call the next function
         wrapper({result, request, response, next});
       }
     };

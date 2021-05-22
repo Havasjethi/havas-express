@@ -3,7 +3,7 @@ import { Constructor, extender, SetProperty } from "../util/class_decorator_util
 import { App } from "../app";
 
 export function Path <T extends Routable<any>>(path: string) {
-  return SetProperty<T>(object => object.set_path(path));
+  return SetProperty(object => object.set_path(path));
 }
 
 export function ResultWrapper(result_wrapper_method: Routable<any>["result_wrapper"]) {
@@ -21,7 +21,7 @@ interface HostParams {
 export function Host({
                        port_number = -1,
                        host = 'localhost',
-                       auto_start = true
+                       auto_start = false,
                      }: HostParams) {
   return (class_definition: Constructor<App>): Constructor<App> | any => {
     const constructor = extender.add_set_property(class_definition, (app) => {

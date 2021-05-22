@@ -10,7 +10,6 @@ export type Middleware = MiddlewareObject | MiddlewareFunction;
 export interface MiddlewareEntry {
   method: ExpressHttpMethod;
   path: string;
-  middlewares: Middleware[];
 }
 
 export type UnaryMethodParameterType = 'request' | 'response' | 'next';

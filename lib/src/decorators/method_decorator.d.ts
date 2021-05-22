@@ -1,0 +1,11 @@
+import { ExpressHttpMethod } from "../types/native_http_methods";
+import { Middleware } from "../interfaces/method_entry";
+import { Routable } from "../classes/routable";
+export declare function Get(path?: string, ...middlewares: Middleware[]): (target: Routable<any>, propertyKey: string, descriptor: PropertyDescriptor) => void;
+export declare function Post(path?: string, ...middlewares: Middleware[]): (target: Routable<any>, propertyKey: string, descriptor: PropertyDescriptor) => void;
+export declare function Delete(path?: string, ...middlewares: Middleware[]): (target: Routable<any>, propertyKey: string, descriptor: PropertyDescriptor) => void;
+export declare function Put(path?: string, ...middlewares: Middleware[]): (target: Routable<any>, propertyKey: string, descriptor: PropertyDescriptor) => void;
+export declare function Option(path?: string, ...middlewares: Middleware[]): (target: Routable<any>, propertyKey: string, descriptor: PropertyDescriptor) => void;
+export declare function Head(path?: string, ...middlewares: Middleware[]): (target: Routable<any>, propertyKey: string, descriptor: PropertyDescriptor) => void;
+export declare function Patch(path?: string, ...middlewares: Middleware[]): (target: Routable<any>, propertyKey: string, descriptor: PropertyDescriptor) => void;
+export declare function Method(method: ExpressHttpMethod, path: string, ...middlewares: Middleware[]): (target: Routable<any>, propertyKey: string, descriptor: PropertyDescriptor) => void;

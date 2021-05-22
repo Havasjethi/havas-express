@@ -32,6 +32,8 @@ export abstract class Routable<T extends ExpressRoutable> {
   protected middlewares: RegistrableMiddleware[] = [];
 
   protected result_wrapper: ((o: ResultWrapperParameters) => any) | null = null;
+
+  // TODO :: Refactor this later
   protected methods: { [method_name: string]: MethodEntry };
   protected method_parameters: { [method_name: string]: MethodParameterEntry<any>[] };
 
@@ -88,14 +90,6 @@ export abstract class Routable<T extends ExpressRoutable> {
     return this;
   }
 
-  /**
-   * TODO :: Add juicy stuff ( Generic + Optional types )
-   *
-   * @param method_name
-   * @param parameter_type
-   * @param index
-   * @param extra_data
-   */
   public add_method_parameter<T extends MethodParameterType>(
     method_name: string,
     parameter_type: T,
@@ -260,7 +254,7 @@ export abstract class Routable<T extends ExpressRoutable> {
       //@ts-ignore
       const result = this[e.object_method](...parameters);
 
-      if (wrapper && !response.headersSent) { // They could call the next function, and we send a response :(
+      if (wrapper && !response.headersSent) { // What happens if they call the next function
         wrapper({result, request, response, next});
       }
     };

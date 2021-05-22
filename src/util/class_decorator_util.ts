@@ -2,15 +2,12 @@ import { ClassExtender } from "./class_extender";
 
 export type Constructor<T = any> = new(...constr_arguments: any[]) => T;
 
-/**
- * Add LifeCycle events to class creation
- */
 export type LifeCycleClassDecorator<T> = (original_constructor: Constructor<T>) => Constructor<T> | any;
 
 export const extender = new ClassExtender();
 
 export function BeforeCreate<T = any>(after_create: (e: Constructor<T> | any) => void): LifeCycleClassDecorator<T> {
-  return <U extends T>(modifiable_constructor: Constructor<U>) =>extender.add_before_initialization(modifiable_constructor, after_create);
+  return <U extends T>(modifiable_constructor: Constructor<U>) => extender.add_before_initialization(modifiable_constructor, after_create);
 }
 
 export function SetProperty<T = any>(set_property: (new_instance: T) => void): LifeCycleClassDecorator<T> {
@@ -23,7 +20,7 @@ export function AfterCreate<T = any>(after_create: (new_instance: T) => void): L
 
 
 /**
- * The method has been deprecated, by the superior class Extender, which creates a lifecycle around item creation
+ * The method has been deprecated, by the superior ClassExtender, which creates a lifecycle around item creation
  * @see ClassExtender
  * @deprecated
  * @param after_construct

@@ -1,6 +1,6 @@
 # Folders
 node_modules/
-lib/
+# lib/ # Experimental turn-off
 
 # Files
-package-lock.json
+# package-lock.json # Experimental turn-off

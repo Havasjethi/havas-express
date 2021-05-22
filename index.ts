@@ -6,18 +6,16 @@ import { Router } from "./src/router";
 import { Host, Path, ResultWrapper } from "./src/decorators/class_decorator";
 import { ComplexMiddleware, MethodSpecificMiddlewares, MiddlewareObject, PipeMiddleware, UseMiddleware } from "./src/middleware";
 
-import express from "express";
 import { Response, Request, ParamsDictionary, Router as ExpressRouter } from "express-serve-static-core";
 import { ParsedQs } from 'qs';
 
-type ExpressRequest = Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>; // Request vs IRouterHandler
-type ExpressResponse = Response<any, Record<string, any>, number>;  // Response vs IRouterHandler
+type ExpressRequest = Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>
+type ExpressResponse = Response<any, Record<string, any>, number>;
 
 const LifecycleClassDecorators = {
   extender, BeforeCreate, SetProperty, AfterCreate
 };
 
-export default express;
 export {
   Get, Post, Delete, Put, Option, Head, Patch, Method,
   RequestObj, ResponseObj, Next, Body, PathVariable, Param, Query, Cookie,

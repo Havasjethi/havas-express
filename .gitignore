@@ -1,6 +1,7 @@
 # Folders
+.idea/*
+lib/
 node_modules/
-# lib/ # Experimental turn-off
 
 # Files
-# package-lock.json # Experimental turn-off
+package-lock.json

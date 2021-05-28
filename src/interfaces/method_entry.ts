@@ -28,10 +28,12 @@ export interface MethodParameterEntry<T extends MethodParameterType> {
 
 // export interface MethodEntry<T extends Routable<any> = Routable<any>> {
 export interface MethodEntry {
-  http_method: ExpressHttpMethod;
-  object_method: string; // keyof <Current Object?>
-  path: string;
+  http_method?: ExpressHttpMethod;
+  object_method_name?: string; // keyof <Current Object?>
+  object_method?: CallableFunction; // keyof <Current Object?>
+  path?: string;
   middlewares: Middleware[];
-  method_parameters: MethodParameterEntry<any>[];
-  use_wrapper: boolean;
+  preprocessor_parameter: MethodParameterEntry<any>[];
+  post_processor_parameters: MethodParameterEntry<any>[];
+  use_wrapper?: boolean;
 }

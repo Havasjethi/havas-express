@@ -1,6 +1,13 @@
 import {ExpressHttpMethod} from "../types/native_http_methods";
 import {Middleware} from "../interfaces/method_entry";
 import {Routable} from "../classes/routable";
+import { extender } from "../util/class_decorator_util";
+
+function add_function (target: Routable<any>, method_name: string, method_type: ExpressHttpMethod, path: string, middlewares: Middleware[]) {
+  extender.set_property<Routable>(target.constructor.name, (x) => {
+    x.add_method(method_name, method_type, path, middlewares);
+  });
+}
 
 // export function Get (path: string = '/', wrap: boolean, ...middlewares: Middleware[]) {
 // export function Get (o: {path: string, wrap: boolean} , ...middlewares: Middleware[]) {
@@ -51,8 +58,4 @@ export function Method (method: ExpressHttpMethod, path: string, ...middlewares:
   return function (target: Routable<any>, propertyKey: string, descriptor: PropertyDescriptor) {
     add_function(target, propertyKey, method, path, middlewares);
   };
-}
-
-function add_function (target: Routable<any>, method_name: string, method_type: ExpressHttpMethod, path: string, middlewares: Middleware[]) {
-  target.add_method(method_name, method_type, path, middlewares);
 }

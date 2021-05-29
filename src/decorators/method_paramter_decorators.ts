@@ -1,6 +1,6 @@
-import {Routable} from "../classes/routable";
+import { Routable } from "../classes/routable";
 import { extender } from "../util/class_decorator_util";
-import { MethodParameterType } from "../interfaces/method_entry";
+import { MethodParameterType, PostProcessorType } from "../interfaces/method_entry";
 
 type TargetType = Routable;
 
@@ -14,7 +14,19 @@ const request_preprocessor = (
   extender.set_property<TargetType>(
     target.constructor.name,
     (x) => x.add_request_preporecssor(method_name, corresponding_type, parameter_index, data)
-  )
+  );
+};
+
+const request_postprocessor = (
+  target: TargetType,
+  method_name: string,
+  parameter_index: number,
+  post_processor: PostProcessorType,
+) => {
+  extender.set_property<TargetType>(
+    target.constructor.name,
+    (x) => x.add_request_postprocessor(method_name, parameter_index, post_processor)
+  );
 };
 
 export const RequestObj = (target: TargetType, method_name: string, parameter_index: number) => {
@@ -59,7 +71,7 @@ export const PathVariable = (name: string) => {
 };
 
 export const Param = (name: string) => {
-    return (target: TargetType, method_name: string, parameter_index: number) => {
+  return (target: TargetType, method_name: string, parameter_index: number) => {
     request_preprocessor(target, method_name, 'parameter', parameter_index, {
       variable_path: name
     });
@@ -67,9 +79,15 @@ export const Param = (name: string) => {
 };
 
 export const Query = (name: string) => {
-    return (target: TargetType, method_name: string, parameter_index: number) => {
+  return (target: TargetType, method_name: string, parameter_index: number) => {
     request_preprocessor(target, method_name, 'query', parameter_index, {
       variable_path: name
     });
   }
+};
+
+export const PostProcessor= <Input = any, Output = any> (process_function: PostProcessorType<Input, Output>) => {
+  return (target: TargetType, method_name: string, parameter_index: number) => {
+    request_postprocessor(target, method_name, parameter_index, process_function);
+  };
 };

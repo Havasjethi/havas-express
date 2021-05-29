@@ -4,7 +4,8 @@ import {
   MethodParameterEntry,
   MethodParameterType,
   Middleware,
-  MiddlewareFunction
+  MiddlewareFunction,
+  PostProcessorType
 } from "../interfaces/method_entry";
 import { ExpressHttpMethod } from "../types/native_http_methods";
 import { ExpressRequest, ExpressResponse } from "../../index";
@@ -64,12 +65,12 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
     return this.result_wrapper ?? this.parent?.get_result_wrapper() ?? null;
   }
 
-  protected get_method_entry (method_name: string): MethodEntry {
+  protected get_method_entry(method_name: string): MethodEntry {
     if (!this.methods[method_name]) {
       this.methods[method_name] = {
         middlewares: [],
         preprocessor_parameter: [],
-        post_processor_parameters: [],
+        post_processors: {},
       };
     }
 
@@ -80,7 +81,7 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
     const method_entry = this.get_method_entry(method_name);
     method_entry.object_method_name = method_name;
     //@ts-ignore
-    method_entry.object_method_name = this.method_name;
+    method_entry.object_method = this[method_name];
     method_entry.http_method = http_method;
     method_entry.path = path;
     method_entry.middlewares.push(...middlewares);
@@ -103,18 +104,17 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
     });
   }
 
-  public add_request_postporecssor<T extends MethodParameterType>(
+  public add_request_postprocessor<T extends PostProcessorType = PostProcessorType>(
     method_name: string,
-    parameter_type: T,
     index: number,
-    extra_data: MethodParameterData | undefined = undefined
+    post_processor: T
   ) {
     const method_entry = this.get_method_entry(method_name);
-    method_entry.post_processor_parameters.push({
-      parameter_index: index,
-      parameter_type,
-      extra_data
-    });
+    const parameter_post_processors = method_entry.post_processors[index]
+      ? method_entry.post_processors[index]
+      : method_entry.post_processors[index] = [];
+
+    parameter_post_processors.push(post_processor);
   }
 
   public get_routable(): T {
@@ -206,17 +206,24 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
     return (request: ExpressRequest, response: ExpressResponse, next: CallableFunction) => {
       const parameters: any[] = [];
 
-      if (e.preprocessor_parameter.length === 0) {
+      if (e.preprocessor_parameter.length === 0 && Object.keys(e.post_processors).length === 0) {
         parameters.push(request, response, next);
       } else {
         // TODO :: Parameter placement ? What if the first parameter is not 0.th
         e.preprocessor_parameter.sort((a, b) => a.parameter_index > b.parameter_index ? 1 : -1);
 
-        if (e.preprocessor_parameter[0].parameter_index !== 0) {
-          throw new Error('What should I do here?? Pass Request, Response, Next, All-of-them ?');
-        }
+        // if (e.preprocessor_parameter[0].parameter_index !== 0) {
+        //   parameters.push(undefined);
+        // throw new Error('What should I do here?? Pass Request, Response, Next, All-of-them ?');
+        // }
 
-        e.preprocessor_parameter.forEach((parameter: MethodParameterEntry<any>) => {
+        // let offset = 0;
+        e.preprocessor_parameter.forEach((parameter: MethodParameterEntry<any>, index) => {
+          // if (parameter.parameter_index + offset !== index) {
+          //   offset += 1;
+          //   parameters.push(undefined);
+          // }
+
           switch (parameter.parameter_type) {
             case "request":
               parameters.push(request);
@@ -236,7 +243,11 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
           }
 
           const add_parameter = (value: any) => {
-            // TODO :: Call post processors
+            e.post_processors[index]?.forEach(post_processor => {
+              const rv = post_processor(value);
+              value = rv != undefined ? rv : value;
+            });
+
             parameters.push(value);
           }
 
@@ -263,14 +274,16 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
               // TODO :: How to tell the difference?
               // parameters.push(request.signedCookies[parameter.extra_data.variable_path]);
               break;
+
+            default:
+              // Called if
+              add_parameter(undefined);
           }
         });
       }
 
       const wrapper = this.get_result_wrapper();
-
-      //@ts-ignore
-      const result = this[e.object_method_name](...parameters);
+      const result = e.object_method(...parameters); // this[e.object_method_name](...parameters);
 
       if (wrapper && !response.headersSent) { // What happens if they call the next function
         wrapper({result, request, response, next});

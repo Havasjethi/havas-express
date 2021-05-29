@@ -1,8 +1,8 @@
-import express from "express";
+import express, { Application } from "express";
 import { Server } from "node:http";
 import { Routable } from "./classes/routable";
 
-export abstract class App extends Routable<express.Application> {
+export abstract class App extends Routable<Application> {
   public path: string = '/';
   public host: string = 'localhost';
   public port: number = -1;

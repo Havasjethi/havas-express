@@ -26,6 +26,8 @@ export interface MethodParameterEntry<T extends MethodParameterType> {
   extra_data: T extends ComplexMethodParameterType ? MethodParameterData : undefined;
 }
 
+export type PostProcessorType<Input = any, Outout = any> = (value: Input) => Outout;
+
 // export interface MethodEntry<T extends Routable<any> = Routable<any>> {
 export interface MethodEntry {
   http_method?: ExpressHttpMethod;
@@ -34,6 +36,6 @@ export interface MethodEntry {
   path?: string;
   middlewares: Middleware[];
   preprocessor_parameter: MethodParameterEntry<any>[];
-  post_processor_parameters: MethodParameterEntry<any>[];
+  post_processors: {[parameter_index: number]: PostProcessorType<any, any>[]};
   use_wrapper?: boolean;
 }

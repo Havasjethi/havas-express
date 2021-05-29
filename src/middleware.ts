@@ -4,12 +4,11 @@ import { SetProperty } from "./util/class_decorator_util";
 import { ExpressRoutable, Routable } from "./classes/routable";
 import { ExpressHttpMethod } from "./types/native_http_methods";
 
-export abstract class MiddlewareObject {
-
-  public abstract handle(req: ExpressRequest, res: ExpressResponse, next: Function): void;
+export interface MiddlewareObject {
+  handle: (req: ExpressRequest, res: ExpressResponse, next: Function) => any;
 }
 
-export abstract class PipeMiddleware extends MiddlewareObject{
+export abstract class PipeMiddleware implements MiddlewareObject {
 
   handle(req: ExpressRequest, res: ExpressResponse, next: Function) {
     this.handle_method(req, res);

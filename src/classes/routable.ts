@@ -9,7 +9,8 @@ import {
 } from "../interfaces/method_entry";
 import { ExpressHttpMethod } from "../types/native_http_methods";
 import { ExpressRequest, ExpressResponse } from "../../index";
-import { IRouter } from "express";
+import { ErrorRequestHandler, IRouter } from "express";
+import { ErrorHandlerClass } from "./error_handler";
 
 export type ExpressRoutable = IRouter;
 
@@ -25,6 +26,7 @@ export interface ResultWrapperParameters {
   response: ExpressResponse;
   next: Function;
 }
+export type ErrorHandler = ErrorHandlerClass | ErrorRequestHandler;
 
 export abstract class Routable<T extends ExpressRoutable = IRouter> {
   public routable_object: T;
@@ -33,6 +35,7 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
   public parent: Routable<any> | null = null;
   protected layers_initialized: boolean = false;
   protected middlewares: RegistrableMiddleware[] = [];
+  protected error_handlers: ErrorHandler[] = [];
 
   protected result_wrapper: ((o: ResultWrapperParameters) => any) | null = null;
 
@@ -133,6 +136,10 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
     this.middlewares.push(middleware);
   }
 
+  add_error_handler(error_handler: ErrorRequestHandler | ErrorHandlerClass) {
+    this.error_handlers.push(error_handler);
+  }
+
   public get_path(): string {
     return this.path;
   }
@@ -170,8 +177,10 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
         child.setup_layers();
       }
 
-      this.get_routable().use(child.get_path(), child.get_routable())
+      this.get_routable().use(child.get_path(), child.get_routable());
     });
+    this.setup_error_handlers(this.error_handlers);
+
     this.layers_initialized = true;
   }
 
@@ -183,9 +192,18 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
     );
   }
 
-  protected setup_methods(methods: Required<MethodEntry>[]): void {
+  protected setup_error_handlers(error_handlers: ErrorHandler[]): void {
+    const routable = this.get_routable();
+    error_handlers.forEach(handler => {
+      if (typeof handler === "function") {
+        routable.use(handler);
+      } else {
+        routable.use(handler.handle.bind(handler));
+      }
+    });
+  }
 
-    // this.get_added_methods()
+  protected setup_methods(methods: Required<MethodEntry>[]): void {
     methods.forEach((e) => {
       this.routable_object[e.http_method](
         e.path,

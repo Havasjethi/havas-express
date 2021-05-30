@@ -1,5 +1,6 @@
 export * from "./src/decorators/method_decorator";
 export * from "./src/decorators/method_paramter_decorators";
+export * from "./src/decorators/default_handler";
 export { extender, BeforeCreate, SetProperty, AfterCreate } from "./src/util/class_decorator_util";
 export { App } from "./src/app";
 export { Router } from "./src/router";

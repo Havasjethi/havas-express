@@ -36,6 +36,7 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
   protected layers_initialized: boolean = false;
   protected middlewares: RegistrableMiddleware[] = [];
   protected error_handlers: ErrorHandler[] = [];
+  protected default_handler: MiddlewareFunction | undefined;
 
   protected result_wrapper: ((o: ResultWrapperParameters) => any) | null = null;
 
@@ -80,7 +81,18 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
     return this.methods[method_name];
   }
 
-  public add_method<T extends ThisType<this>>(method_name: keyof T & string, http_method: ExpressHttpMethod, path: string = '/', middlewares: Middleware[] = []) {
+  public set_default_handler<Ext extends Routable> (method_name: keyof Ext): this {
+    //@ts-ignore
+    this.default_handler = this[method_name];
+    return this;
+  }
+
+  public add_method<T extends ThisType<this>> (
+    method_name: keyof T & string,
+    http_method: ExpressHttpMethod,
+    path: string = '/',
+    middlewares: Middleware[] = []
+  ): this {
     const method_entry = this.get_method_entry(method_name);
     method_entry.object_method_name = method_name;
     //@ts-ignore
@@ -140,6 +152,12 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
     this.error_handlers.push(error_handler);
   }
 
+  add_error_handler_method<Child extends this>(error_handler_method_name: keyof Child) {
+
+    //@ts-ignore
+    this.error_handlers.push(this[error_handler_method_name]);
+  }
+
   public get_path(): string {
     return this.path;
   }
@@ -179,6 +197,8 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
 
       this.get_routable().use(child.get_path(), child.get_routable());
     });
+
+    this.setup_default_handler();
     this.setup_error_handlers(this.error_handlers);
 
     this.layers_initialized = true;
@@ -191,6 +211,15 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
       : routable.use(e.path, ...e.middleware_functions)
     );
   }
+
+  protected setup_default_handler(): void {
+    if (!this.default_handler) {
+      return;
+    }
+
+    this.get_routable().use(this.default_handler.bind(this));
+  }
+
 
   protected setup_error_handlers(error_handlers: ErrorHandler[]): void {
     const routable = this.get_routable();
@@ -308,4 +337,5 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
       }
     };
   }
+
 }

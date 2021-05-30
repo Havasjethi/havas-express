@@ -1,5 +1,5 @@
 import {ExpressRequest, ExpressResponse} from "../../index";
-import {MiddlewareObject} from "../middleware";
+import {MiddlewareObject} from "../classes/middleware";
 import {ExpressHttpMethod} from "../types/native_http_methods";
 
 // export type MiddlewareFunction = IRouterHandler<any>;

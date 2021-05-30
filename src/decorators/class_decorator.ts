@@ -1,6 +1,6 @@
 import { Routable } from "../classes/routable";
 import { Constructor, extender, SetProperty } from "../util/class_decorator_util";
-import { App } from "../app";
+import { App } from "../classes/app";
 import { ErrorRequestHandler } from "express";
 import { ErrorHandlerClass } from "../classes/error_handler";
 

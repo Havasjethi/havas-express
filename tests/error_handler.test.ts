@@ -33,7 +33,7 @@ class TestRotuer extends Router {
 
 @Path('/router-2')
 @ErrorHandler(new PipeErrorHandler(parameters => {
-  console.log('Nice Dick Tough')
+  console.log('Some logging')
 }))
 class TestRotuerWithPipeErrorHandler extends Router {
 

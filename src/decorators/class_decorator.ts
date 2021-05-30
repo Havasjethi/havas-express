@@ -1,6 +1,8 @@
 import { Routable } from "../classes/routable";
 import { Constructor, extender, SetProperty } from "../util/class_decorator_util";
-import { App } from "../app";
+import { App } from "../classes/app";
+import { ErrorRequestHandler } from "express";
+import { ErrorHandlerClass } from "../classes/error_handler";
 
 export function Path <T extends Routable<any>>(path: string) {
   return SetProperty(object => object.set_path(path));
@@ -37,4 +39,8 @@ export function Host({
 
     return constructor;
   }
+}
+
+export function ErrorHandler (error_handler: ErrorRequestHandler | ErrorHandlerClass) {
+  return SetProperty<Routable>((instance) => instance.add_error_handler(error_handler));
 }

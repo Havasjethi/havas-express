@@ -1,6 +1,4 @@
 import { BeforeCreate, SetProperty, AfterCreate } from "../../src/util/class_decorator_util";
-import { buildType } from "../../../ts-structure-parser/dist/tsStructureParser";
-
 
 @BeforeCreate((class_decl) => {class_decl.default_x = 100})
 @SetProperty<A>((instance) => {instance.x += 3})

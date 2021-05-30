@@ -25,7 +25,7 @@ class TestAppWithMethodDecorators extends App {}
 @UseMiddleware(body_parser.json())
 @UseMiddleware(cookie_parser())
 @ResultWrapper(({result,response}) => response.send(result))
-class Router1 extends Router {
+class TestRouter extends Router {
 
   @Get('/')
   index (@ResponseObj res: any) {
@@ -68,7 +68,7 @@ class Router1 extends Router {
 
 }
 
-const router_1 = new Router1();
+const router_1 = new TestRouter();
 export const __testAppWithMethodDecorators = new TestAppWithMethodDecorators();
 
 __testAppWithMethodDecorators.append(router_1);

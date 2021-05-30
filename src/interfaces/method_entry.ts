@@ -1,5 +1,5 @@
 import {ExpressRequest, ExpressResponse} from "../../index";
-import {MiddlewareObject} from "../middleware";
+import {MiddlewareObject} from "../classes/middleware";
 import {ExpressHttpMethod} from "../types/native_http_methods";
 
 // export type MiddlewareFunction = IRouterHandler<any>;
@@ -26,12 +26,16 @@ export interface MethodParameterEntry<T extends MethodParameterType> {
   extra_data: T extends ComplexMethodParameterType ? MethodParameterData : undefined;
 }
 
+export type PostProcessorType<Input = any, Outout = any> = (value: Input) => Outout;
+
 // export interface MethodEntry<T extends Routable<any> = Routable<any>> {
 export interface MethodEntry {
-  http_method: ExpressHttpMethod;
-  object_method: string; // keyof <Current Object?>
-  path: string;
+  http_method?: ExpressHttpMethod;
+  object_method_name?: string; // keyof <Current Object?>
+  object_method?: CallableFunction; // keyof <Current Object?>
+  path?: string;
   middlewares: Middleware[];
-  method_parameters: MethodParameterEntry<any>[];
-  use_wrapper: boolean;
+  preprocessor_parameter: MethodParameterEntry<any>[];
+  post_processors: {[parameter_index: number]: PostProcessorType<any, any>[]};
+  use_wrapper?: boolean;
 }

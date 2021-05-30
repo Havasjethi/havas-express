@@ -153,7 +153,6 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
   }
 
   add_error_handler_method<Child extends this>(error_handler_method_name: keyof Child) {
-
     //@ts-ignore
     this.error_handlers.push(this[error_handler_method_name]);
   }

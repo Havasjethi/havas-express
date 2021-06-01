@@ -33,14 +33,12 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
   public path: string = '/';
   public children_routable: Routable<any>[] = [];
   public parent: Routable<any> | null = null;
+
   protected layers_initialized: boolean = false;
   protected middlewares: RegistrableMiddleware[] = [];
   protected error_handlers: ErrorHandler[] = [];
   protected default_handler: MiddlewareFunction | undefined;
-
   protected result_wrapper: ((o: ResultWrapperParameters) => any) | null = null;
-
-  // TODO :: Refactor this later
   protected methods: { [method_name: string]: MethodEntry } = {};
   protected method_parameters: { [method_name: string]: MethodParameterEntry<any>[] } = {};
 
@@ -329,7 +327,7 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
       }
 
       const wrapper = this.get_result_wrapper();
-      const result = e.object_method(...parameters); // this[e.object_method_name](...parameters);
+      const result = e.object_method.bind(this)(...parameters);
 
       if (wrapper && !response.headersSent) { // What happens if they call the next function
         wrapper({result, request, response, next});

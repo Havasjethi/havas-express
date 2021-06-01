@@ -1,14 +1,20 @@
 {
   "name": "havas-express",
-  "version": "0.0.1",
-  "description": "ExpressJs Wrapper for Spring like Endpoint creation",
+  "version": "0.1.0",
+  "description": "ExpressJs wrapper for creating class-oriented endpoint handlers",
+  "files": [
+    "lib/",
+    "README.md"
+  ],
   "main": "lib/index.js",
   "types": "lib/index.d.js",
   "scripts": {
+    "build": "tsc",
+    "dev-build": "tsc --watch",
     "test": "jest",
-    "prepublish": "tsc"
+    "prepare": "npm build"
   },
-  "author": "",
+  "author": "havasjethi",
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",

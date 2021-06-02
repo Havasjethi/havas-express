@@ -17,33 +17,3 @@ export function SetProperty<T = any>(set_property: (new_instance: T) => void): L
 export function AfterCreate<T = any>(after_create: (new_instance: T) => void): LifeCycleClassDecorator<T> {
   return <U extends T>(modifiable_constructor: Constructor<U>) => extender.add_after_initialization(modifiable_constructor, after_create);
 }
-
-
-/**
- * The method has been deprecated, by the superior ClassExtender, which creates a lifecycle around item creation
- * @see ClassExtender
- * @deprecated
- * @param after_construct
- */
-export function class_extender<ExtendedClass>(after_construct: (created_element: ExtendedClass) => void) {
-  return function (old_class: Constructor<ExtendedClass>) {
-
-    const new_class: any = function (...args: any[]) {
-      const new_constructor: any = () => new old_class(...args);
-      new_constructor.prototype = old_class.prototype;
-
-      const instance = new_constructor();
-
-      /**
-       * This after_creations could be collected into an array, then executed!
-       * Note: Added in
-       */
-      after_construct(instance);
-
-      return instance;
-    }
-
-    new_class.prototype = old_class.prototype;
-    return new_class;
-  }
-}

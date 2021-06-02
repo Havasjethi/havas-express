@@ -5,7 +5,7 @@ import { get_request_creator } from "./util";
 const error_handler_message_main_app = 'TestApp - Error handled!';
 const error_handler_message_router = 'TestApp - Error handled!';
 
-@Host({port_number: 42342})
+@Host({port: 42342})
 @ErrorHandler(((err, req, res, next) => {
   console.log('Error: err');
   res.send(error_handler_message_main_app);

@@ -2,6 +2,7 @@ import { Routable } from "../classes/routable";
 import { Constructor, extender, SetProperty } from "../util/class_decorator_util";
 import { App } from "../classes/app";
 import { ErrorRequestHandler } from "express";
+import { ListenOptions } from "node:net";
 import { ErrorHandlerClass } from "../classes/error_handler";
 
 export function Path <T extends Routable<any>>(path: string) {
@@ -14,24 +15,21 @@ export function ResultWrapper(result_wrapper_method: Routable<any>["result_wrapp
   });
 }
 
-interface HostParams {
-  port_number: number | string;
-  host?: string;
+interface HostParams extends ListenOptions {
   auto_start?: boolean;
 }
 
-export function Host({
-                       port_number = -1,
-                       host = 'localhost',
-                       auto_start = false,
-                     }: HostParams) {
+
+export function Host(options: (HostParams & {port: number | string})) {
+  options.auto_start = options.auto_start ?? false;
+  options.port = typeof (options.port) === 'string' ? parseInt(options.port, 10) : options.port;
+
   return (class_definition: Constructor<App>): Constructor<App> | any => {
     const constructor = extender.add_set_property(class_definition, (app) => {
-      app.port = typeof (port_number) === 'string' ? parseInt(port_number, 10) : port_number;
-      app.host = host;
+      app.options = options;
     });
 
-    if (auto_start) {
+    if (options.auto_start) {
       extender.add_after_initialization(class_definition, (app) => {
         app.start_app();
       });

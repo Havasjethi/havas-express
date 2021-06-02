@@ -6,7 +6,7 @@ describe('Application test', () => {
   const auto_start = false;
 
   @Host({
-    port_number: port,
+    port,
     host: host,
     auto_start: auto_start,
   })
@@ -15,11 +15,11 @@ describe('Application test', () => {
   const test_app = new EmptyTestApp();
 
   test('Port setting is correct', () => {
-    expect(test_app.port).toEqual(port);
+    expect(test_app.options.port).toEqual(port);
   });
 
   test('Host setting is correct', () => {
-    expect(test_app.host).toEqual(host);
+    expect(test_app.options.host).toEqual(host);
   });
 
   test('Path is the default', () => {

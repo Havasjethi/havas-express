@@ -5,7 +5,7 @@ const host = 'localhost';
 const auto_start = false;
 
 @Host({
-  port_number: port,
+  port,
   host: host,
   auto_start: auto_start,
 })

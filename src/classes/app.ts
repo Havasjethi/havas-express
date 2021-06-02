@@ -1,11 +1,10 @@
 import express, { Application } from "express";
 import { Server } from "node:http";
 import { Routable } from "./routable";
+import { ListenOptions } from "node:net";
 
 export abstract class App extends Routable<Application> {
-  public path: string = '/';
-  public host: string = 'localhost';
-  public port: number = -1;
+  public options: ListenOptions = {};
   protected running_server: Server | undefined;
   protected _start_stop_logging = true;
 
@@ -22,17 +21,17 @@ export abstract class App extends Routable<Application> {
     this.get_routable()._router.stack.splice(2);
   }
 
-  public start_app () {
+  public start_app (callback: ((created_server: Server) => void) | undefined = undefined) {
     if (!this.layers_initialized) {
       this.setup_layers();
     }
 
     this.running_server = this.routable_object.listen(
-      this.port,
-      this.host,
+      this.options,
       () => {
-        if (this._start_stop_logging) {
-          console.log(`App is active: http://${this.host}:${this.port}`);
+        console.log(`App is active: http://${this.options.host}:${this.options.port}`);
+        if (callback && this.running_server) {
+          callback(this.running_server);
         }
       });
   }
@@ -42,7 +41,7 @@ export abstract class App extends Routable<Application> {
       this.running_server.close(() => {
         delete this.running_server;
         if (this._start_stop_logging) {
-          console.log(`Server stopped listening to http://${this.host}:${this.port}`);
+          console.log(`Server stopped listening to http://${this.options.host}:${this.options.port}`);
         }
         on_stop_callback();
       });

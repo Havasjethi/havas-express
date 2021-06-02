@@ -1,7 +1,7 @@
 import { App, Get, Host, PathVariable, PostProcessor, ResultWrapper } from "../../index";
 import request from "supertest";
 
-@Host({port_number: 33123})
+@Host({port: 33123})
 @ResultWrapper(({response, result}) =>
   response
     .set('Content-Type', 'text/plain')

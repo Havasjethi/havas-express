@@ -15,7 +15,7 @@ const body_parser = require('body-parser');
 const cookie_parser = require('cookie-parser');
 
 @Host({
-  port_number: 4343,
+  port: 4343,
   host: 'loclhost',
   auto_start: false,
 })

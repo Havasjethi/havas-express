@@ -8,7 +8,7 @@ export const get_free_port = async () => {
 };
 
 export const init_app = async (app: App): Promise<App> => {
-  app.port = await get_free_port();
+  app.options.port = await get_free_port();
   return app;
 }
 

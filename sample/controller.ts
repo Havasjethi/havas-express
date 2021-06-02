@@ -5,7 +5,7 @@ import {
 @Host({
   auto_start: false,
   host: 'localhost',
-  port_number: 3000,
+  port: 3000,
 })
 @UseMiddleware(((req, res, next) => {
   console.log('Got a new request');

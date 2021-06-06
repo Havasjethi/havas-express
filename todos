@@ -1,0 +1,12 @@
+Whould be nice:
+    [ ] Write tests for
+        - @Session()
+        - @Session(<param>)
+        - @SessionId
+    [ ] Add change log
+    [ ] Performance tests
+    [ ] Documentation for Npm
+    [ ] Samples
+
+Features in future:
+    [ ] Decorators for ErrorHandlingMethod, ResultWrapperMethod ( + ResultWrapper on Methods )

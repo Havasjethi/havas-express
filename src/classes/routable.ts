@@ -343,6 +343,17 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
               // parameters.push(request.signedCookies[parameter.extra_data.variable_path]);
               break;
 
+            case "session":
+              add_parameter(parameter.extra_data.variable_path === undefined
+                ? request.session
+                // @ts-ignore
+                : request.session[parameter.extra_data.variable_path]);
+              break;
+
+            case "sessionId":
+              add_parameter(request.session.id);
+              break;
+
             default:
               // Called if
               add_parameter(undefined);

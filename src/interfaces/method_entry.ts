@@ -13,7 +13,7 @@ export interface MiddlewareEntry {
 }
 
 export type UnaryMethodParameterType = 'request' | 'response' | 'next';
-export type ComplexMethodParameterType = 'path' | 'query' | 'body' | 'parameter' | 'cookie';
+export type ComplexMethodParameterType = 'path' | 'query' | 'body' | 'parameter' | 'cookie' | 'session' | 'sessionId';
 
 export type MethodParameterType = UnaryMethodParameterType | ComplexMethodParameterType;
 export type MethodParameterData = {

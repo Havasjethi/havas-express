@@ -2,10 +2,10 @@ import { Routable } from "../classes/routable";
 import { Constructor, extender, SetProperty } from "../util/class_decorator_util";
 import { App } from "../classes/app";
 import { ErrorRequestHandler } from "express";
-import { ListenOptions } from "node:net";
 import { ErrorHandlerClass } from "../classes/error_handler";
+import { ListenOptions } from "net";
 
-export function Path <T extends Routable<any>>(path: string) {
+export function Path<T extends Routable<any>>(path: string) {
   return SetProperty(object => object.set_path(path));
 }
 
@@ -20,7 +20,7 @@ interface HostParams extends ListenOptions {
 }
 
 
-export function Host(options: (HostParams & {port: number | string})) {
+export function Host(options: (HostParams & { port?: number | string })) {
   options.auto_start = options.auto_start ?? false;
   options.port = typeof (options.port) === 'string' ? parseInt(options.port, 10) : options.port;
 
@@ -39,6 +39,6 @@ export function Host(options: (HostParams & {port: number | string})) {
   }
 }
 
-export function ErrorHandler (error_handler: ErrorRequestHandler | ErrorHandlerClass) {
+export function ErrorHandler(error_handler: ErrorRequestHandler | ErrorHandlerClass) {
   return SetProperty<Routable>((instance) => instance.add_error_handler(error_handler));
 }

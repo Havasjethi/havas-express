@@ -54,14 +54,17 @@ describe('Test error handlers', () => {
     .append(rotuer_2);
 
   const get = get_request_creator(app);
+
   test('Test 1', async () =>
     await get('/')
       .expect((res) => expect(res.text).toBe(error_handler_message_main_app))
   );
+
   test('Test 2', async () =>
     await get('/router')
       .expect((res) => expect(res.text).toBe(error_handler_message_router))
   );
+
   test('Test 3', async () =>
     await get('/router-2')
       .expect((res) => expect(res.text).toBe(error_handler_message_main_app))

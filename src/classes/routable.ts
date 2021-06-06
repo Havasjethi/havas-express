@@ -10,7 +10,7 @@ import {
 import { ExpressHttpMethod } from "../types/native_http_methods";
 import { ExpressRequest, ExpressResponse } from "../../index";
 import { ErrorRequestHandler, IRouter } from "express";
-import { ErrorHandlerClass } from "./error_handler";
+import { ErrorHanderParams, ErrorHandlerClass } from "./error_handler";
 
 export type ExpressRoutable = IRouter;
 
@@ -26,7 +26,15 @@ export interface ResultWrapperParameters {
   response: ExpressResponse;
   next: Function;
 }
-export type ErrorHandler = ErrorHandlerClass | ErrorRequestHandler;
+export type ErrorHandlerShort = ((o: ErrorHanderParams) => unknown);
+export type ErrorHandler = ErrorHandlerClass  | ErrorRequestHandler | ErrorHandlerShort;
+export enum ErrorHandlerType {
+  ErrorHandlerClass,
+  ErrorRequestHandler,
+  ErrorHandlerShort
+}
+
+type ErrorHandlerEntry = {handler: ErrorHandler, type: ErrorHandlerType};
 
 export abstract class Routable<T extends ExpressRoutable = IRouter> {
   public routable_object: T;
@@ -36,7 +44,7 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
 
   protected layers_initialized: boolean = false;
   protected middlewares: RegistrableMiddleware[] = [];
-  protected error_handlers: ErrorHandler[] = [];
+  protected error_handlers: ErrorHandlerEntry[] = [];
   protected default_handler: MiddlewareFunction | undefined;
   protected result_wrapper: ((o: ResultWrapperParameters) => any) | null = null;
   protected methods: { [method_name: string]: MethodEntry } = {};
@@ -146,13 +154,25 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
     this.middlewares.push(middleware);
   }
 
-  add_error_handler(error_handler: ErrorRequestHandler | ErrorHandlerClass) {
-    this.error_handlers.push(error_handler);
+  add_error_handler(error_handler: ErrorHandler) {
+    const type = typeof error_handler === 'function'
+      ? ErrorHandlerType.ErrorRequestHandler
+      : ErrorHandlerType.ErrorHandlerClass;
+
+    this.error_handlers.push({
+      handler: error_handler,
+      type
+    });
   }
 
   add_error_handler_method<Child extends this>(error_handler_method_name: keyof Child) {
     //@ts-ignore
-    this.error_handlers.push(this[error_handler_method_name]);
+    const handler = this[error_handler_method_name];
+    console.log(handler);
+    this.error_handlers.push({
+      handler,
+      type: handler.length === 1 ? ErrorHandlerType.ErrorHandlerShort : ErrorHandlerType.ErrorRequestHandler,
+    });
   }
 
   public get_path(): string {
@@ -218,13 +238,17 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
   }
 
 
-  protected setup_error_handlers(error_handlers: ErrorHandler[]): void {
+  protected setup_error_handlers(error_handlers: ErrorHandlerEntry[]): void {
     const routable = this.get_routable();
-    error_handlers.forEach(handler => {
-      if (typeof handler === "function") {
-        routable.use(handler);
-      } else {
-        routable.use(handler.handle.bind(handler));
+    error_handlers.forEach(({handler, type}) => {
+      if (type === ErrorHandlerType.ErrorHandlerShort) {
+        routable.use((error: Error, request: ExpressRequest, response: ExpressResponse, next: Function) =>
+          (handler as ErrorHandlerShort)({error, request, response, next}));
+      } else if (type === ErrorHandlerType.ErrorHandlerClass) {
+        routable.use((error: Error, request: ExpressRequest, response: ExpressResponse, next: Function) =>
+          (handler as ErrorHandlerClass).handle({error, request, response, next}))
+      } else if (type === ErrorHandlerType.ErrorRequestHandler) {
+        routable.use((handler as ErrorRequestHandler));
       }
     });
   }
@@ -330,7 +354,13 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
       const result = e.object_method.bind(this)(...parameters);
 
       if (wrapper && !response.headersSent) { // What happens if they call the next function
-        wrapper({result, request, response, next});
+        if (result.constructor.name === 'Promise') {
+          result
+            .then((result: any) => wrapper({result, request, response, next}))
+            .catch((e: any) => next(e))
+        } else {
+          wrapper({result, request, response, next});
+        }
       }
     };
   }

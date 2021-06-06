@@ -1,7 +1,6 @@
 import express, { Application } from "express";
-import { Server } from "node:http";
 import { Routable } from "./routable";
-import { ListenOptions } from "node:net";
+import { AddressInfo, ListenOptions, Server } from "net";
 
 export abstract class App extends Routable<Application> {
   public options: ListenOptions = {};
@@ -29,7 +28,11 @@ export abstract class App extends Routable<Application> {
     this.running_server = this.routable_object.listen(
       this.options,
       () => {
-        console.log(`App is active: http://${this.options.host}:${this.options.port}`);
+        let {address, port} = this.running_server!.address() as AddressInfo;
+        address = address === '::' ? 'localhost' : address;
+
+        console.log(`App is active: http://${address}:${port}`);
+
         if (callback && this.running_server) {
           callback(this.running_server);
         }

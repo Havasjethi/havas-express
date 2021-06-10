@@ -111,6 +111,8 @@ export abstract class App extends Routable<Application> {
 
   public stop_all (error_hander?: (err: Error | undefined) => void) {
     this.started_servers.splice(0).map(({ server }) => server.close(error_hander));
+    stop();
+    console.log('App stopped listening!');
   }
 
   /**
@@ -118,14 +120,15 @@ export abstract class App extends Routable<Application> {
    * @param {() => any} on_stop_callback
    */
   public stop (on_stop_callback: () => any = () => {}) {
-    if (this.default_server) {
-      this.default_server.close(() => {
-        delete this.default_server;
-        if (this._start_stop_logging) {
-          console.log(`Server stopped listening to http://${ this.options.host }:${ this.options.port }`);
-        }
-        on_stop_callback();
-      });
+    if (!this.default_server) {
+      return;
     }
+    this.default_server.close(() => {
+      delete this.default_server;
+      if (this._start_stop_logging) {
+        console.log(`Server stopped listening to http://${ this.options.host }:${ this.options.port }`);
+      }
+      on_stop_callback();
+    });
   }
 }

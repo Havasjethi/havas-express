@@ -29,14 +29,24 @@ export interface MethodParameterEntry<T extends MethodParameterType> {
 
 export type PostProcessorType<Input = any, Outout = any> = (value: Input) => Outout;
 
+export type RequestMethodProcessing = {
+  parameter_extractors: Array<{
+    parameter_index: number;
+    extractor_name: string;
+    arguments: any[];
+  }>;
+  preprocessor_parameter: MethodParameterEntry<any>[];
+  post_processors: {
+    [parameter_index: number]: PostProcessorType<any, any>[]
+  };
+}
+
 // export interface MethodEntry<T extends Routable<any> = Routable<any>> {
-export interface MethodEntry {
+export interface MethodEntry extends RequestMethodProcessing {
   http_method?: ExpressHttpMethod;
   object_method_name?: string; // keyof <Current Object?>
   object_method?: CallableFunction; // keyof <Current Object?>
   path?: string;
   middlewares: Middleware[];
-  preprocessor_parameter: MethodParameterEntry<any>[];
-  post_processors: {[parameter_index: number]: PostProcessorType<any, any>[]};
   use_wrapper?: boolean;
 }

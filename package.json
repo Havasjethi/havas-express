@@ -1,6 +1,6 @@
 {
   "name": "havas-express",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "ExpressJs wrapper for creating class-oriented endpoint handlers",
   "files": [
     "lib/",

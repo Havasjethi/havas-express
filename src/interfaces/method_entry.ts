@@ -4,8 +4,9 @@ import {ExpressHttpMethod} from "../types/native_http_methods";
 
 // export type MiddlewareFunction = IRouterHandler<any>;
 export type MiddlewareFunction = (req: ExpressRequest, res: ExpressResponse, next: any) => any;
+export type AyncMiddlewareFunction<T = unknown> = (req: ExpressRequest, res: ExpressResponse, next: any) => Promise<T>;
 
-export type Middleware = MiddlewareObject | MiddlewareFunction;
+export type Middleware = MiddlewareObject | MiddlewareFunction | AyncMiddlewareFunction;
 
 export interface MiddlewareEntry {
   method: ExpressHttpMethod;

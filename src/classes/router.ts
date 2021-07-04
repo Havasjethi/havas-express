@@ -3,7 +3,7 @@ import { Routable } from "./routable";
 
 export class Router extends Routable<ExpressRouter> {
   constructor() {
-    super(ExpressRouter());
+    super(ExpressRouter(), 'router');
   }
 
   remove_layers(): void {

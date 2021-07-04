@@ -1,3 +1,5 @@
+import { ErrorRequestHandler, IRouter, Application } from "express";
+import { ExpressRequest, ExpressResponse, MiddlewareObject } from "../../index";
 import {
   MethodEntry,
   MethodParameterData,
@@ -5,11 +7,9 @@ import {
   MethodParameterType,
   Middleware,
   MiddlewareFunction,
-  PostProcessorType
+  PostProcessorType,
 } from "../interfaces/method_entry";
 import { ExpressHttpMethod } from "../types/native_http_methods";
-import { ExpressRequest, ExpressResponse } from "../../index";
-import { ErrorRequestHandler, IRouter } from "express";
 import { ErrorHanderParams, ErrorHandlerClass } from "./error_handler";
 
 export type ExpressRoutable = IRouter;
@@ -17,7 +17,7 @@ export type ExpressRoutable = IRouter;
 interface RegistrableMiddleware {
   path: string;
   method?: ExpressHttpMethod;
-  middleware_functions: MiddlewareFunction[];
+  middlewares: Middleware[];
 }
 
 export interface ResultWrapperParameters {
@@ -50,7 +50,10 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
   protected methods: { [method_name: string]: MethodEntry } = {};
   protected method_parameters: { [method_name: string]: MethodParameterEntry<any>[] } = {};
 
-  protected constructor(routable_object: T) {
+  protected constructor(
+    routable_object: T,
+    protected type: 'router' | 'app'
+  ) {
     this.routable_object = routable_object;
 
     //@ts-ignore
@@ -65,6 +68,32 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
   }
 
   public abstract remove_layers(): void;
+
+  public get locals(): Application['locals'] {
+    if (this.type === 'router') {
+      return this.parent!.locals;
+    } else {
+      return (<Application><unknown>this.get_routable()).locals;
+    }
+  }
+
+  public get_local<Result = any>(key: string): Result | undefined {
+    let starting_element: Routable = this;
+
+    do {
+      if (starting_element.type === 'app') {
+        const value = (<Application><unknown>starting_element.get_routable()).locals[key];
+
+        if (value) {
+          return value;
+        }
+      }
+
+      starting_element = starting_element.parent!;
+    } while (this.parent);
+
+    return undefined;
+  }
 
 
   public set_result_wrapper(wrapper_function: Routable<any>['result_wrapper']) {
@@ -168,7 +197,6 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
   add_error_handler_method<Child extends this>(error_handler_method_name: keyof Child) {
     //@ts-ignore
     const handler = this[error_handler_method_name];
-    console.log(handler);
     this.error_handlers.push({
       handler,
       type: handler.length === 1 ? ErrorHandlerType.ErrorHandlerShort : ErrorHandlerType.ErrorRequestHandler,
@@ -223,10 +251,22 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
 
   protected setup_middlewares(middlewares: RegistrableMiddleware[]): void {
     const routable = this.get_routable();
-    middlewares.forEach(e => e.method !== undefined
-      ? routable[e.method](e.path, ...e.middleware_functions)
-      : routable.use(e.path, ...e.middleware_functions)
-    );
+
+    const middleware_mapper = (middlewares: Middleware[]): MiddlewareFunction[] =>
+      middlewares.map(e => {
+        if (typeof e === 'function') {
+          return e;
+        } else {
+          return (e as MiddlewareObject).handle.bind(e)
+        }
+      });
+
+    middlewares.forEach(e => {
+      const functions: MiddlewareFunction[] = middleware_mapper(e.middlewares);
+      e.method !== undefined
+        ? routable[e.method](e.path, ...functions)
+        : routable.use(e.path, ...functions);
+    });
   }
 
   protected setup_default_handler(): void {
@@ -236,7 +276,6 @@ export abstract class Routable<T extends ExpressRoutable = IRouter> {
 
     this.get_routable().use(this.default_handler.bind(this));
   }
-
 
   protected setup_error_handlers(error_handlers: ErrorHandlerEntry[]): void {
     const routable = this.get_routable();

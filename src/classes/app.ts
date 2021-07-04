@@ -29,7 +29,7 @@ export abstract class App extends Routable<Application> {
   protected _start_stop_logging = true;
 
   constructor () {
-    super(express());
+    super(express(), 'app');
     this.default_server = undefined;
     this.started_servers = [];
   }

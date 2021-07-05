@@ -43,19 +43,14 @@ export const ParameterExtractorStorage = new class {
   }
 
   public is_custom(extractor_name: string) {
-    return Object.keys(this.custom_extractors).includes(extractor_name);
+    return this.custom_extractors[extractor_name] !== undefined;
   }
-
   public get_parameter_extractor (extractor_name: string) {
-    return this.is_custom(extractor_name)
-      ? this.custom_extractors[extractor_name]
-      : this.built_in_extractors[extractor_name];
+    return this.custom_extractors[extractor_name] || this.built_in_extractors[extractor_name];
   }
 
   public get_parameter_extractor_safe (extractor_name: string) {
-    const result =  this.is_custom(extractor_name)
-      ? this.custom_extractors[extractor_name]
-      : this.built_in_extractors[extractor_name];
+    const result = this.get_parameter_extractor(extractor_name);
 
     if (!result) {
       throw new Error('Cannot extractor method!');

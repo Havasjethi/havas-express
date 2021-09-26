@@ -29,8 +29,7 @@ export class ClassExtender {
       this.create_lifecycle_constructor(original_constructor, item);
     }
 
-    //@ts-ignore
-    return item;
+    return item as Required<ClassExtenderStoredItem<T>>;
   }
 
   protected get_or_initialize_stored_item<T>(class_name: string): ClassExtenderStoredItem<T> {

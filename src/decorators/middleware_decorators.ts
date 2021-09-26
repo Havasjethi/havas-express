@@ -1,4 +1,4 @@
-import { ExpressRoutable, Routable } from "../classes/routable";
+import { ExpressRoutable, Routable } from "../classes/express_core_routable";
 import { ExpressHttpMethod } from "../types/native_http_methods";
 import { Middleware, MiddlewareEntry } from "../interfaces/method_entry";
 import { SetProperty } from "../util/class_decorator_util";

@@ -1,5 +1,5 @@
 import { Router as ExpressRouter } from "express";
-import { Routable } from "./routable";
+import { Routable } from "./express_core_routable";
 
 export class Router extends Routable<ExpressRouter> {
   constructor() {

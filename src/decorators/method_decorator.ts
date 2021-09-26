@@ -1,6 +1,6 @@
 import {ExpressHttpMethod} from "../types/native_http_methods";
 import {Middleware} from "../interfaces/method_entry";
-import {Routable} from "../classes/routable";
+import {Routable} from "../classes/express_core_routable";
 import { extender } from "../util/class_decorator_util";
 
 function add_function (target: Routable<any>, method_name: string, method_type: ExpressHttpMethod, path: string, middlewares: Middleware[]) {

@@ -1,4 +1,4 @@
-import { Routable } from '../classes/routable';
+import { Routable } from '../classes/express_core_routable';
 import { extender } from '../util/class_decorator_util';
 import { ParameterExctractor, ParameterExtractorStorage } from './parameter_exctractor_storage';
 

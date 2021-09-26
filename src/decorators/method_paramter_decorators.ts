@@ -1,4 +1,4 @@
-import { Routable } from "../classes/routable";
+import { Routable } from "../classes/express_core_routable";
 import { PostProcessorType } from "../interfaces/method_entry";
 import { extender } from "../util/class_decorator_util";
 

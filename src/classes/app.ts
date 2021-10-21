@@ -2,7 +2,7 @@ import express, { Application } from "express";
 import { createServer as createHttpServer, ServerOptions as HttpServerOptions } from 'http';
 import { createServer as createHttpsServer, ServerOptions as HttpsServerOptions } from 'https';
 import { AddressInfo, ListenOptions, Server } from "net";
-import {} from 'havas-core';
+import { ExpressCoreRoutable } from './express_core_routable';
 
 
 const SimpleIdGenerator = new class {
@@ -22,7 +22,8 @@ export interface ServerListenOptions {
 }
 
 
-export abstract class App extends Routable<Application> {
+export abstract class App extends ExpressCoreRoutable<Application> {
+  // Routable<Application> {
   public options: ListenOptions = {};
   protected default_server: Server | undefined;
   protected started_servers: { id: number, server: Server }[];
@@ -39,19 +40,19 @@ export abstract class App extends Routable<Application> {
   }
 
   public remove_layers (): void {
-    this.get_routable()._router.stack.splice(2);
+    this.getRoutable()._router.stack.splice(2);
   }
 
   public start_app (callback: ((created_server: Server) => void) | undefined = undefined) {
-    if (!this.layers_initialized) {
-      this.setup_layers();
+    if (!this.layersInitialized) {
+      this.setupLayers();
     }
 
     if (this.default_server && this.default_server.listening) {
       throw new Error('Default server is already active, cannot be started again!');
     }
 
-    this.default_server = createHttpServer(this.routable_object);
+    this.default_server = createHttpServer(this.getRoutable());
     this.default_server.listen(
       this.options,
       () => {
@@ -77,13 +78,13 @@ export abstract class App extends Routable<Application> {
       https = false;
     }
 
-    if (!this.layers_initialized) {
-      this.setup_layers();
+    if (!this.layersInitialized) {
+      this.setupLayers();
     }
 
     const server = https
-      ? createHttpsServer(server_options ?? {}, this.routable_object)
-      : createHttpServer(server_options ?? {}, this.routable_object);
+      ? createHttpsServer(server_options ?? {}, this.routable)
+      : createHttpServer(server_options ?? {}, this.routable);
 
     server.listen(Object.assign(this.options, listen_options ?? {}), () => {
       if (start_callback) {

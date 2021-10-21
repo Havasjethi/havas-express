@@ -1,39 +1,190 @@
 import { ErrorRequestHandler, IRouter } from 'express';
 import { NextFunction } from 'express-serve-static-core';
 import { BaseCoreRouter } from 'havas-core';
-import { ExpressRequest, ExpressResponse, Next, ParameterExtractorStorage } from '../../index';
-import { MethodEntry } from '../interfaces/method_entry';
+import {
+  DynamicParameterExctractorFunction,
+  ExpressRequest,
+  ExpressResponse,
+  ParameterExtractorStorage,
+  StaticParameterExctractorFunction,
+} from '../../index';
+import { ExpressHttpMethod } from '../types/native_http_methods';
 import { ErrorHandlerClass } from './error_handler';
 import { MiddlewareObject } from './middleware';
-import { ExpressEndpoint } from './types/endpoint';
-import { ErrorHandlerEntry, ErrorHandlerShort, ErrorHandlerType } from './types/error';
+import { ExpressEndpoint, PostProcessor } from './types/endpoint';
+import {
+  ErrorHandlerEntry,
+  ErrorHandlerShort,
+  ErrorHandlerType,
+  RegistreableErrorHandler,
+} from './types/error';
 import { Middleware, MiddlewareFunction, RegistrableMiddleware } from './types/middleware';
 import { ResultWrapperType } from './types/result_wrapper';
 
-
-export abstract class ExpressCoreRoutable<T extends IRouter = IRouter>
-  extends BaseCoreRouter<ExpressEndpoint, RegistrableMiddleware, ErrorHandlerEntry, ResultWrapperType> {
-
-
-  public abstract routable: T;
+export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends BaseCoreRouter<
+  ExpressEndpoint,
+  RegistrableMiddleware,
+  ErrorHandlerEntry,
+  ResultWrapperType
+> {
+  public routable: T;
   public layersInitialized: boolean = false;
+
+  public errorHandlersMethods: { [name: string]: RegistreableErrorHandler } = {};
 
   public children: ExpressCoreRoutable[] = [];
 
-  compose () {
-
+  protected constructor(routable: T, protected type: 'router' | 'app') {
+    super();
+    this.routable = routable;
   }
 
-  getRoutable (): IRouter {
+  set_path(path: string) {
+    return this.setPath(path);
+  }
+
+  /**
+   * TODO Move method
+   */
+  public setPath(path: string): this {
+    this.path = path;
+    return this;
+  }
+
+  append(child: ExpressCoreRoutable) {
+    return this.addChild(child);
+  }
+
+  getRoutable(): T {
     return this.routable;
+  }
+
+  // Registration methods
+
+  private getEndpoint(name: string): ExpressEndpoint {
+    if (this.endpoints[name] === undefined) {
+      this.endpoints[name] = {
+        postProcessors: [],
+        methodName: name,
+        middlewares: [],
+        parameters: [],
+        // methodType
+        // methodName
+        // path
+      } as unknown as ExpressEndpoint;
+    }
+
+    return this.endpoints[name];
+  }
+
+  private getErrorHandler(name: string): RegistreableErrorHandler {
+    if (this.errorHandlersMethods[name] === undefined) {
+      this.errorHandlersMethods[name] = {
+        parameters: [],
+        // TODO :: Should MethodName be added ?
+      } as unknown as RegistreableErrorHandler;
+    }
+    return this.errorHandlersMethods[name];
+  }
+
+  public addParameterExtractor(
+    methodName: string,
+    parameterIndex: number,
+    extractorName: string,
+    argument?: any[],
+  ) {
+    const endpoint = this.getEndpoint(methodName);
+
+    // TODO :: Add Chaining Extractors ?
+    endpoint.parameters.push({
+      name: extractorName,
+      index: parameterIndex,
+      arguments: argument,
+    });
+  }
+
+  public addRequestPostprocessor<T extends PostProcessor = PostProcessor>(
+    methodName: string,
+    index: number,
+    post_processor: T,
+  ) {
+    const method_entry = this.getEndpoint(methodName);
+    if (!method_entry.postProcessors[index]) {
+      method_entry.postProcessors[index] = [];
+    }
+
+    method_entry.postProcessors[index].push(post_processor);
+  }
+
+  /**
+   * Register endpoint method -- @Get, @Post...
+   */
+  public registerEndpoint(
+    methodName: string,
+    methodType: ExpressHttpMethod,
+    path: string,
+    middlewares: Middleware[],
+  ) {
+    const endpoint = this.getEndpoint(methodName);
+    endpoint.methodType = methodType;
+    endpoint.path = path;
+    endpoint.middlewares.push(...middlewares);
+  }
+
+  public add_constructor_middleware(middleware: RegistrableMiddleware) {
+    this.middlewares.push(middleware);
+  }
+
+  public registerResultWrapperMethod(resultWrapperName: string) {
+    // const x = this.getEndpoint(resultWrapperName);
+    this.registerResultWrapper({
+      methodName: resultWrapperName,
+      parameters: [],
+    });
+  }
+
+  // public registerErrorHandler(x: ErrorRequestHandler | ErrorHandlerClass) {
+  // public registerErrorHandler(errorHandlerClass: ErrorHandlerClass): void;
+  public registerErrorHandler(errorHandler: ErrorRequestHandler | ErrorHandlerClass): void;
+  public registerErrorHandler(methodName: string): void;
+
+  public registerErrorHandler(
+    errorHandlerOrMethodName: ErrorRequestHandler | ErrorHandlerClass | string,
+  ) {
+    if (typeof this.errorHandlersMethods === 'string') {
+      this.getErrorHandler(<string>errorHandlerOrMethodName).methodName = <string>(
+        errorHandlerOrMethodName
+      );
+    } else {
+      // Todo :: Register ErrorRequestHandler & ErrorHandlerClass
+    }
+  }
+
+  public registerDefaultHandler(handlerName: string) {
+    console.log('Hello');
+  }
+
+  /**
+   * @deprecated
+   */
+  get_initialized_routable(): T {
+    return this.getInitializedRoutable();
+  }
+
+  getInitializedRoutable(): T {
+    if (!this.layersInitialized) {
+      this.setupLayers();
+    }
+
+    return this.getRoutable();
   }
 
   /**
    * Add endpoints
    */
-  public setupLayers (): void {
+  public setupLayers(): void {
     this.setupMiddlewares(this.middlewares);
-    this.setupMethods(this.endpoints);
+    this.setupMethods(Object.values(this.endpoints));
 
     // this.setupDefaultHandler(this.get_added_methods() as Required<MethodEntry>[]);
 
@@ -51,11 +202,11 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter>
     this.layersInitialized = true;
   }
 
-  protected setupMiddlewares (middlewares: RegistrableMiddleware[]): void {
+  protected setupMiddlewares(middlewares: RegistrableMiddleware[]): void {
     const routable = this.getRoutable();
 
     const middlewareMapper = (middlewares: Middleware[]): MiddlewareFunction[] =>
-      middlewares.map(e => {
+      middlewares.map((e) => {
         if (typeof e === 'function') {
           return e;
         } else {
@@ -71,7 +222,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter>
     });
   }
 
-  protected setupDefaultHandler (): void {
+  protected setupDefaultHandler(): void {
     if (!this.defaultHandler) {
       return;
     }
@@ -80,32 +231,42 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter>
     // this.getRoutable().use(this.defaultHandler.bind(this));
   }
 
-  protected setupErrorHandlers (errorHandlers: ErrorHandlerEntry[]): void {
+  protected setupErrorHandlers(errorHandlers: ErrorHandlerEntry[]): void {
     const routable = this.getRoutable();
 
     errorHandlers.forEach(({ handler, type }) => {
       if (type === ErrorHandlerType.ErrorHandlerShort) {
-        routable.use((error: Error, request: ExpressRequest, response: ExpressResponse, next: NextFunction) =>
-          (handler as ErrorHandlerShort)({ error, request, response, next }));
+        routable.use(
+          (error: Error, request: ExpressRequest, response: ExpressResponse, next: NextFunction) =>
+            (handler as ErrorHandlerShort)({ error, request, response, next }),
+        );
       } else if (type === ErrorHandlerType.ErrorHandlerClass) {
-        routable.use((error: Error, request: ExpressRequest, response: ExpressResponse, next: NextFunction) =>
-          (handler as ErrorHandlerClass).handle({ error, request, response, next }));
+        routable.use(
+          (error: Error, request: ExpressRequest, response: ExpressResponse, next: NextFunction) =>
+            (handler as ErrorHandlerClass).handle({
+              error,
+              request,
+              response,
+              next,
+            }),
+        );
       } else if (type === ErrorHandlerType.ErrorRequestHandler) {
-        routable.use((handler as ErrorRequestHandler));
+        routable.use(handler as ErrorRequestHandler);
       }
     });
   }
 
-  protected setupMethods (endpoints: ExpressEndpoint[]): void {
+  protected setupMethods(endpoints: ExpressEndpoint[]): void {
     const routable = this.getRoutable();
 
     endpoints.forEach((e: ExpressEndpoint) => {
       routable[e.methodType](
         e.path,
-        ...(e.middlewares.map((middleware: Middleware) => typeof middleware === 'function'
-          ? middleware
-          : middleware.handle.bind(middleware))), // VS  (req: any, res: any, next: any) => middleware.handle(req, res, next))),
-        this.methodCreator(e));
+        ...e.middlewares.map((middleware: Middleware) =>
+          typeof middleware === 'function' ? middleware : middleware.handle.bind(middleware),
+        ), // VS  (req: any, res: any, next: any) => middleware.handle(req, res, next))),
+        this.methodCreator(e).bind(this),
+      );
     });
   }
 
@@ -116,8 +277,10 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter>
    * @param endpoint
    * @protected
    */
-  protected methodCreator (endpoint: ExpressEndpoint): any {
-    const wrapper = this.getResultWrapper();
+  protected methodCreator(endpoint: ExpressEndpoint): any {
+    // This should be callable with this: { result, request, response, next }
+    // TODO :: This should't be undefined right now!!
+    const wrapper = this.getResultWrapperFunction();
 
     return (request: ExpressRequest, response: ExpressResponse, next: NextFunction) => {
       const parameters: any[] = [];
@@ -125,38 +288,45 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter>
       if (endpoint.parameters.length === 0) {
         parameters.push(request, response, next);
       } else {
-        endpoint.parameters.sort((a, b) => a.index! > b.index! ? 1 : -1);
+        endpoint.parameters.sort((a, b) => (a.index! > b.index! ? 1 : -1));
 
         const addParameter = (value: any, index: number) => {
-          endpoint.postProcessors[index]?.forEach(postProcessor => {
+          endpoint.postProcessors[index]?.forEach((postProcessor) => {
             const rv = postProcessor(value);
-            value = rv != undefined
-              ? rv
-              : value;
+            value = rv != undefined ? rv : value;
           });
 
           parameters.push(value);
         };
 
         endpoint.parameters.forEach((value, index) => {
-          const extractor = ParameterExtractorStorage.get_parameter_extractor(value.name);
-          addParameter(
-            extractor(
-              value.arguments,
-              request,
-              response,
-              next),
-            index,
-          );
+          const { extractor, type } = ParameterExtractorStorage.get_parameter_extractor(value.name);
+
+          if (type === 'Static') {
+            addParameter(
+              (extractor as StaticParameterExctractorFunction)(request, response, next),
+              index,
+            );
+          } else if (type === 'Dynamic') {
+            addParameter(
+              (extractor as DynamicParameterExctractorFunction)(
+                value.arguments,
+                request,
+                response,
+                next,
+              ),
+              index,
+            );
+          }
         });
       }
 
       //@ts-ignore
-      const result = this[endpoint.methodName].bind(this)(...parameters)
+      const result = this[endpoint.methodName].bind(this)(...parameters);
       // const result = endpoint.object_method.bind(this)(...parameters);
 
-
-      if (wrapper && !response.headersSent) { // What happens if they call the next function
+      if (wrapper && !response.headersSent) {
+        // What happens if they call the next function
         if (result.constructor.name === 'Promise') {
           result
             .then((result: any) => wrapper({ result, request, response, next }))
@@ -166,5 +336,20 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter>
         }
       }
     };
+  }
+
+  /**
+   * TODO :: Cucc
+   * @protected
+   */
+  protected getResultWrapperFunction(): CallableFunction {
+    const wrapper: ResultWrapperType = this.getResultWrapper() as ResultWrapperType;
+
+    if (typeof wrapper === 'function') {
+      return wrapper;
+    }
+
+    //@ts-ignore
+    return this[wrapper.methodName].bind(this);
   }
 }

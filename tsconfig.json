@@ -1,14 +1,12 @@
 {
-  "exclude": [
-    "lib",
-    "node_modules"
-  ],
+  "exclude": ["lib", "node_modules"],
   "compilerOptions": {
     "incremental": true,
     "target": "es5",
     "module": "commonjs",
     "declaration": true,
-    "outDir": "./lib",
+    "outDir": "lib",
+    "sourceMap": true,
     "rootDir": "./",
     "strict": true,
     "noImplicitAny": true,

@@ -1,13 +1,9 @@
-import { App, Get, Host, PathVariable, PostProcessor, ResultWrapper } from "../../index";
-import request from "supertest";
+import { App, Get, Host, PathVariable, PostProcessor, ResultWrapper } from '../../index';
+import request from 'supertest';
 
-@Host({port: 33123})
-@ResultWrapper(({response, result}) =>
-  response
-    .set('Content-Type', 'text/plain')
-    .send(result))
+@Host({ port: 33123 })
+@ResultWrapper(({ response, result }) => response.set('Content-Type', 'text/plain').send(result))
 class TestApp extends App {
-
   // Todo :: Should this be supported ??
   // @Get('/get_number')
   // return_13 (
@@ -18,7 +14,7 @@ class TestApp extends App {
   // }
 
   @Get('/number-:id')
-  square (
+  square(
     @PostProcessor((x: string | number) => `${(+x) ** 2}`)
     @PathVariable('id')
     doubled_id: number,
@@ -27,7 +23,7 @@ class TestApp extends App {
   }
 
   @Get('/string-:str')
-  string_manipultaion (
+  string_manipultaion(
     @PostProcessor((str: string) => str + '__')
     @PathVariable('str')
     doubled_id: number,
@@ -36,7 +32,7 @@ class TestApp extends App {
   }
 
   @Get('/void-:str')
-  void_manipultaion (
+  void_manipultaion(
     @PostProcessor((x: string) => {
       const y = x + 13;
     })
@@ -48,8 +44,7 @@ class TestApp extends App {
 }
 
 describe('PostProcessor tests', () => {
-
-  const test_app = (new TestApp()).get_initialized_routable();
+  const test_app = new TestApp().get_initialized_routable();
   const get_ = (path: string): request.Test => request(test_app).get(path);
 
   // test('test - return_13', async () => {
@@ -59,21 +54,16 @@ describe('PostProcessor tests', () => {
 
   test('test - square', async () => {
     const input = 13;
-    await get_('/number-' + input)
-          .expect((response) => expect(response.text).toBe('169'));
+    await get_('/number-' + input).expect((response) => expect(response.text).toBe('169'));
   });
 
   test('test - string_manipultaion', async () => {
     const input = '13';
-    await get_('/string-' + input)
-          .expect((response) => expect(response.text).toBe('13__'));
-
+    await get_('/string-' + input).expect((response) => expect(response.text).toBe('13__'));
   });
 
   test('test - void_manipultaion', async () => {
     const input = '13';
-    await get_('/void-' + input)
-          .expect((response) => expect(response.text).toBe('13'));
+    await get_('/void-' + input).expect((response) => expect(response.text).toBe('13'));
   });
-
 });

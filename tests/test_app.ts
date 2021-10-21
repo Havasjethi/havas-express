@@ -1,4 +1,4 @@
-import { Path, ResultWrapper, Host, App, Get, Router, ExpressRequest } from "../index";
+import { Path, ResultWrapper, Host, App, Get, Router, ExpressRequest } from '../index';
 
 const port = 4001;
 const host = 'localhost';
@@ -10,29 +10,27 @@ const auto_start = false;
   auto_start: auto_start,
 })
 class TestApp extends App {
-
   @Get('/')
-  index (req: any, res: any) {
+  index(req: any, res: any) {
     res.send('Nice');
   }
 
   @Get('/13')
-  index2 (req: ExpressRequest, res: any) {
-    res.send({any: 13});
+  index2(req: ExpressRequest, res: any) {
+    res.send({ any: 13 });
   }
 }
 
 @Path('/router')
-@ResultWrapper(({response, result}) => response.send({data: result}))
+@ResultWrapper(({ response, result }) => response.send({ data: result }))
 class TestRouter extends Router {
-
   @Get('/')
-  index () {
+  index() {
     return 'Index';
   }
 
   @Get('/:asd')
-  any_path () {
+  any_path() {
     return 13;
   }
 }

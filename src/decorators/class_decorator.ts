@@ -1,52 +1,54 @@
-import { ErrorRequestHandler } from "express";
-import { ListenOptions } from "net";
-import { App } from "../classes/app";
-import { ErrorHandlerClass } from "../classes/error_handler";
-import { ExpressCoreRoutable } from "../classes/express_core_routable";
-import { Constructor, extender, SetProperty } from "../util/class_decorator_util";
+import { ErrorRequestHandler } from 'express';
+import { ListenOptions } from 'net';
+import { App } from '../classes/app';
+import { ErrorHandlerClass } from '../classes/error_handler';
+import { ExpressCoreRoutable } from '../classes/express_core_routable';
+import { ResultWrapperFunction, ResultWrapperMethod } from '../classes/types/result_wrapper';
+import { Constructor, extender, SetProperty } from '../util/class_decorator_util';
 
-export function Path<T extends Routable<any>> (path: string) {
-  return SetProperty(object => object.set_path(path));
+export function Path<T extends ExpressCoreRoutable<any>>(path: string) {
+  return SetProperty((object) => {
+    object.setPath(path);
+  });
 }
 
-export function ResultWrapper (result_wrapper_method: Routable<any>["result_wrapper"]): any;
-export function ResultWrapper (target: Routable<any>, propertyKey: string, descriptor: PropertyDescriptor): void;
+export function ResultWrapper(result_wrapper_method: ResultWrapperFunction): any;
+export function ResultWrapper(
+  target: ExpressCoreRoutable<any>,
+  propertyKey: string,
+  descriptor: PropertyDescriptor,
+): void;
 
 /*
  * TODO :: Implement this
  * Methods and classes could be annotated with this
  * @returns asd
  */
-export function ResultWrapper (
-  target: Routable<any>["result_wrapper"] | Routable<any>,
-  method_name?: string,
-  parameter_index?: PropertyDescriptor) {
-
-  if (method_name === undefined && parameter_index === undefined) {
-    return SetProperty<Routable<any>>(element => {
-      element.set_result_wrapper(target as Routable<any>["result_wrapper"]);
+export function ResultWrapper(
+  target: ResultWrapperFunction | ExpressCoreRoutable<any>,
+  methodName?: string,
+  propertyDescriptor?: PropertyDescriptor,
+) {
+  if (methodName === undefined && propertyDescriptor === undefined) {
+    return SetProperty<ExpressCoreRoutable<any>>((element) => {
+      element.registerResultWrapper(target as ResultWrapperFunction);
     });
   } else {
-    // TODO :: Add method call to bullshit
+    console.log('Me called Before');
 
-    return (target: Routable, method_name: string, parameter_index: number) => {
-      extender.set_property<Routable>(target.constructor.name, (x) => {
-        x.set_result_wrapper_method_name(method_name);
-      });
-    };
+    extender.set_property<ExpressCoreRoutable>(target.constructor.name, (x) => {
+      x.registerResultWrapperMethod(methodName!);
+    });
   }
-
 }
-
 
 interface HostParams extends ListenOptions {
   auto_start?: boolean;
 }
 
-
-export function Host (options: (HostParams & { port?: number | string })) {
+export function Host(options: HostParams & { port?: number | string }) {
   options.auto_start = options.auto_start ?? false;
-  options.port = typeof (options.port) === 'string' ? parseInt(options.port, 10) : options.port;
+  options.port = typeof options.port === 'string' ? parseInt(options.port, 10) : options.port;
 
   return (class_definition: Constructor<App>): Constructor<App> | any => {
     const constructor = extender.add_set_property(class_definition, (app) => {
@@ -63,6 +65,8 @@ export function Host (options: (HostParams & { port?: number | string })) {
   };
 }
 
-export function ErrorHandler (error_handler: ErrorRequestHandler | ErrorHandlerClass) {
-  return SetProperty<Routable>((instance) => instance.add_error_handler(error_handler));
+export function ErrorHandler(errorHandler: ErrorRequestHandler | ErrorHandlerClass) {
+  return SetProperty<ExpressCoreRoutable>((instance) =>
+    instance.registerErrorHandler(errorHandler),
+  );
 }

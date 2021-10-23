@@ -1,6 +1,6 @@
 import { ErrorRequestHandler, IRouter } from 'express';
 import { NextFunction } from 'express-serve-static-core';
-import { BaseCoreRouter } from 'havas-core';
+import { BaseCoreRouter, DecoratedParameters } from 'havas-core';
 import {
   DynamicParameterExctractorFunction,
   ExpressRequest,
@@ -87,21 +87,27 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
     return this.errorHandlersMethods[name];
   }
 
+  parameterExtractors: {[name: string | symbol | number]: DecoratedParameters[]} = {};
+
   public addParameterExtractor(
     methodName: string,
     parameterIndex: number,
     extractorName: string,
     argument?: any[],
   ) {
-    const endpoint = this.getEndpoint(methodName);
+    if (!this.parameterExtractors[methodName]) {
+      this.parameterExtractors[methodName] = [];
+    }
+    const extractor = this.parameterExtractors[methodName] ??= [];
 
-    // TODO :: Add Chaining Extractors ?
-    endpoint.parameters.push({
+    extractor.push({
       name: extractorName,
       index: parameterIndex,
       arguments: argument,
     });
   }
+
+
 
   public addRequestPostprocessor<T extends PostProcessor = PostProcessor>(
     methodName: string,
@@ -129,6 +135,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
     endpoint.methodType = methodType;
     endpoint.path = path;
     endpoint.middlewares.push(...middlewares);
+    endpoint.parameters = this.parameterExtractors[methodName];
   }
 
   public add_constructor_middleware(middleware: RegistrableMiddleware) {
@@ -160,8 +167,24 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
     }
   }
 
-  public registerDefaultHandler(handlerName: string) {
-    console.log('Hello');
+  defaultHandlerMethod?: ExpressEndpoint;
+  defaultHandlerFunction?: MiddlewareFunction;
+
+  public registerDefaultHandlerFunction(defaultHandler: MiddlewareFunction) {
+    this.defaultHandlerFunction = defaultHandler;
+  }
+  
+  public registerDefaultHandlerMethod(handlerName: string) {
+    console.log('registerDefaultHandlerMethod')
+    this.defaultHandlerMethod = {
+      methodName: handlerName,
+      name: handlerName,
+      parameters: this.parameterExtractors[handlerName] ?? [],
+      methodType: 'all',
+      path: '/*',
+      middlewares: [],
+      postProcessors: [],
+    }
   }
 
   /**
@@ -186,6 +209,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
     this.setupMiddlewares(this.middlewares);
     this.setupMethods(Object.values(this.endpoints));
 
+    // TODO :: Add this pls: Initialize Result Wrapper Function for each nodes (Router) 
     // this.setupDefaultHandler(this.get_added_methods() as Required<MethodEntry>[]);
 
     this.children.forEach((child: ExpressCoreRoutable) => {
@@ -222,9 +246,18 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
     });
   }
 
+  /**
+   * Deafult handler method is more important than registered functions
+   */
   protected setupDefaultHandler(): void {
-    if (!this.defaultHandler) {
-      return;
+    if (this.defaultHandlerMethod) {
+      // TODO :: Create method instead
+      // @ts-ignore
+      this.getRoutable().use(
+        this.methodCreator(this.defaultHandlerMethod).bind(this)
+      )
+    } else if (this.defaultHandlerFunction) {0
+      this.getRoutable().use(this.defaultHandlerFunction.bind(this))
     }
 
     // Todo :: Bind item
@@ -277,7 +310,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
    * @param endpoint
    * @protected
    */
-  protected methodCreator(endpoint: ExpressEndpoint): any {
+  protected methodCreator(endpoint: ExpressEndpoint): MiddlewareFunction {
     // This should be callable with this: { result, request, response, next }
     // TODO :: This should't be undefined right now!!
     const wrapper = this.getResultWrapperFunction();
@@ -346,7 +379,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
     const wrapper: ResultWrapperType = this.getResultWrapper() as ResultWrapperType;
 
     if (typeof wrapper === 'function') {
-      return wrapper;
+      return wrapper as unknown as  MiddlewareFunction;
     }
 
     //@ts-ignore

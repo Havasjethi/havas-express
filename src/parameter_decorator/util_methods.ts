@@ -2,7 +2,6 @@ import { ExpressCoreRoutable } from '../classes/express_core_routable';
 import { extender } from '../util/class_decorator_util';
 import {
   DynamicParameterExctractorFunction,
-  ParameterExctractor,
   ParameterExtractorStorage,
   StaticParameterExctractorFunction,
 } from './parameter_exctractor_storage';

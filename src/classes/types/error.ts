@@ -1,5 +1,5 @@
 import { ErrorRequestHandler } from 'express';
-import { DecoratedParameters } from 'havas-core';
+import { DecoratedParameters, RegistrableMethod } from 'havas-core';
 import { ErrorHanderParams, ErrorHandlerClass } from '../error_handler';
 
 export type ErrorHandlerShort = (o: ErrorHanderParams) => unknown;
@@ -11,7 +11,7 @@ export enum ErrorHandlerType {
   ErrorHandlerShort,
 }
 
-export type ErrorHandlerEntry = { handler: ErrorHandler; type: ErrorHandlerType };
+export type ErrorHandlerEntry = RegistrableMethod;
 
 export interface RegistreableErrorHandler {
   methodName: string;

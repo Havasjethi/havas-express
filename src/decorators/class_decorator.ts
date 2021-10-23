@@ -67,6 +67,6 @@ export function Host(options: HostParams & { port?: number | string }) {
 
 export function ErrorHandler(errorHandler: ErrorRequestHandler | ErrorHandlerClass) {
   return SetProperty<ExpressCoreRoutable>((instance) =>
-    instance.registerErrorHandler(errorHandler),
+    instance.registerErrorHandlerFunction(errorHandler),
   );
 }

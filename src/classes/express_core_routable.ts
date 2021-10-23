@@ -1,15 +1,16 @@
-import { ErrorRequestHandler, IRouter } from 'express';
+import { ErrorRequestHandler, IRouter, Errback } from 'express';
 import { NextFunction } from 'express-serve-static-core';
-import { BaseCoreRouter, DecoratedParameters } from 'havas-core';
+import { BaseCoreRouter, DecoratedParameters, Objectified, RegistrableMethod } from 'havas-core';
 import {
   DynamicParameterExctractorFunction,
   ExpressRequest,
   ExpressResponse,
+  Next,
   ParameterExtractorStorage,
   StaticParameterExctractorFunction,
 } from '../../index';
 import { ExpressHttpMethod } from '../types/native_http_methods';
-import { ErrorHandlerClass } from './error_handler';
+import { ErrorHandlerClass, ErrorHandlerFunction } from './error_handler';
 import { MiddlewareObject } from './middleware';
 import { ExpressEndpoint, PostProcessor } from './types/endpoint';
 import {
@@ -20,6 +21,8 @@ import {
 } from './types/error';
 import { Middleware, MiddlewareFunction, RegistrableMiddleware } from './types/middleware';
 import { ResultWrapperType } from './types/result_wrapper';
+
+//type Mapping<T> = errorHandlerMethods;
 
 export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends BaseCoreRouter<
   ExpressEndpoint,
@@ -77,15 +80,15 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
     return this.endpoints[name];
   }
 
-  private getErrorHandler(name: string): RegistreableErrorHandler {
-    if (this.errorHandlersMethods[name] === undefined) {
-      this.errorHandlersMethods[name] = {
-        parameters: [],
-        // TODO :: Should MethodName be added ?
-      } as unknown as RegistreableErrorHandler;
-    }
-    return this.errorHandlersMethods[name];
-  }
+  // private getErrorHandler(name: string): RegistreableErrorHandler {
+  //   if (this.errorHandlersMethods[name] === undefined) {
+  //     this.errorHandlersMethods[name] = {
+  //       parameters: [],
+  //       // TODO :: Should MethodName be added ?
+  //     } as unknown as RegistreableErrorHandler;
+  //   }
+  //   return this.errorHandlersMethods[name];
+  // }
 
   parameterExtractors: {[name: string | symbol | number]: DecoratedParameters[]} = {};
 
@@ -147,24 +150,30 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
     this.registerResultWrapper({
       methodName: resultWrapperName,
       parameters: [],
+      postProcessors: {}
     });
   }
 
-  // public registerErrorHandler(x: ErrorRequestHandler | ErrorHandlerClass) {
-  // public registerErrorHandler(errorHandlerClass: ErrorHandlerClass): void;
-  public registerErrorHandler(errorHandler: ErrorRequestHandler | ErrorHandlerClass): void;
-  public registerErrorHandler(methodName: string): void;
+  errorHandlerFunctions: ErrorHandlerFunction[] = [];
+  errorHandlerMethods: Objectified<RegistrableMethod> = {};
 
-  public registerErrorHandler(
-    errorHandlerOrMethodName: ErrorRequestHandler | ErrorHandlerClass | string,
-  ) {
-    if (typeof this.errorHandlersMethods === 'string') {
-      this.getErrorHandler(<string>errorHandlerOrMethodName).methodName = <string>(
-        errorHandlerOrMethodName
-      );
+  public registerErrorHandlerFunction(errorHandler: ErrorHandlerFunction | ErrorHandlerClass): void{
+    if (typeof errorHandler === 'object') {
+      this.errorHandlerFunctions.push(
+        (error, request, response, next) => (errorHandler as ErrorHandlerClass).handle({error, request, response, next})
+        )
+    } else if( typeof errorHandler === 'function'){
+      this.errorHandlerFunctions.push(
+        errorHandler
+      )
     } else {
-      // Todo :: Register ErrorRequestHandler & ErrorHandlerClass
+      console.error('Unable to register function: ', typeof errorHandler)
+      throw new Error('Unable to register function');
     }
+  }
+
+  public registerErrorHandler(methodName: string) {
+    this.errorHandlerMethods[methodName] = {methodName, parameters: this.parameterExtractors[methodName]};
   }
 
   defaultHandlerMethod?: ExpressEndpoint;
@@ -271,26 +280,13 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
   protected setupErrorHandlers(errorHandlers: ErrorHandlerEntry[]): void {
     const routable = this.getRoutable();
 
-    errorHandlers.forEach(({ handler, type }) => {
-      if (type === ErrorHandlerType.ErrorHandlerShort) {
-        routable.use(
-          (error: Error, request: ExpressRequest, response: ExpressResponse, next: NextFunction) =>
-            (handler as ErrorHandlerShort)({ error, request, response, next }),
-        );
-      } else if (type === ErrorHandlerType.ErrorHandlerClass) {
-        routable.use(
-          (error: Error, request: ExpressRequest, response: ExpressResponse, next: NextFunction) =>
-            (handler as ErrorHandlerClass).handle({
-              error,
-              request,
-              response,
-              next,
-            }),
-        );
-      } else if (type === ErrorHandlerType.ErrorRequestHandler) {
-        routable.use(handler as ErrorRequestHandler);
-      }
+    Object.values(this.errorHandlerMethods).forEach(errorHandlermethod => {
+      const method = this.errorHandlerCreator(errorHandlermethod).bind(this);
+      routable.use(method);
+
     });
+
+    this.errorHandlerFunctions.forEach(e => routable.use(e));
   }
 
   protected setupMethods(endpoints: ExpressEndpoint[]): void {
@@ -376,6 +372,56 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
     };
   }
 
+  protected errorHandlerCreator(endpoint: ErrorHandlerEntry): ErrorHandlerFunction {
+    const callback = () => {};
+
+    // Todo :: Post Processors
+    return endpoint.parameters.length === 0
+      //@ts-ignore
+      ? (error: Error, request: ExpressRequest, response: ExpressResponse, next: NextFunction) => this[endpoint.methodName](error, request, response, next)
+      : (error: Error, request: ExpressRequest, response: ExpressResponse, next: NextFunction) => {
+          const parameters: any[] = [];
+    
+          endpoint.parameters.sort((a, b) => (a.index! > b.index! ? 1 : -1));
+  
+          const addParameter = (value: any, index: number) => {
+            if (endpoint.postProcessors) {
+              endpoint.postProcessors[index]?.forEach((postProcessor: any) => {
+                const rv = postProcessor(value);
+                value = rv != undefined ? rv : value;
+              });
+            }
+
+            parameters.push(value);
+          };
+  
+          endpoint.parameters.forEach((value, index) => {
+            const { extractor, type } = ParameterExtractorStorage.get_parameter_extractor(value.name);
+  
+            if (type === 'Static') {
+              addParameter(
+                // TODO :: Add error handler @Error
+                (extractor as StaticParameterExctractorFunction)(request, response, next),
+                index,
+              );
+            } else if (type === 'Dynamic') {
+              addParameter(
+                (extractor as DynamicParameterExctractorFunction)(
+                  value.arguments,
+                  request,
+                  response,
+                  next,
+                ),
+                index,
+              );
+            }
+          });
+
+
+          //@ts-ignore
+          this[endpoint.methodName](...parameters);
+      }
+  };
 
   /**
    * TODO :: Cucc

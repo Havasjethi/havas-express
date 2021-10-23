@@ -1,10 +1,12 @@
 import { ExpressCoreRoutable } from '../classes/express_core_routable';
-import { extender } from '../util/class_decorator_util';
+import { MiddlewareFunction } from '../classes/types/middleware';
+import { extender, SetProperty } from '../util/class_decorator_util';
 
-
+// const MethodClassDecorator = (a, b) => { }
 // TODO :: Mixed Constructor branches :: MethodClassDecorator(func, fnc) => FactoryOrNot<Method | ClassDecorator>
-// export function DefaultHandler = (target: ExpressCoreRoutable) => any; 
-// export function DefaultHandler = (target: ExpressCoreRoutable, methodName: string, desc: PropertyDescriptor) => any;
+export const DefaultHandlerFunction = (handler: MiddlewareFunction) => 
+  SetProperty<ExpressCoreRoutable>((instance) => instance.registerDefaultHandlerFunction(handler));
+
 
 export function DefaultHandler<T extends ExpressCoreRoutable = ExpressCoreRoutable>(
   target: T,

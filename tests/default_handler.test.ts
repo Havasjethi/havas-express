@@ -21,7 +21,9 @@ class TestRouter extends Router {
 }
 
 describe('DefaultHandler tests', () => {
-  const app = init_app(new TestApp().append(new TestRouter()));
+  const app = init_app(new TestApp()
+    .append(new TestRouter())
+    );
   const get_ = app.then((application) => get_request_creator(application));
 
   test('TestApp - /', async () => {

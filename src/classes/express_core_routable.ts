@@ -181,7 +181,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
       name: handlerName,
       parameters: this.parameterExtractors[handlerName] ?? [],
       methodType: 'all',
-      path: '/*',
+      path: '*',
       middlewares: [],
       postProcessors: [],
     }
@@ -213,6 +213,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
     // this.setupDefaultHandler(this.get_added_methods() as Required<MethodEntry>[]);
 
     this.children.forEach((child: ExpressCoreRoutable) => {
+      console.log('called')
       if (!child.layersInitialized) {
         child.setupLayers();
       }
@@ -250,15 +251,18 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
    * Deafult handler method is more important than registered functions
    */
   protected setupDefaultHandler(): void {
+    console.log('setupDefaultHandler')
     if (this.defaultHandlerMethod) {
       // TODO :: Create method instead
       // @ts-ignore
       this.getRoutable().use(
         this.methodCreator(this.defaultHandlerMethod).bind(this)
       )
-    } else if (this.defaultHandlerFunction) {0
+    } else if (this.defaultHandlerFunction) {
       this.getRoutable().use(this.defaultHandlerFunction.bind(this))
     }
+
+    console.log('Finished');
 
     // Todo :: Bind item
     // this.getRoutable().use(this.defaultHandler.bind(this));
@@ -313,6 +317,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
   protected methodCreator(endpoint: ExpressEndpoint): MiddlewareFunction {
     // This should be callable with this: { result, request, response, next }
     // TODO :: This should't be undefined right now!!
+    console.log('Method Creator', endpoint)
     const wrapper = this.getResultWrapperFunction();
 
     return (request: ExpressRequest, response: ExpressResponse, next: NextFunction) => {
@@ -371,13 +376,18 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
     };
   }
 
+
   /**
    * TODO :: Cucc
    * @protected
    */
-  protected getResultWrapperFunction(): CallableFunction {
+  protected getResultWrapperFunction(): CallableFunction | undefined {
+    // Todo ?? Debug this shit: `getResultWrapper`
     const wrapper: ResultWrapperType = this.getResultWrapper() as ResultWrapperType;
 
+    console.log({wrapper})
+
+    if (!wrapper) {return undefined;}
     if (typeof wrapper === 'function') {
       return wrapper as unknown as  MiddlewareFunction;
     }

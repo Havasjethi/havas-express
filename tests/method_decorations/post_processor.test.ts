@@ -4,11 +4,15 @@ import request from 'supertest';
 @Host({ port: 33123 })
 @ResultWrapper(({ response, result }) => response.set('Content-Type', 'text/plain').send(result))
 class TestApp extends App {
-  // Todo :: Should this be supported ??
+  /*
+    Todo :: Should this be supported ??
+    By adding this feature it would be possible to wrap the Req, Res, Next function,
+    but it is useless since the objects are configurable by the Express config
+   */
   // @Get('/get_number')
-  // return_13 (
+  // return_13(
   //   @PostProcessor(() => '13')
-  //   x: string
+  //   x: string,
   // ) {
   //   return x;
   // }
@@ -33,9 +37,7 @@ class TestApp extends App {
 
   @Get('/void-:str')
   void_manipultaion(
-    @PostProcessor((x: string) => {
-      const y = x + 13;
-    })
+    @PostProcessor((x: string) => {})
     @PathVariable('str')
     parameter: any,
   ) {
@@ -48,8 +50,7 @@ describe('PostProcessor tests', () => {
   const get_ = (path: string): request.Test => request(test_app).get(path);
 
   // test('test - return_13', async () => {
-  //   await get_('/get_number')
-  //     .expect((response) => expect(response.text).toBe('13'));
+  //   await get_('/get_number').expect((response) => expect(response.text).toBe('13'));
   // });
 
   test('test - square', async () => {

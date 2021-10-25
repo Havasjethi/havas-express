@@ -133,6 +133,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
     endpoint.path = path;
     endpoint.middlewares.push(...middlewares);
     endpoint.parameters = this.parameterExtractors[methodName];
+    endpoint.postProcessors = this.parameterPostProcessors[methodName];
   }
 
   public add_constructor_middleware(middleware: RegistrableMiddleware) {
@@ -349,13 +350,14 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
     endpoint.parameters.sort((a, b) => (a.index! > b.index! ? 1 : -1));
 
     const addParameter = (value: any, index: number) => {
-      endpoint.postProcessors &&
-        endpoint.postProcessors[index]?.forEach((postProcessor) => {
-          const rv = postProcessor(value);
-          value = rv != undefined ? rv : value;
-        });
-
-      parameters.push(value);
+      parameters.push(
+        endpoint.postProcessors && (endpoint.postProcessors[index] || []).length > 0
+          ? endpoint.postProcessors[index].reduce(
+              (v, postProcessor) => postProcessor(v) ?? v,
+              value,
+            )
+          : value,
+      );
     };
 
     endpoint.parameters.forEach((value, index) => {

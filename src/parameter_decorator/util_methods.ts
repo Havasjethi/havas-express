@@ -36,7 +36,7 @@ export const parameterExtractor = (
   extractor_name: string,
   argument?: any[],
 ) => {
-  extender.set_property<ExpressCoreRoutable>(target.constructor.name, (x) =>
-    x.addParameterExtractor(method_name, parameter_index, extractor_name, argument),
+  extender.setProperty<ExpressCoreRoutable>(target.constructor.name, (newInstance) =>
+    newInstance.addParameterExtractor(method_name, parameter_index, extractor_name, argument),
   );
 };

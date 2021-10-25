@@ -98,9 +98,6 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
     extractorName: string,
     argument?: any[],
   ) {
-    if (!this.parameterExtractors[methodName]) {
-      this.parameterExtractors[methodName] = [];
-    }
     const extractor = (this.parameterExtractors[methodName] ??= []);
 
     extractor.push({
@@ -353,7 +350,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
 
     const addParameter = (value: any, index: number) => {
       endpoint.postProcessors &&
-        endpoint.postProcessors[index].forEach((postProcessor) => {
+        endpoint.postProcessors[index]?.forEach((postProcessor) => {
           const rv = postProcessor(value);
           value = rv != undefined ? rv : value;
         });

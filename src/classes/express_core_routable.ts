@@ -1,4 +1,4 @@
-import { ErrorRequestHandler, IRouter, Errback } from 'express';
+import { IRouter } from 'express';
 import { NextFunction } from 'express-serve-static-core';
 import {
   BaseCoreRouter,
@@ -11,7 +11,6 @@ import {
   DynamicParameterExctractorFunction,
   ExpressRequest,
   ExpressResponse,
-  Next,
   ParameterExtractorStorage,
   StaticParameterExctractorFunction,
 } from '../../index';
@@ -19,13 +18,8 @@ import { ExpressHttpMethod } from '../types/native_http_methods';
 import { ErrorHandlerClass, ErrorHandlerFunction } from './error_handler';
 import { MiddlewareObject } from './middleware';
 import { ExpressEndpoint } from './types/endpoint';
-import {
-  ErrorHandlerEntry,
-  ErrorHandlerShort,
-  ErrorHandlerType,
-  RegistreableErrorHandler,
-} from './types/error';
-import { Middleware, MiddlewareFunction, RegistrableMiddleware } from './types/middleware';
+import { ErrorHandlerEntry, RegistreableErrorHandler } from './types/error';
+import { ExpressFunction, Middleware, RegistrableMiddleware } from './types/middleware';
 import { ResultWrapperType } from './types/result_wrapper';
 
 //type Mapping<T> = errorHandlerMethods;
@@ -182,14 +176,13 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
   }
 
   defaultHandlerMethod?: ExpressEndpoint;
-  defaultHandlerFunction?: MiddlewareFunction;
+  defaultHandlerFunction?: ExpressFunction;
 
-  public registerDefaultHandlerFunction(defaultHandler: MiddlewareFunction) {
+  public registerDefaultHandlerFunction(defaultHandler: ExpressFunction) {
     this.defaultHandlerFunction = defaultHandler;
   }
 
   public registerDefaultHandlerMethod(handlerName: string) {
-    console.log('registerDefaultHandlerMethod');
     this.defaultHandlerMethod = {
       methodName: handlerName,
       name: handlerName,
@@ -227,7 +220,6 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
     // this.setupDefaultHandler(this.get_added_methods() as Required<MethodEntry>[]);
 
     this.children.forEach((child: ExpressCoreRoutable) => {
-      console.log('called');
       if (!child.layersInitialized) {
         child.setupLayers();
       }
@@ -244,7 +236,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
   protected setupMiddlewares(middlewares: RegistrableMiddleware[]): void {
     const routable = this.getRoutable();
 
-    const middlewareMapper = (middlewares: Middleware[]): MiddlewareFunction[] =>
+    const middlewareMapper = (middlewares: Middleware[]): ExpressFunction[] =>
       middlewares.map((e) => {
         if (typeof e === 'function') {
           return e;
@@ -254,7 +246,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
       });
 
     middlewares.forEach((e: RegistrableMiddleware) => {
-      const functions: MiddlewareFunction[] = middlewareMapper(e.middlewares);
+      const functions: ExpressFunction[] = middlewareMapper(e.middlewares);
       e.method !== undefined
         ? routable[e.method](e.path, ...functions)
         : routable.use(e.path, ...functions);
@@ -265,7 +257,6 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
    * Deafult handler method is more important than registered functions
    */
   protected setupDefaultHandler(): void {
-    console.log('setupDefaultHandler');
     if (this.defaultHandlerMethod) {
       // TODO :: Create method instead
       // @ts-ignore
@@ -273,8 +264,6 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
     } else if (this.defaultHandlerFunction) {
       this.getRoutable().use(this.defaultHandlerFunction.bind(this));
     }
-
-    console.log('Finished');
 
     // Todo :: Bind item
     // this.getRoutable().use(this.defaultHandler.bind(this));
@@ -306,73 +295,94 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
   }
 
   /**
+   * Wrap function if wrapper defined
+   * @private
+   */
+  private mightWrapFunction(functionToWrap: ExpressFunction): ExpressFunction {
+    const wrapper = this.getResultWrapperFunction();
+
+    return wrapper === undefined
+      ? functionToWrap
+      : (request: ExpressRequest, response: ExpressResponse, next: NextFunction) => {
+          const result = functionToWrap(request, response, next);
+
+          if (!response.headersSent) {
+            // What happens if they call the next function
+            if (result.constructor.name === 'Promise') {
+              result
+                .then((result: any) => wrapper({ result, request, response, next }))
+                .catch((e: any) => next(e));
+            } else {
+              wrapper({ result, request, response, next });
+            }
+          }
+        };
+  }
+
+  /**
    * Creates callable method for the endpoint
    * TODO :: Minimize overhead
    *
    * @param endpoint
    * @protected
    */
-  protected methodCreator(endpoint: ExpressEndpoint): MiddlewareFunction {
-    // This should be callable with this: { result, request, response, next }
-    // TODO :: This should't be undefined right now!!
-    console.log('Method Creator', endpoint);
-    const wrapper = this.getResultWrapperFunction();
+  protected methodCreator(endpoint: ExpressEndpoint): ExpressFunction {
+    const methodFuntion: ExpressFunction =
+      endpoint.parameters === undefined || endpoint.parameters.length === 0
+        ? //@ts-ignore
+          this[endpoint.methodName]
+        : (request, response, next): ExpressFunction => {
+            const parameters = this.getParameters(endpoint, request, response, next);
 
-    return (request: ExpressRequest, response: ExpressResponse, next: NextFunction) => {
-      const parameters: any[] = [];
+            //@ts-ignore
+            return this[endpoint.methodName].bind(this)(...parameters);
+          };
 
-      if (endpoint.parameters.length === 0) {
-        parameters.push(request, response, next);
-      } else {
-        endpoint.parameters.sort((a, b) => (a.index! > b.index! ? 1 : -1));
+    return this.mightWrapFunction(methodFuntion);
+  }
 
-        const addParameter = (value: any, index: number) => {
-          endpoint.postProcessors &&
-            endpoint.postProcessors[index].forEach((postProcessor) => {
-              const rv = postProcessor(value);
-              value = rv != undefined ? rv : value;
-            });
+  protected getParameters(
+    endpoint: ExpressEndpoint,
+    request: ExpressRequest,
+    response: ExpressResponse,
+    next: NextFunction,
+  ) {
+    const parameters: any[] = [];
 
-          parameters.push(value);
-        };
+    endpoint.parameters.sort((a, b) => (a.index! > b.index! ? 1 : -1));
 
-        endpoint.parameters.forEach((value, index) => {
-          const { extractor, type } = ParameterExtractorStorage.get_parameter_extractor(value.name);
-
-          if (type === 'Static') {
-            addParameter(
-              (extractor as StaticParameterExctractorFunction)(request, response, next),
-              index,
-            );
-          } else if (type === 'Dynamic') {
-            addParameter(
-              (extractor as DynamicParameterExctractorFunction)(
-                value.arguments,
-                request,
-                response,
-                next,
-              ),
-              index,
-            );
-          }
+    const addParameter = (value: any, index: number) => {
+      endpoint.postProcessors &&
+        endpoint.postProcessors[index].forEach((postProcessor) => {
+          const rv = postProcessor(value);
+          value = rv != undefined ? rv : value;
         });
-      }
 
-      //@ts-ignore
-      const result = this[endpoint.methodName].bind(this)(...parameters);
-      // const result = endpoint.object_method.bind(this)(...parameters);
-
-      if (wrapper && !response.headersSent) {
-        // What happens if they call the next function
-        if (result.constructor.name === 'Promise') {
-          result
-            .then((result: any) => wrapper({ result, request, response, next }))
-            .catch((e: any) => next(e));
-        } else {
-          wrapper({ result, request, response, next });
-        }
-      }
+      parameters.push(value);
     };
+
+    endpoint.parameters.forEach((value, index) => {
+      const { extractor, type } = ParameterExtractorStorage.get_parameter_extractor(value.name);
+
+      if (type === 'Static') {
+        addParameter(
+          (extractor as StaticParameterExctractorFunction)(request, response, next),
+          index,
+        );
+      } else if (type === 'Dynamic') {
+        addParameter(
+          (extractor as DynamicParameterExctractorFunction)(
+            value.arguments,
+            request,
+            response,
+            next,
+          ),
+          index,
+        );
+      }
+    });
+
+    return parameters;
   }
 
   protected errorHandlerCreator(endpoint: ErrorHandlerEntry): ErrorHandlerFunction {
@@ -436,13 +446,11 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
     // Todo ?? Debug this shit: `getResultWrapper`
     const wrapper: ResultWrapperType = this.getResultWrapper() as ResultWrapperType;
 
-    console.log({ wrapper });
-
     if (!wrapper) {
       return undefined;
     }
     if (typeof wrapper === 'function') {
-      return wrapper as unknown as MiddlewareFunction;
+      return wrapper as unknown as ExpressFunction;
     }
 
     //@ts-ignore

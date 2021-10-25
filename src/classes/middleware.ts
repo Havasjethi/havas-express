@@ -1,5 +1,5 @@
 import { ExpressRequest, ExpressResponse } from '../../index';
-import { Middleware, MiddlewareFunction } from './types/middleware';
+import { Middleware, ExpressFunction } from './types/middleware';
 
 export interface MiddlewareObject {
   handle: (req: ExpressRequest, res: ExpressResponse, next: Function) => any;
@@ -10,7 +10,7 @@ export abstract class MiddlewareClass {
 }
 
 export abstract class PipeMiddleware extends MiddlewareClass implements MiddlewareObject {
-  get_handle(): MiddlewareFunction {
+  get_handle(): ExpressFunction {
     return this.handle;
   }
 

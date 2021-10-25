@@ -16,6 +16,7 @@ export type StaticParameterExctractorFunction<T = unknown> = (
   req: Request,
   res: Response,
   next: NextFunction,
+  error?: any,
 ) => T;
 
 export type DynamicParameterExctractorFunction<Result = unknown, Arg = unknown> = (
@@ -23,6 +24,7 @@ export type DynamicParameterExctractorFunction<Result = unknown, Arg = unknown> 
   req: Request,
   res: Response,
   next: NextFunction,
+  error?: any,
 ) => Result;
 
 // export type ParameterExctractorEntry<T = unknown> = {

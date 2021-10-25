@@ -12,8 +12,7 @@ export interface ResultWrapperFunctionParameters<T = any> {
 /**
  * Todo :: Add ResultWrapperMethod
  */
-export type ResultWrapperType<T = unknown> = ResultWrapperFunction<T> | ResultWrapperMethod;
-export type ResultWrapperMethod = RegistrableMethod;
+export type ResultWrapperType<T = unknown> = ResultWrapperFunction<T> | RegistrableMethod;
 export type ResultWrapperFunction<T = unknown> = ({
   result,
   request,

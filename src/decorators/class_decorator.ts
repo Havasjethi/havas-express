@@ -3,7 +3,7 @@ import { ListenOptions } from 'net';
 import { App } from '../classes/app';
 import { ErrorHandlerClass } from '../classes/error_handler';
 import { ExpressCoreRoutable } from '../classes/express_core_routable';
-import { ResultWrapperFunction, ResultWrapperMethod } from '../classes/types/result_wrapper';
+import { ResultWrapperFunction } from '../classes/types/result_wrapper';
 import { Constructor, extender, SetProperty } from '../util/class_decorator_util';
 
 export function Path<T extends ExpressCoreRoutable<any>>(path: string) {

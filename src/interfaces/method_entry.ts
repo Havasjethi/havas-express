@@ -1,6 +1,6 @@
+import { PostProcessor } from 'havas-core';
 import { ExpressRequest, ExpressResponse } from '../../index';
 import { MiddlewareObject } from '../classes/middleware';
-import { PostProcessor } from '../classes/types/endpoint';
 import { Middleware } from '../classes/types/middleware';
 import { ExpressHttpMethod } from '../types/native_http_methods';
 
@@ -41,7 +41,7 @@ export type RequestMethodProcessing = {
   }>;
   preprocessor_parameter: MethodParameterEntry<any>[];
   post_processors: {
-    [parameter_index: number]: PostProcessor<any, any>[];
+    [parameter_index: number]: PostProcessor[];
   };
 };
 

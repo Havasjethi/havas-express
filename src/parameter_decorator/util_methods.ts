@@ -20,13 +20,19 @@ export const StaticMethodParameterExtractor = <T = unknown>(
 export const DynamicParameterExtractor = <Args = unknown, Result = unknown>(
   extractor_name: string,
   method: DynamicParameterExctractorFunction<Result, Args>,
-  argument: any = undefined,
 ) => {
   ParameterExtractorStorage.register_dynamic_parameter_extractor(extractor_name, method);
 
-  return (target: ExpressCoreRoutable, method_name: string, parameter_index: number) => {
-    parameterExtractor(target, method_name, parameter_index, extractor_name, argument);
-  };
+  return (argument: Args) =>
+    (target: ExpressCoreRoutable, method_name: string, parameter_index: number) => {
+      parameterExtractor(
+        target,
+        method_name,
+        parameter_index,
+        extractor_name,
+        argument as unknown as any[],
+      );
+    };
 };
 
 export const parameterExtractor = (

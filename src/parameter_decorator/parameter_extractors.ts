@@ -1,3 +1,4 @@
+import { DynamicParameterExctractorFunction } from './parameter_exctractor_storage';
 import { DynamicParameterExtractor, StaticMethodParameterExtractor } from './util_methods';
 
 /*
@@ -19,48 +20,26 @@ export const ResponseObj = StaticMethodParameterExtractor('Response', (_, res) =
 
 export const Next = StaticMethodParameterExtractor('Next', (_, __, next) => next);
 
-export const Body = <Result = unknown>(name: string | undefined = undefined) => {
-  return DynamicParameterExtractor<string | undefined, Result>(
-    'Body',
-    (name, req) => (name ? req.body[name] : req.body),
-    name,
-  );
-};
+export const WholeBody = StaticMethodParameterExtractor('WholeBody', (req) => req.body);
 
-export const Cookie = <Result = unknown>(cookie_name: string) => {
-  return DynamicParameterExtractor<Result, string>(
-    'Cookie',
-    (cookie_name, req) => req.cookies[cookie_name],
-    cookie_name,
-  );
-};
+export const Body = DynamicParameterExtractor<string>('Body', (name, req) =>
+  name ? req.body[name as string] : req.body,
+);
 
-export const PathVariable = (variable: string) => {
-  return DynamicParameterExtractor<string>(
-    'PathVariable',
-    (variable, req) => {
-      return req.params[variable];
-    },
-    variable,
-  );
-};
+export const Cookie = DynamicParameterExtractor<string>(
+  'Cookie',
+  (cookie_name, req) => req.cookies[cookie_name],
+);
 
-export const Param = (variable: string) => {
-  return DynamicParameterExtractor<string>(
-    'Param',
-    (variable, req) => req.params[variable],
-    variable,
-  );
-};
+export const PathVariable = DynamicParameterExtractor<string>(
+  'PathVariable',
+  (variable, req) => req.params[variable],
+);
 
-export const WholeQuery = StaticMethodParameterExtractor('Query', (req) => req.query);
+export const Param = PathVariable;
 
-export const Query = (parameter_name: string) => {
-  return DynamicParameterExtractor<string>(
-    'Query',
-    (param, req) => req.query[param],
-    parameter_name,
-  );
-};
+export const WholeQuery = StaticMethodParameterExtractor('WholeQuery', (req) => req.query);
 
-export const Session = DynamicParameterExtractor('Session', (_, req) => req.session);
+export const Query = DynamicParameterExtractor<string>('Query', (param, req) => req.query[param]);
+
+export const Session = StaticMethodParameterExtractor('Session', (req) => req.session);

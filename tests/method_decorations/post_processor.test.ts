@@ -1,5 +1,18 @@
-import { App, Get, Host, PathVariable, PostProcessor, ResultWrapper } from '../../index';
+import {
+  App,
+  Get,
+  Host,
+  PathVariable,
+  PostProcessor,
+  ResponseObj,
+  ResultWrapper,
+} from '../../index';
 import request from 'supertest';
+
+const Convert = (type: NumberConstructor | StringConstructor) =>
+  PostProcessor((x: string) => {
+    return type === Number ? parseInt(x) : x;
+  });
 
 @Host({ port: 33123 })
 @ResultWrapper(({ response, result }) => response.set('Content-Type', 'text/plain').send(result))
@@ -43,10 +56,20 @@ class TestApp extends App {
   ) {
     return parameter;
   }
+
+  @Get('/as-string-:str')
+  asString(@Convert(String) @PathVariable('str') variable: any) {
+    return variable + 1;
+  }
+
+  @Get('/as-number-:num')
+  asNumber(@Convert(Number) @PathVariable('num') variable: any, @ResponseObj respone: any) {
+    return `${variable + 1}`;
+  }
 }
 
 describe('PostProcessor tests', () => {
-  const test_app = new TestApp().get_initialized_routable();
+  const test_app = new TestApp().getInitializedRoutable();
   const get_ = (path: string): request.Test => request(test_app).get(path);
 
   // test('test - return_13', async () => {
@@ -66,5 +89,17 @@ describe('PostProcessor tests', () => {
   test('test - void_manipultaion', async () => {
     const input = '13';
     await get_('/void-' + input).expect((response) => expect(response.text).toBe('13'));
+  });
+
+  test('test - Str as string', async () => {
+    const input = '13';
+    const expected = input + 1;
+    await get_('/as-string-' + input).expect((response) => expect(response.text).toBe(expected));
+  });
+
+  test('test - Str as Number', async () => {
+    const input = '13';
+    const expected = `${parseInt(input) + 1}`;
+    await get_('/as-number-' + input).expect((response) => expect(response.text).toBe(expected));
   });
 });

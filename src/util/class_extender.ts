@@ -1,5 +1,7 @@
 import { Constructor } from './class_decorator_util';
 
+export const wrapperConstructorName = 'new_constructor';
+
 interface CreationLifecycleMethodHolder<T> {
   before_initialization: ((new_class: Constructor<T>) => void)[];
   set_properties: ((new_instance: T) => void)[];

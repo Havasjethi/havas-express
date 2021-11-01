@@ -16,14 +16,14 @@ export function BeforeCreate<T = any>(
 }
 
 export function SetProperty<T = any>(
-  set_property: (new_instance: T) => void,
+  set_property: (newIsntance: T) => void,
 ): LifeCycleClassDecorator<T> {
   return <U extends T>(modifiable_constructor: Constructor<U>) =>
     extender.add_set_property(modifiable_constructor, set_property);
 }
 
 export function AfterCreate<T = any>(
-  after_create: (new_instance: T) => void,
+  after_create: (newIsntance: T) => void,
 ): LifeCycleClassDecorator<T> {
   return <U extends T>(modifiable_constructor: Constructor<U>) =>
     extender.add_after_initialization(modifiable_constructor, after_create);

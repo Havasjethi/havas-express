@@ -18,7 +18,8 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
-    "havas-core": "^0.1.0"
+    "havas-core": "^0.1.0",
+    "inversify": "^6.0.1"
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.13.0",

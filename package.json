@@ -12,7 +12,7 @@
     "build": "tsc",
     "dev-build": "tsc --watch",
     "test": "jest",
-    "prepare": "npm build"
+    "prepare": "npm run build"
   },
   "author": "havasjethi",
   "license": "ISC",

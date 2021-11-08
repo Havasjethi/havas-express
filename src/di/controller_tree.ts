@@ -3,10 +3,11 @@ import { ExpressCoreRoutable } from '../classes/express_core_routable';
 import { Constructor } from '../util/class_decorator_util';
 import { wrapperConstructorName } from '../util/class_extender';
 
-const getName = (target: Constructor<ExpressCoreRoutable>) =>
-  target.constructor.name !== wrapperConstructorName
-    ? target.constructor.name
-    : target.prototype.constructor.name;
+export const getName = (target: Constructor<ExpressCoreRoutable>) =>
+  target.name !== wrapperConstructorName ? target.name : target.prototype.constructor.name;
+
+export const getWrapper = (target: Constructor<any>) =>
+  target.name !== wrapperConstructorName ? target : target.prototype.constructor.name;
 
 export class ControllerTree {
   constructor(private mainNode?: Constructor<ExpressCoreRoutable>) {}
@@ -26,8 +27,9 @@ export class ControllerTree {
   }
 
   public initialize(container: Container) {
-    console.log('Initialize', this.mainNode!.name);
-    console.log('Initialize', this.mainNode!.constructor.name);
+    const item = container.get(getName(this.mainNode!).name);
+    console.log('Initialize', getName(this.mainNode!));
+    // console.log('Initialize', this.mainNode!.constructor.name);
     // container.get(get)
   }
 }

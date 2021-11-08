@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+import { injectable } from 'inversify';
 import {
   AMainController,
   App,
@@ -8,6 +10,7 @@ import {
   UseMiddleware,
 } from '../../index';
 
+// @injectable()
 @AMainController
 @UseMiddleware(() => {})
 class MainController extends App {}

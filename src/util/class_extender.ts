@@ -1,5 +1,5 @@
 import { Constructor } from './class_decorator_util';
-import { constructorWrapper, evilArgsModifier } from './constructor_creator';
+import { constructorWrapper } from './constructor_creator';
 
 export const wrapperConstructorName = 'new_constructor';
 

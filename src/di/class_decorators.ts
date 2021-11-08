@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import { injectable } from 'inversify';
+import { decorate, injectable } from 'inversify';
 import { ExpressCoreRoutable } from '../classes/express_core_routable';
 import { AfterCreate, Constructor } from '../util/class_decorator_util';
 import { wrapperConstructorName } from '../util/class_extender';
@@ -10,20 +10,15 @@ import { getName, getWrapper } from './controller_tree';
 // const injector = injectable();
 
 export const AMainController = (target: Constructor<ExpressCoreRoutable>) => {
-  // console.log(target.constructor.name);
-
-  const name = getName(target);
-  const getWrapped = getWrapper(target);
-  console.log(getWrapped);
-
+  decorate(injectable(), target);
   MainControllerTree.registerMainNode(target);
-  // return AfterCreate((newInstance) => {
-  //   MainControllerTree.registerMainNode(newInstance);
-  // });
-  // injector(getWrapped);
-  injectable()(getWrapped);
 };
 
-export const Controller = (parent?: ExpressCoreRoutable) => {
-  return AfterCreate((newInstance) => console.log(newInstance.constructor.name));
+export const Controller = (parent?: Constructor<ExpressCoreRoutable>) => {
+  return (target: Constructor<ExpressCoreRoutable>) => {
+    decorate(injectable(), target);
+    MainControllerTree.registerNode(target, parent);
+
+    return AfterCreate((newInstance) => console.log(newInstance.constructor.name))(target);
+  };
 };

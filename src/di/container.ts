@@ -1,17 +1,17 @@
 import { Container } from 'inversify';
-import { ControllerTree } from './controller_tree';
+import { ComposableTree, ControllerTreeNode } from './controller_tree';
 
 export const mainContainer = new Container();
 export const main_container = mainContainer;
-export const MainControllerTree = new ControllerTree();
+export const MainControllerTree = new ComposableTree(ControllerTreeNode);
 
 export enum ReadType {
   None,
   Folder,
 }
 
-export const initializeControllerTree = (y: ReadType, initializeControllers: boolean) => {
-  const fileImporter = getReaderMethod(y);
+export const initializeControllerTree = (readType: ReadType, initializeControllers: boolean) => {
+  const fileImporter = getReaderMethod(readType);
 
   const filesToImport: string[] = fileImporter();
 

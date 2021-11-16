@@ -54,26 +54,6 @@ export class ClassExtender {
     stored_item: ClassExtenderStoredItem<T>,
   ): void {
     const new_constructor = constructorWrapper(original_constructor, stored_item);
-    // const new_constructor: any = evilArgsModifier(function (...args: any[]) {
-    //   const wrapped_constructor: () => T = () => {
-    //     const new_instance = new original_constructor(...args);
-    //
-    //     stored_item.set_properties.forEach((fnc) => fnc(new_instance));
-    //
-    //     return new_instance;
-    //   };
-    //
-    //   wrapped_constructor.prototype = original_constructor.prototype;
-    //
-    //   stored_item.before_initialization.forEach((e) => e(new_constructor));
-    //   const instance = wrapped_constructor();
-    //   // stored_item.set_properties.forEach((fnc) => fnc(instance));
-    //
-    //   stored_item.after_initialization.forEach((e) => e(instance));
-    //
-    //   return instance;
-    // });
-    // const new_constructor = constructorWrapper(original_constructor, stored_item);
 
     new_constructor.prototype = original_constructor.prototype;
     Reflect.getMetadataKeys(original_constructor).forEach((key) => {

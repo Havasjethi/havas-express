@@ -22,8 +22,6 @@ import { ErrorHandlerEntry, RegistreableErrorHandler } from './types/error';
 import { ExpressFunction, Middleware, RegistrableMiddleware } from './types/middleware';
 import { ResultWrapperType } from './types/result_wrapper';
 
-//type Mapping<T> = errorHandlerMethods;
-
 export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends BaseCoreRouter<
   ExpressEndpoint,
   RegistrableMiddleware,
@@ -438,11 +436,10 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
   }
 
   /**
-   * TODO :: Cucc
    * @protected
    */
   protected getResultWrapperFunction(): CallableFunction | undefined {
-    // Todo ?? Debug this shit: `getResultWrapper`
+    // Todo ?? Debug this if actual: `getResultWrapper`
     const wrapper: ResultWrapperType = this.getResultWrapper() as ResultWrapperType;
 
     if (!wrapper) {

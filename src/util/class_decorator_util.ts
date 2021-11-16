@@ -8,6 +8,9 @@ export type LifeCycleClassDecorator<T> = (
 
 export const extender = new ClassExtender();
 
+// TODO :: Implement
+function OnlyWrap() {}
+
 export function BeforeCreate<T = any>(
   after_create: (e: Constructor<T> | any) => void,
 ): LifeCycleClassDecorator<T> {

@@ -3,22 +3,30 @@ import 'reflect-metadata';
 import { decorate, injectable } from 'inversify';
 import { ExpressCoreRoutable } from '../classes/express_core_routable';
 import { AfterCreate, Constructor } from '../util/class_decorator_util';
-import { wrapperConstructorName } from '../util/class_extender';
 import { mainContainer, MainControllerTree } from './container';
-import { getName, getWrapper } from './controller_tree';
 
-// const injector = injectable();
-
+// Todo :: Wrap Target | Replace  AfterCreate((newInstance) => {})
 export const AMainController = (target: Constructor<ExpressCoreRoutable>) => {
   decorate(injectable(), target);
-  MainControllerTree.registerMainNode(target);
+  const wrappedTarget = AfterCreate((newInstance) => {})(target);
+  MainControllerTree.registerMainNode(wrappedTarget);
+  mainContainer.bind(wrappedTarget).toSelf();
+
+  return wrappedTarget;
 };
 
 export const Controller = (parent?: Constructor<ExpressCoreRoutable>) => {
   return (target: Constructor<ExpressCoreRoutable>) => {
-    decorate(injectable(), target);
-    MainControllerTree.registerNode(target, parent);
+    const wrappedTarget = AfterCreate((newInstance) => {})(target);
+    decorate(injectable(), wrappedTarget);
+    MainControllerTree.registerNode(wrappedTarget, parent);
+    mainContainer.bind(wrappedTarget).toSelf();
 
-    return AfterCreate((newInstance) => console.log(newInstance.constructor.name))(target);
+    return wrappedTarget;
   };
+};
+
+export const Component = (identifier?: string | symbol) => (target: Constructor<any>) => {
+  decorate(injectable(), target);
+  mainContainer.bind(identifier ?? target).toSelf();
 };

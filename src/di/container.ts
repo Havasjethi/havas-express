@@ -1,28 +1,43 @@
 import { Container } from 'inversify';
-import { ComposableTree, ControllerTreeNode } from './controller_tree';
+import { ExpressCoreRoutable } from '../classes/express_core_routable';
+import { ComposableTreeCreator, ControllerTree } from './controller_tree';
 
-export const mainContainer = new Container();
+export const mainContainer = new Container({
+  skipBaseClassChecks: true,
+});
+
+/**
+ * @deprecated
+ */
 export const main_container = mainContainer;
-export const MainControllerTree = new ComposableTree(ControllerTreeNode);
+export const MainControllerTree = new ControllerTree(); //;new ComposableTreeCreator(ControllerTreeNode);
 
 export enum ReadType {
   None,
   Folder,
+  NameMatch,
 }
 
-export const initializeControllerTree = (readType: ReadType, initializeControllers: boolean) => {
+export const initializeControllerTree = (
+  readType: ReadType,
+  initializeControllers: boolean,
+): ExpressCoreRoutable[] => {
   const fileImporter = getReaderMethod(readType);
 
   const filesToImport: string[] = fileImporter();
 
   filesToImport.forEach((file) => import(file));
 
+  const initializedRouters = [];
   if (initializeControllers) {
-    MainControllerTree.initialize(mainContainer);
+    initializedRouters.push(...MainControllerTree.initialize(mainContainer));
   }
+
+  return initializedRouters;
 };
 
 const getReaderMethod = (y: ReadType): (() => string[]) => {
+  // TODO :: Add Folder  find logic
   switch (y) {
     case ReadType.Folder:
       return recursiveRead;

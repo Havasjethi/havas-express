@@ -12,6 +12,7 @@
     "build": "tsc",
     "dev-build": "tsc --watch",
     "test": "jest",
+    "ss": "ts-node some.ts",
     "prepare": "npm run build"
   },
   "author": "havasjethi",

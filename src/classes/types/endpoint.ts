@@ -3,6 +3,6 @@ import { Middleware } from './middleware';
 
 export interface ExpressEndpoint extends CoreEndpoint {
   // TODO :: Remove name :: Mis spelled
-  name: string;
+  // name: string;
   middlewares: Middleware[];
 }

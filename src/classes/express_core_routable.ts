@@ -181,7 +181,6 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
   public registerDefaultHandlerMethod(handlerName: string) {
     this.defaultHandlerMethod = {
       methodName: handlerName,
-      name: handlerName,
       parameters: this.parameterExtractors[handlerName] ?? [],
       methodType: 'all',
       path: '*',

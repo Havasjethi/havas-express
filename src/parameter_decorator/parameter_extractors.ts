@@ -1,19 +1,6 @@
 import { DynamicParameterExctractorFunction } from './parameter_exctractor_storage';
 import { DynamicParameterExtractor, StaticMethodParameterExtractor } from './util_methods';
 
-/*
-  TODO :: Add StaticMethodParameterExtractor which return has no input parameters
-   MethodParameterExtractor('Request', (_, req) => req)
-   MethodParameterExtractor('Request', (_, req) => req)
-   MethodParameterExtractor('Response', (_, __, res) => res)
-   MethodParameterExtractor('Session', (_, req) => req.session);
-
-   StaticMethodParameterExtractor('Request', (req) => req)
-   StaticMethodParameterExtractor('Response', (_, res) => res)
-   StaticMethodParameterExtractor('Next', (_, __, next) => next)
-   StaticMethodParameterExtractor('Session', (req) => req.session);
- */
-
 export const RequestObj = StaticMethodParameterExtractor('Request', (req) => req);
 
 export const ResponseObj = StaticMethodParameterExtractor('Response', (_, res) => res);
@@ -43,3 +30,8 @@ export const WholeQuery = StaticMethodParameterExtractor('WholeQuery', (req) => 
 export const Query = DynamicParameterExtractor<string>('Query', (param, req) => req.query[param]);
 
 export const Session = StaticMethodParameterExtractor('Session', (req) => req.session);
+
+export const Header = DynamicParameterExtractor<string>(
+  'Header',
+  (headerName, req) => req.headers[headerName],
+);

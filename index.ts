@@ -6,6 +6,8 @@ export { extender, BeforeCreate, SetProperty, AfterCreate } from './src/util/cla
 export * from './src/classes/app';
 export * from './src/classes/middleware';
 export * from './src/classes/router';
+export * from './src/classes/express_core_routable';
+export * from './src/classes/types/endpoint';
 export * from './src/di/class_decorators';
 export * from './src/di/container';
 export * from './src/di/controller_tree';

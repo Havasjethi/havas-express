@@ -14,6 +14,10 @@ import {
   ParameterExtractorStorage,
   StaticParameterExctractorFunction,
 } from '../../index';
+// import { isPromise } from 'util/types';
+
+const isPromise = (v: any) => v.constructor.name === 'Promise';
+
 import { ExpressHttpMethod } from '../types/native_http_methods';
 import { ErrorHandlerClass, ErrorHandlerFunction } from './error_handler';
 import { MiddlewareObject } from './middleware';
@@ -303,7 +307,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
 
           if (!response.headersSent) {
             // What happens if they call the next function
-            if (result.constructor.name === 'Promise') {
+            if (isPromise(result)) {
               result
                 .then((result: any) => wrapper({ result, request, response, next }))
                 .catch((e: any) => next(e));

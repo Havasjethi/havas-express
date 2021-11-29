@@ -1,9 +1,11 @@
 import { DynamicParameterExctractorFunction } from './parameter_exctractor_storage';
 import { DynamicParameterExtractor, StaticMethodParameterExtractor } from './util_methods';
 
-export const RequestObj = StaticMethodParameterExtractor('Request', (req) => req);
+export const Request = StaticMethodParameterExtractor('Request', (req) => req);
+export const RequestObj = Request;
 
-export const ResponseObj = StaticMethodParameterExtractor('Response', (_, res) => res);
+export const Response = StaticMethodParameterExtractor('Response', (_, res) => res);
+export const ResponseObj = Response;
 
 export const Next = StaticMethodParameterExtractor('Next', (_, __, next) => next);
 

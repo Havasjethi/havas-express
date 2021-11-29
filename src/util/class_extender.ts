@@ -4,9 +4,9 @@ import { constructorWrapper } from './constructor_creator';
 export const wrapperConstructorName = 'new_constructor';
 
 interface CreationLifecycleMethodHolder<T> {
-  before_initialization: ((new_class: Constructor<T>) => void)[];
-  set_properties: ((new_instance: T) => void)[];
-  after_initialization: ((new_instance: T) => void)[];
+  beforeInitialization: ((new_class: Constructor<T>) => void)[];
+  setProperties: ((new_instance: T) => void)[];
+  afterInitialization: ((new_instance: T) => void)[];
 }
 
 export interface ClassExtenderStoredItem<T> extends CreationLifecycleMethodHolder<T> {
@@ -40,9 +40,9 @@ export class ClassExtender {
   protected get_or_initialize_stored_item<T>(class_name: string): ClassExtenderStoredItem<T> {
     if (!this.decorations[class_name]) {
       this.decorations[class_name] = {
-        before_initialization: [],
-        set_properties: [],
-        after_initialization: [],
+        beforeInitialization: [],
+        setProperties: [],
+        afterInitialization: [],
       };
     }
 
@@ -56,9 +56,21 @@ export class ClassExtender {
     const new_constructor = constructorWrapper(original_constructor, stored_item);
 
     new_constructor.prototype = original_constructor.prototype;
-    Reflect.getMetadataKeys(original_constructor).forEach((key) => {
-      Reflect.defineMetadata(key, Reflect.getMetadata(key, original_constructor), new_constructor);
-    });
+
+    if (
+      Reflect &&
+      Reflect.getMetadataKeys !== undefined &&
+      Reflect.defineMetadata !== undefined &&
+      Reflect.getMetadata !== undefined
+    ) {
+      Reflect.getMetadataKeys(original_constructor).forEach((key) => {
+        Reflect.defineMetadata(
+          key,
+          Reflect.getMetadata(key, original_constructor),
+          new_constructor,
+        );
+      });
+    }
 
     // @ts-ignore
     stored_item.new_constructor = new_constructor;
@@ -66,15 +78,15 @@ export class ClassExtender {
 
   public before_initialization<T>(
     class_name: string,
-    method_to_run: CreationLifecycleMethodHolder<T>['before_initialization'][0],
+    method_to_run: CreationLifecycleMethodHolder<T>['beforeInitialization'][0],
   ) {
     const stored_item = this.get_or_initialize_stored_item<T>(class_name);
-    stored_item.before_initialization.push(method_to_run);
+    stored_item.beforeInitialization.push(method_to_run);
   }
 
   public setProperty<T>(class_name: string, method_to_run: (new_instance: T) => void) {
     const stored_item = this.get_or_initialize_stored_item<T>(class_name);
-    stored_item.set_properties.push(method_to_run);
+    stored_item.setProperties.push(method_to_run);
   }
 
   public set_property<T>(class_name: string, method_to_run: (new_instance: T) => void) {
@@ -83,15 +95,15 @@ export class ClassExtender {
 
   public after_initialization<T>(class_name: string, method_to_run: (new_instance: T) => void) {
     const stored_item = this.get_or_initialize_stored_item<T>(class_name);
-    stored_item.after_initialization.push(method_to_run);
+    stored_item.afterInitialization.push(method_to_run);
   }
 
   public add_before_initialization<T>(
     original_constructor: Constructor<T>,
-    before_initialization: any | CreationLifecycleMethodHolder<T>['before_initialization'][0],
+    before_initialization: any | CreationLifecycleMethodHolder<T>['beforeInitialization'][0],
   ): Constructor<T> {
     const stored_item = this.get_or_initialize<T>(original_constructor);
-    stored_item.before_initialization.push(before_initialization);
+    stored_item.beforeInitialization.push(before_initialization);
     return stored_item.new_constructor;
   }
 
@@ -100,7 +112,7 @@ export class ClassExtender {
     set_property: (new_instance: T) => void,
   ): Constructor<T> {
     const stored_item = this.get_or_initialize<T>(original_constructor);
-    stored_item.set_properties.push(set_property);
+    stored_item.setProperties.push(set_property);
     return stored_item.new_constructor;
   }
 
@@ -109,7 +121,7 @@ export class ClassExtender {
     after_initialization: (new_instance: T) => void,
   ): Constructor<T> {
     const stored_item = this.get_or_initialize<T>(original_constructor);
-    stored_item.after_initialization.push(after_initialization);
+    stored_item.afterInitialization.push(after_initialization);
     return stored_item.new_constructor;
   }
 }

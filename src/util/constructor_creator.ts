@@ -19,17 +19,17 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor();
 
-          stored_item.set_properties.forEach((fnc) => fnc(new_instance));
+          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
 
           return new_instance;
         };
 
         wrapped_constructor.prototype = original_constructor.prototype;
 
-        stored_item.before_initialization.forEach((e) => e(new_constructor));
+        stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
 
-        stored_item.after_initialization.forEach((e) => e(instance));
+        stored_item.afterInitialization.forEach((e) => e(instance));
 
         return instance;
       };
@@ -41,17 +41,17 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a);
 
-          stored_item.set_properties.forEach((fnc) => fnc(new_instance));
+          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
 
           return new_instance;
         };
 
         wrapped_constructor.prototype = original_constructor.prototype;
 
-        stored_item.before_initialization.forEach((e) => e(new_constructor));
+        stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
 
-        stored_item.after_initialization.forEach((e) => e(instance));
+        stored_item.afterInitialization.forEach((e) => e(instance));
 
         return instance;
       };
@@ -64,17 +64,17 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a, b);
 
-          stored_item.set_properties.forEach((fnc) => fnc(new_instance));
+          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
 
           return new_instance;
         };
 
         wrapped_constructor.prototype = original_constructor.prototype;
 
-        stored_item.before_initialization.forEach((e) => e(new_constructor));
+        stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
 
-        stored_item.after_initialization.forEach((e) => e(instance));
+        stored_item.afterInitialization.forEach((e) => e(instance));
 
         return instance;
       };
@@ -87,17 +87,17 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a, b, c);
 
-          stored_item.set_properties.forEach((fnc) => fnc(new_instance));
+          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
 
           return new_instance;
         };
 
         wrapped_constructor.prototype = original_constructor.prototype;
 
-        stored_item.before_initialization.forEach((e) => e(new_constructor));
+        stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
 
-        stored_item.after_initialization.forEach((e) => e(instance));
+        stored_item.afterInitialization.forEach((e) => e(instance));
 
         return instance;
       };
@@ -110,17 +110,17 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a, b, c, d);
 
-          stored_item.set_properties.forEach((fnc) => fnc(new_instance));
+          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
 
           return new_instance;
         };
 
         wrapped_constructor.prototype = original_constructor.prototype;
 
-        stored_item.before_initialization.forEach((e) => e(new_constructor));
+        stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
 
-        stored_item.after_initialization.forEach((e) => e(instance));
+        stored_item.afterInitialization.forEach((e) => e(instance));
 
         return instance;
       };
@@ -133,17 +133,17 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a, b, c, d, e);
 
-          stored_item.set_properties.forEach((fnc) => fnc(new_instance));
+          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
 
           return new_instance;
         };
 
         wrapped_constructor.prototype = original_constructor.prototype;
 
-        stored_item.before_initialization.forEach((e) => e(new_constructor));
+        stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
 
-        stored_item.after_initialization.forEach((e) => e(instance));
+        stored_item.afterInitialization.forEach((e) => e(instance));
 
         return instance;
       };
@@ -156,17 +156,17 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a, b, c, d, e, f);
 
-          stored_item.set_properties.forEach((fnc) => fnc(new_instance));
+          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
 
           return new_instance;
         };
 
         wrapped_constructor.prototype = original_constructor.prototype;
 
-        stored_item.before_initialization.forEach((e) => e(new_constructor));
+        stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
 
-        stored_item.after_initialization.forEach((e) => e(instance));
+        stored_item.afterInitialization.forEach((e) => e(instance));
 
         return instance;
       };
@@ -179,17 +179,17 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a, b, c, d, e, f, g);
 
-          stored_item.set_properties.forEach((fnc) => fnc(new_instance));
+          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
 
           return new_instance;
         };
 
         wrapped_constructor.prototype = original_constructor.prototype;
 
-        stored_item.before_initialization.forEach((e) => e(new_constructor));
+        stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
 
-        stored_item.after_initialization.forEach((e) => e(instance));
+        stored_item.afterInitialization.forEach((e) => e(instance));
 
         return instance;
       };
@@ -202,17 +202,17 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a, b, c, d, e, f, g, h);
 
-          stored_item.set_properties.forEach((fnc) => fnc(new_instance));
+          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
 
           return new_instance;
         };
 
         wrapped_constructor.prototype = original_constructor.prototype;
 
-        stored_item.before_initialization.forEach((e) => e(new_constructor));
+        stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
 
-        stored_item.after_initialization.forEach((e) => e(instance));
+        stored_item.afterInitialization.forEach((e) => e(instance));
 
         return instance;
       };
@@ -225,17 +225,17 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a, b, c, d, e, f, g, h, i);
 
-          stored_item.set_properties.forEach((fnc) => fnc(new_instance));
+          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
 
           return new_instance;
         };
 
         wrapped_constructor.prototype = original_constructor.prototype;
 
-        stored_item.before_initialization.forEach((e) => e(new_constructor));
+        stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
 
-        stored_item.after_initialization.forEach((e) => e(instance));
+        stored_item.afterInitialization.forEach((e) => e(instance));
 
         return instance;
       };
@@ -248,17 +248,17 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a, b, c, d, e, f, g, h, i, j);
 
-          stored_item.set_properties.forEach((fnc) => fnc(new_instance));
+          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
 
           return new_instance;
         };
 
         wrapped_constructor.prototype = original_constructor.prototype;
 
-        stored_item.before_initialization.forEach((e) => e(new_constructor));
+        stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
 
-        stored_item.after_initialization.forEach((e) => e(instance));
+        stored_item.afterInitialization.forEach((e) => e(instance));
 
         return instance;
       };
@@ -271,17 +271,17 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a, b, c, d, e, f, g, h, i, j, k);
 
-          stored_item.set_properties.forEach((fnc) => fnc(new_instance));
+          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
 
           return new_instance;
         };
 
         wrapped_constructor.prototype = original_constructor.prototype;
 
-        stored_item.before_initialization.forEach((e) => e(new_constructor));
+        stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
 
-        stored_item.after_initialization.forEach((e) => e(instance));
+        stored_item.afterInitialization.forEach((e) => e(instance));
 
         return instance;
       };
@@ -294,17 +294,17 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a, b, c, d, e, f, g, h, i, j, k, l);
 
-          stored_item.set_properties.forEach((fnc) => fnc(new_instance));
+          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
 
           return new_instance;
         };
 
         wrapped_constructor.prototype = original_constructor.prototype;
 
-        stored_item.before_initialization.forEach((e) => e(new_constructor));
+        stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
 
-        stored_item.after_initialization.forEach((e) => e(instance));
+        stored_item.afterInitialization.forEach((e) => e(instance));
 
         return instance;
       };
@@ -317,17 +317,17 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a, b, c, d, e, f, g, h, i, j, k, l, m);
 
-          stored_item.set_properties.forEach((fnc) => fnc(new_instance));
+          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
 
           return new_instance;
         };
 
         wrapped_constructor.prototype = original_constructor.prototype;
 
-        stored_item.before_initialization.forEach((e) => e(new_constructor));
+        stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
 
-        stored_item.after_initialization.forEach((e) => e(instance));
+        stored_item.afterInitialization.forEach((e) => e(instance));
 
         return instance;
       };
@@ -340,17 +340,17 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a, b, c, d, e, f, g, h, i, j, k, l, m, n);
 
-          stored_item.set_properties.forEach((fnc) => fnc(new_instance));
+          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
 
           return new_instance;
         };
 
         wrapped_constructor.prototype = original_constructor.prototype;
 
-        stored_item.before_initialization.forEach((e) => e(new_constructor));
+        stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
 
-        stored_item.after_initialization.forEach((e) => e(instance));
+        stored_item.afterInitialization.forEach((e) => e(instance));
 
         return instance;
       };
@@ -379,17 +379,17 @@ export const constructorWrapper = <T = unknown>(
             o,
           );
 
-          stored_item.set_properties.forEach((fnc) => fnc(new_instance));
+          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
 
           return new_instance;
         };
 
         wrapped_constructor.prototype = original_constructor.prototype;
 
-        stored_item.before_initialization.forEach((e) => e(new_constructor));
+        stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
 
-        stored_item.after_initialization.forEach((e) => e(instance));
+        stored_item.afterInitialization.forEach((e) => e(instance));
 
         return instance;
       };
@@ -419,17 +419,17 @@ export const constructorWrapper = <T = unknown>(
             p,
           );
 
-          stored_item.set_properties.forEach((fnc) => fnc(new_instance));
+          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
 
           return new_instance;
         };
 
         wrapped_constructor.prototype = original_constructor.prototype;
 
-        stored_item.before_initialization.forEach((e) => e(new_constructor));
+        stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
 
-        stored_item.after_initialization.forEach((e) => e(instance));
+        stored_item.afterInitialization.forEach((e) => e(instance));
 
         return instance;
       };
@@ -460,17 +460,17 @@ export const constructorWrapper = <T = unknown>(
             q,
           );
 
-          stored_item.set_properties.forEach((fnc) => fnc(new_instance));
+          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
 
           return new_instance;
         };
 
         wrapped_constructor.prototype = original_constructor.prototype;
 
-        stored_item.before_initialization.forEach((e) => e(new_constructor));
+        stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
 
-        stored_item.after_initialization.forEach((e) => e(instance));
+        stored_item.afterInitialization.forEach((e) => e(instance));
 
         return instance;
       };
@@ -502,17 +502,17 @@ export const constructorWrapper = <T = unknown>(
             r,
           );
 
-          stored_item.set_properties.forEach((fnc) => fnc(new_instance));
+          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
 
           return new_instance;
         };
 
         wrapped_constructor.prototype = original_constructor.prototype;
 
-        stored_item.before_initialization.forEach((e) => e(new_constructor));
+        stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
 
-        stored_item.after_initialization.forEach((e) => e(instance));
+        stored_item.afterInitialization.forEach((e) => e(instance));
 
         return instance;
       };
@@ -564,17 +564,17 @@ export const constructorWrapper = <T = unknown>(
             s,
           );
 
-          stored_item.set_properties.forEach((fnc) => fnc(new_instance));
+          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
 
           return new_instance;
         };
 
         wrapped_constructor.prototype = original_constructor.prototype;
 
-        stored_item.before_initialization.forEach((e) => e(new_constructor));
+        stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
 
-        stored_item.after_initialization.forEach((e) => e(instance));
+        stored_item.afterInitialization.forEach((e) => e(instance));
 
         return instance;
       };
@@ -629,17 +629,17 @@ export const constructorWrapper = <T = unknown>(
             t,
           );
 
-          stored_item.set_properties.forEach((fnc) => fnc(new_instance));
+          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
 
           return new_instance;
         };
 
         wrapped_constructor.prototype = original_constructor.prototype;
 
-        stored_item.before_initialization.forEach((e) => e(new_constructor));
+        stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
 
-        stored_item.after_initialization.forEach((e) => e(instance));
+        stored_item.afterInitialization.forEach((e) => e(instance));
 
         return instance;
       };
@@ -696,17 +696,17 @@ export const constructorWrapper = <T = unknown>(
             u,
           );
 
-          stored_item.set_properties.forEach((fnc) => fnc(new_instance));
+          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
 
           return new_instance;
         };
 
         wrapped_constructor.prototype = original_constructor.prototype;
 
-        stored_item.before_initialization.forEach((e) => e(new_constructor));
+        stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
 
-        stored_item.after_initialization.forEach((e) => e(instance));
+        stored_item.afterInitialization.forEach((e) => e(instance));
 
         return instance;
       };
@@ -714,23 +714,3 @@ export const constructorWrapper = <T = unknown>(
     }
   }
 };
-
-// const evilMethodArgsCreator = (argsLength: number): string => {
-//   const letters = [];
-//   let current = '';
-//   while (letters.length < argsLength) {
-//     current += 'a';
-//     letters.push(current);
-//   }
-//   return letters.join(', ');
-// };
-//
-// const evilMethodCreator = (new_constructor: Function, argsLength: number): Function => {
-//   return new Function(evilMethodArgsCreator(argsLength), evileMethodBodyGetter(new_constructor));
-// };
-//
-// const evileMethodBodyGetter = (x: Function): string => {
-//   const fnc = x.toString();
-//
-//   return fnc.slice(fnc.indexOf('{') + 1, fnc.lastIndexOf('}'));
-// };

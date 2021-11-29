@@ -329,7 +329,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
     const methodFuntion: ExpressFunction =
       endpoint.parameters === undefined || endpoint.parameters.length === 0
         ? //@ts-ignore
-          this[endpoint.methodName]
+          this[endpoint.methodName] // TODO :: ??Bind this??
         : (request, response, next): ExpressFunction => {
             const parameters = this.getParameters(endpoint, request, response, next);
 

@@ -16,19 +16,79 @@ export interface ClassExtenderStoredItem<T> extends CreationLifecycleMethodHolde
 export class ClassExtender {
   private decorations: { [class_name: string]: ClassExtenderStoredItem<any> };
 
-  constructor() {
+  public constructor() {
     this.decorations = {};
   }
 
-  protected get_or_init_empty(class_name: string): ClassExtenderStoredItem<any> {
-    return this.get_or_initialize_stored_item(class_name);
+  public before_initialization<T>(
+    class_name: string,
+    method_to_run: CreationLifecycleMethodHolder<T>['beforeInitialization'][0],
+  ) {
+    this.before_initialization(class_name, method_to_run);
   }
 
-  protected get_or_initialize<T>(
+  public wrapClass<T>(classTarget: Constructor<T>): Constructor<T> {
+    return this.getInitializedWrapped(classTarget).new_constructor;
+  }
+
+  public beforeInitialization<T>(
+    className: string,
+    methodToRun: CreationLifecycleMethodHolder<T>['beforeInitialization'][0],
+  ) {
+    const stored_item = this.getStoredItem<T>(className);
+    stored_item.beforeInitialization.push(methodToRun);
+  }
+
+  public setProperty<T>(class_name: string, method_to_run: (new_instance: T) => void) {
+    const stored_item = this.getStoredItem<T>(class_name);
+    stored_item.setProperties.push(method_to_run);
+  }
+
+  public set_property<T>(class_name: string, method_to_run: (new_instance: T) => void) {
+    return this.setProperty(class_name, method_to_run);
+  }
+
+  public after_initialization<T>(class_name: string, method_to_run: (new_instance: T) => void) {
+    const stored_item = this.getStoredItem<T>(class_name);
+    stored_item.afterInitialization.push(method_to_run);
+  }
+
+  public add_before_initialization<T>(
+    original_constructor: Constructor<T>,
+    before_initialization: any | CreationLifecycleMethodHolder<T>['beforeInitialization'][0],
+  ): Constructor<T> {
+    const stored_item = this.getInitializedWrapped<T>(original_constructor);
+    stored_item.beforeInitialization.push(before_initialization);
+    return stored_item.new_constructor;
+  }
+
+  public add_set_property<T>(
+    original_constructor: Constructor<T>,
+    set_property: (new_instance: T) => void,
+  ): Constructor<T> {
+    const stored_item = this.getInitializedWrapped<T>(original_constructor);
+    stored_item.setProperties.push(set_property);
+    return stored_item.new_constructor;
+  }
+
+  public add_after_initialization<T>(
+    original_constructor: Constructor<T>,
+    after_initialization: (new_instance: T) => void,
+  ): Constructor<T> {
+    const stored_item = this.getInitializedWrapped<T>(original_constructor);
+    stored_item.afterInitialization.push(after_initialization);
+    return stored_item.new_constructor;
+  }
+
+  protected get_or_init_empty(class_name: string): ClassExtenderStoredItem<any> {
+    return this.getStoredItem(class_name);
+  }
+
+  protected getInitializedWrapped<T>(
     original_constructor: Constructor<T>,
   ): Required<ClassExtenderStoredItem<T>> {
     const class_name = original_constructor.prototype.constructor.name;
-    const item = this.get_or_initialize_stored_item<T>(class_name);
+    const item = this.getStoredItem<T>(class_name);
 
     if (!item.new_constructor) {
       this.create_lifecycle_constructor(original_constructor, item);
@@ -37,7 +97,7 @@ export class ClassExtender {
     return item as Required<ClassExtenderStoredItem<T>>;
   }
 
-  protected get_or_initialize_stored_item<T>(class_name: string): ClassExtenderStoredItem<T> {
+  protected getStoredItem<T>(class_name: string): ClassExtenderStoredItem<T> {
     if (!this.decorations[class_name]) {
       this.decorations[class_name] = {
         beforeInitialization: [],
@@ -74,54 +134,5 @@ export class ClassExtender {
 
     // @ts-ignore
     stored_item.new_constructor = new_constructor;
-  }
-
-  public before_initialization<T>(
-    class_name: string,
-    method_to_run: CreationLifecycleMethodHolder<T>['beforeInitialization'][0],
-  ) {
-    const stored_item = this.get_or_initialize_stored_item<T>(class_name);
-    stored_item.beforeInitialization.push(method_to_run);
-  }
-
-  public setProperty<T>(class_name: string, method_to_run: (new_instance: T) => void) {
-    const stored_item = this.get_or_initialize_stored_item<T>(class_name);
-    stored_item.setProperties.push(method_to_run);
-  }
-
-  public set_property<T>(class_name: string, method_to_run: (new_instance: T) => void) {
-    return this.setProperty(class_name, method_to_run);
-  }
-
-  public after_initialization<T>(class_name: string, method_to_run: (new_instance: T) => void) {
-    const stored_item = this.get_or_initialize_stored_item<T>(class_name);
-    stored_item.afterInitialization.push(method_to_run);
-  }
-
-  public add_before_initialization<T>(
-    original_constructor: Constructor<T>,
-    before_initialization: any | CreationLifecycleMethodHolder<T>['beforeInitialization'][0],
-  ): Constructor<T> {
-    const stored_item = this.get_or_initialize<T>(original_constructor);
-    stored_item.beforeInitialization.push(before_initialization);
-    return stored_item.new_constructor;
-  }
-
-  public add_set_property<T>(
-    original_constructor: Constructor<T>,
-    set_property: (new_instance: T) => void,
-  ): Constructor<T> {
-    const stored_item = this.get_or_initialize<T>(original_constructor);
-    stored_item.setProperties.push(set_property);
-    return stored_item.new_constructor;
-  }
-
-  public add_after_initialization<T>(
-    original_constructor: Constructor<T>,
-    after_initialization: (new_instance: T) => void,
-  ): Constructor<T> {
-    const stored_item = this.get_or_initialize<T>(original_constructor);
-    stored_item.afterInitialization.push(after_initialization);
-    return stored_item.new_constructor;
   }
 }

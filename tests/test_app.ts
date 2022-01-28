@@ -1,23 +1,27 @@
-import { Path, ResultWrapper, Host, App, Get, Router, ExpressRequest } from '../index';
+import {
+  Path,
+  ResultWrapper,
+  Host,
+  App,
+  Get,
+  Router,
+  ExpressRequest,
+  UseMiddleware,
+} from '../index';
 
 const port = 4001;
 const host = 'localhost';
 const auto_start = false;
 
-@Host({
-  port,
-  host: host,
-  auto_start: auto_start,
-})
+const middleWarefucntion1 = () => {};
+const middleWarefucntion2 = () => {};
+const bodyParser = require('body-parser');
+
+@UseMiddleware(bodyParser.json())
 class TestApp extends App {
-  @Get('/')
+  @Get('/', middleWarefucntion1, middleWarefucntion2)
   index(req: any, res: any) {
     res.send('Nice');
-  }
-
-  @Get('/13')
-  index2(req: ExpressRequest, res: any) {
-    res.send({ any: 13 });
   }
 }
 

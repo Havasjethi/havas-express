@@ -1,4 +1,4 @@
-import { App, Host } from "../index";
+import { App, Host } from '../index';
 
 describe('Application test', () => {
   const port = 4000;
@@ -26,5 +26,3 @@ describe('Application test', () => {
     expect(test_app.path).toEqual('/');
   });
 });
-
-

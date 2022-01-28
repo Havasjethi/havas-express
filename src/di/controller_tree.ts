@@ -1,4 +1,3 @@
-import { Controller } from 'havas-core';
 import { Container, decorate, injectable } from 'inversify';
 import { ExpressCoreRoutable } from '../classes/express_core_routable';
 import { Constructor } from '../util/class_decorator_util';
@@ -141,7 +140,7 @@ export class ComposableTreeCreator<T> {
   }
 }
 
-export class ControllerTree extends ComposableTreeCreator<Constructor<ExpressCoreRoutable>> {
+export class ControllerTreeCreator extends ComposableTreeCreator<Constructor<ExpressCoreRoutable>> {
   constructor() {
     super(ComposableTreeNode);
   }

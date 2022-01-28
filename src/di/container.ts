@@ -1,6 +1,6 @@
 import { Container } from 'inversify';
 import { ExpressCoreRoutable } from '../classes/express_core_routable';
-import { ComposableTreeCreator, ControllerTree } from './controller_tree';
+import { ComposableTreeCreator, ControllerTreeCreator } from './controller_tree';
 
 export const mainContainer = new Container({
   skipBaseClassChecks: true,
@@ -10,7 +10,7 @@ export const mainContainer = new Container({
  * @deprecated
  */
 export const main_container = mainContainer;
-export const MainControllerTree = new ControllerTree(); //;new ComposableTreeCreator(ControllerTreeNode);
+export const MainControllerTree = new ControllerTreeCreator(); //;new ComposableTreeCreator(ControllerTreeNode);
 
 export enum ReadType {
   None,

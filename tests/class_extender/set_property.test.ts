@@ -1,28 +1,32 @@
-import { SetProperty } from "../../src/util/class_decorator_util";
+import { SetProperty } from '../../src/util/class_decorator_util';
 
 describe('@SetProperty tests', () => {
-
-  @SetProperty<ClassA>((instance) => {instance.some_name = instance.some_name.toUpperCase()})
+  @SetProperty<ClassA>((instance) => {
+    instance.some_name = instance.some_name.toUpperCase();
+  })
   class ClassA {
     public static x: number = 13;
-    constructor(public some_name: string = '') { }
+    constructor(public some_name: string = '') {}
   }
 
-  @SetProperty<ClassB>((instance) => {instance.x += 1})
-  @SetProperty<ClassB>((instance) => {instance.x += 1})
+  @SetProperty<ClassB>((instance) => {
+    instance.x += 1;
+  })
+  @SetProperty<ClassB>((instance) => {
+    instance.x += 1;
+  })
   class ClassB {
-    constructor(public x: number) { }
+    constructor(public x: number) {}
   }
 
-  function Add_To_X (value: number) {
-    return SetProperty(instance => instance.x += value);
+  function Add_To_X(value: number) {
+    return SetProperty((instance) => (instance.x += value));
   }
 
   @Add_To_X(10)
-  class ClassC extends ClassB { }
+  class ClassC extends ClassB {}
 
   const random_string = 'random_string';
-
 
   test('ClassA works', () => {
     const a_instance = new ClassA(random_string);
@@ -38,10 +42,9 @@ describe('@SetProperty tests', () => {
     expect(b_instance_2.x).toBe(5 + 2);
   });
 
-  test('ClassB works', () => {
+  test('ClassC works', () => {
     const c_instance = new ClassC(-1);
 
     expect(c_instance.x).toBe(-1 + (2 + 10));
   });
-
 });

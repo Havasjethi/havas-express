@@ -8,8 +8,12 @@ export type LifeCycleClassDecorator<T> = (
 
 export const extender = new ClassExtender();
 
-// TODO :: Implement
-function OnlyWrap() {}
+/**
+ * Returns a wrapped constructor
+ */
+export function OnlyWrap<T>(target: Constructor<T>): Constructor<T> {
+  return extender.wrapClass(target);
+}
 
 export function BeforeCreate<T = any>(
   after_create: (e: Constructor<T> | any) => void,

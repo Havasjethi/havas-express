@@ -6,7 +6,11 @@ import {
   StaticParameterExctractorFunction,
 } from './parameter_exctractor_storage';
 
-export const StaticMethodParameterExtractor = <T = unknown>(
+/**
+ * Creates Static Parameter Extractor for methods
+ * Eg.: @Response
+ */
+export const CreateStaticParameterExtractor = <T = unknown>(
   extractor_name: string,
   method: StaticParameterExctractorFunction<T>,
 ) => {
@@ -17,7 +21,11 @@ export const StaticMethodParameterExtractor = <T = unknown>(
   };
 };
 
-export const DynamicParameterExtractor = <Args = unknown, Result = unknown>(
+/**
+ * Creates Dynamic Parameter Extractor for endpoint methods
+ * Eg.: @Body(<path>), @PathVariable(<name>)
+ */
+export const CreateDynamicParameterExtractor = <Args = unknown, Result = unknown>(
   extractor_name: string,
   method: DynamicParameterExctractorFunction<Result, Args>,
 ) => {

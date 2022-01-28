@@ -100,12 +100,12 @@ export function Patch(path: string = '/', ...middlewares: Middleware[]) {
   };
 }
 
-export function Method(method: ExpressHttpMethod, path: string, ...middlewares: Middleware[]) {
+export function Method(httpMethod: ExpressHttpMethod, path: string, ...middlewares: Middleware[]) {
   return function (
     target: ExpressCoreRoutable<any>,
     propertyKey: string,
     descriptor: PropertyDescriptor,
   ) {
-    add_function(target, propertyKey, method, path, middlewares);
+    add_function(target, propertyKey, httpMethod, path, middlewares);
   };
 }

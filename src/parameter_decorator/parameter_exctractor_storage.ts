@@ -27,12 +27,6 @@ export type DynamicParameterExctractorFunction<Result = unknown, Arg = unknown> 
   error?: any,
 ) => Result;
 
-// export type ParameterExctractorEntry<T = unknown> = {
-//   name: string;
-//   built_in: boolean;
-//   method: ParameterExctractor<T>;
-// };
-
 /**
  * TODO:: Add Static Parameter extractors for flexig
  */
@@ -46,10 +40,6 @@ export const ParameterExtractorStorage = new (class {
 
   get custom_extractors(): { [key: string]: ParameterExctractor } {
     return this._custom_extractors;
-  }
-
-  get predefined_extractors(): { [key: string]: ParameterExctractor } {
-    return this._predefined_extractors;
   }
 
   get built_in_extractors(): { [key: string]: ParameterExctractor } {
@@ -116,25 +106,27 @@ export const ParameterExtractorStorage = new (class {
   // }
 })();
 
-export const createCustumExtractor = (
-  name: string,
-  method: DynamicParameterExctractorFunction | StaticParameterExctractorFunction,
-) => {
-  // ParameterExtractorStorage.register_static_parameter_extractor(name, method);
-  //
-  // return (target: ExpressCoreRoutable, method_name: string, parameter_index: number) => {
-  //   parameterExtractor(target, method_name, parameter_index, name, []);
-  // };
-};
-
-export const createCustumParameteredExtractor = <Arguments extends []>(
-  name: string,
-  method: DynamicParameterExctractorFunction,
-) => {
-  // ParameterExtractorStorage.register_dynamic_parameter_extractor(name, method);
-  //
-  // return (...args: Arguments) =>
-  //   (target: ExpressCoreRoutable, method_name: string, parameter_index: number) => {
-  //     parameterExtractor(target, method_name, parameter_index, name, args);
-  //   };
-};
+// Note :: All parameter extractors are registered into a single Array, 'a' overrites 'a'
+//
+// export const createCustumExtractor = (
+//   name: string,
+//   method: DynamicParameterExctractorFunction | StaticParameterExctractorFunction,
+// ) => {
+//   // ParameterExtractorStorage.register_static_parameter_extractor(name, method);
+//   //
+//   // return (target: ExpressCoreRoutable, method_name: string, parameter_index: number) => {
+//   //   parameterExtractor(target, method_name, parameter_index, name, []);
+//   // };
+// };
+//
+// export const createCustumParameteredExtractor = <Arguments extends []>(
+//   name: string,
+//   method: DynamicParameterExctractorFunction,
+// ) => {
+//   // ParameterExtractorStorage.register_dynamic_parameter_extractor(name, method);
+//   //
+//   // return (...args: Arguments) =>
+//   //   (target: ExpressCoreRoutable, method_name: string, parameter_index: number) => {
+//   //     parameterExtractor(target, method_name, parameter_index, name, args);
+//   //   };
+// };

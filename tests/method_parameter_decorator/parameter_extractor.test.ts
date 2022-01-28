@@ -2,7 +2,7 @@ import {
   App,
   Body,
   Cookie,
-  DynamicParameterExtractor,
+  CreateDynamicParameterExtractor,
   ExpressNext,
   ExpressRequest,
   ExpressResponse,
@@ -14,7 +14,7 @@ import {
   RequestObj,
   ResponseObj,
   ResultWrapper,
-  StaticMethodParameterExtractor,
+  CreateStaticParameterExtractor,
   UseMiddleware,
   WholeBody,
   WholeQuery,
@@ -47,14 +47,14 @@ const Methods = {
 };
 
 function StaticFunctionBased() {
-  return StaticMethodParameterExtractor('C1', () => 'C1');
+  return CreateStaticParameterExtractor('C1', () => 'C1');
 }
 
-const StaticConstantBased = StaticMethodParameterExtractor('C2', () => 'C2');
+const StaticConstantBased = CreateStaticParameterExtractor('C2', () => 'C2');
 
-const Dyn = DynamicParameterExtractor<string>('Dyn', (arg) => arg);
+const Dyn = CreateDynamicParameterExtractor<string>('Dyn', (arg) => arg);
 
-const DynStatic = (x: string) => StaticMethodParameterExtractor(`dyn-${x}`, () => x);
+const DynStatic = (x: string) => CreateStaticParameterExtractor(`dyn-${x}`, () => x);
 
 @Host({})
 @UseMiddleware(bodyParser.json())

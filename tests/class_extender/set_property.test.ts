@@ -1,4 +1,4 @@
-import { SetProperty } from '../../src/util/class_decorator_util';
+import { SetProperty } from '../../src/util';
 
 describe('@SetProperty tests', () => {
   @SetProperty<ClassA>((instance) => {
@@ -24,7 +24,11 @@ describe('@SetProperty tests', () => {
   }
 
   @Add_To_X(10)
-  class ClassC extends ClassB {}
+  class ClassC extends ClassB {
+    constructor(x: number) {
+      super(x);
+    }
+  }
 
   const random_string = 'random_string';
 

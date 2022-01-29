@@ -1,35 +1,33 @@
-import exp from 'constants';
-import { inject, injectable } from 'inversify';
 import {
-  AMainController,
   App,
   Component,
   Controller,
   initializeControllerTree,
+  MainController,
   ReadType,
   Router,
   UseMiddleware,
 } from '../../index';
-import { ExpressCoreRoutable } from '../../src/classes/express_core_routable';
-import { Constructor } from '../../src/util/class_decorator_util';
+import { ExpressCoreRoutable } from '../../src/classes';
+import { Constructor } from '../../src/util';
 
 @Component()
 class Dependency {
-  test_method() {}
+  public testMethod() {}
 }
 
-@AMainController
 @UseMiddleware(() => {})
-class MainController extends App {
+@MainController
+class AMainController extends App {
   constructor(public testDependency: Dependency) {
     super();
   }
 }
 
-@Controller(MainController)
+@Controller(AMainController)
 class SubController_1 extends Router {}
 
-@Controller(MainController)
+@Controller(AMainController)
 class SubController_2 extends Router {}
 
 @Controller(SubController_2)
@@ -47,7 +45,7 @@ describe('Testing auto building & Creation', () => {
         e.constructor.name === cls.name || e.constructor.name === cls?.prototype?.constructor?.name,
     );
 
-  const mainNodeIndex = findIndex(initializedItems, MainController);
+  const mainNodeIndex = findIndex(initializedItems, AMainController);
   const mainNode = initializedItems[mainNodeIndex];
   test('Main node found', () => {
     expect(mainNodeIndex).toBeGreaterThan(-1);

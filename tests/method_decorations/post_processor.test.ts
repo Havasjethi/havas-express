@@ -1,3 +1,4 @@
+import request from 'supertest';
 import {
   App,
   Get,
@@ -7,7 +8,6 @@ import {
   ResponseObj,
   ResultWrapper,
 } from '../../index';
-import request from 'supertest';
 
 const Convert = (type: NumberConstructor | StringConstructor) =>
   PostProcessor((x: string) => {
@@ -18,17 +18,18 @@ const Convert = (type: NumberConstructor | StringConstructor) =>
 @ResultWrapper(({ response, result }) => response.set('Content-Type', 'text/plain').send(result))
 class TestApp extends App {
   /*
-    Todo :: Should this be supported ??
-    By adding this feature it would be possible to wrap the Req, Res, Next function,
-    but it is useless since the objects are configurable by the Express config
-   */
-  // @Get('/get_number')
-  // return_13(
-  //   @PostProcessor(() => '13')
-  //   x: string,
-  // ) {
-  //   return x;
-  // }
+    // Todo :: Should this be supported ??
+    // By adding this feature it would be possible to wrap the Req, Res, Next function,
+    // but it is useless since the objects are configurable by the Express config
+
+    @Get('/get_number')
+    return_13(
+      @PostProcessor(() => '13')
+      x: string,
+    ) {
+      return x;
+    }
+  */
 
   @Get('/number-:id')
   square(

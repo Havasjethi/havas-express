@@ -19,8 +19,6 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor();
 
-          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
-
           return new_instance;
         };
 
@@ -28,6 +26,7 @@ export const constructorWrapper = <T = unknown>(
 
         stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
+        stored_item.setProperties.forEach((fnc) => fnc(instance));
 
         stored_item.afterInitialization.forEach((e) => e(instance));
 
@@ -41,8 +40,6 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a);
 
-          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
-
           return new_instance;
         };
 
@@ -50,6 +47,7 @@ export const constructorWrapper = <T = unknown>(
 
         stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
+        stored_item.setProperties.forEach((fnc) => fnc(instance));
 
         stored_item.afterInitialization.forEach((e) => e(instance));
 
@@ -64,8 +62,6 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a, b);
 
-          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
-
           return new_instance;
         };
 
@@ -73,6 +69,7 @@ export const constructorWrapper = <T = unknown>(
 
         stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
+        stored_item.setProperties.forEach((fnc) => fnc(instance));
 
         stored_item.afterInitialization.forEach((e) => e(instance));
 
@@ -87,8 +84,6 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a, b, c);
 
-          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
-
           return new_instance;
         };
 
@@ -96,6 +91,7 @@ export const constructorWrapper = <T = unknown>(
 
         stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
+        stored_item.setProperties.forEach((fnc) => fnc(instance));
 
         stored_item.afterInitialization.forEach((e) => e(instance));
 
@@ -110,8 +106,6 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a, b, c, d);
 
-          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
-
           return new_instance;
         };
 
@@ -119,6 +113,7 @@ export const constructorWrapper = <T = unknown>(
 
         stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
+        stored_item.setProperties.forEach((fnc) => fnc(instance));
 
         stored_item.afterInitialization.forEach((e) => e(instance));
 
@@ -133,8 +128,6 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a, b, c, d, e);
 
-          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
-
           return new_instance;
         };
 
@@ -142,6 +135,7 @@ export const constructorWrapper = <T = unknown>(
 
         stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
+        stored_item.setProperties.forEach((fnc) => fnc(instance));
 
         stored_item.afterInitialization.forEach((e) => e(instance));
 
@@ -156,8 +150,6 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a, b, c, d, e, f);
 
-          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
-
           return new_instance;
         };
 
@@ -165,6 +157,7 @@ export const constructorWrapper = <T = unknown>(
 
         stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
+        stored_item.setProperties.forEach((fnc) => fnc(instance));
 
         stored_item.afterInitialization.forEach((e) => e(instance));
 
@@ -179,8 +172,6 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a, b, c, d, e, f, g);
 
-          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
-
           return new_instance;
         };
 
@@ -188,6 +179,7 @@ export const constructorWrapper = <T = unknown>(
 
         stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
+        stored_item.setProperties.forEach((fnc) => fnc(instance));
 
         stored_item.afterInitialization.forEach((e) => e(instance));
 
@@ -202,8 +194,6 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a, b, c, d, e, f, g, h);
 
-          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
-
           return new_instance;
         };
 
@@ -211,6 +201,7 @@ export const constructorWrapper = <T = unknown>(
 
         stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
+        stored_item.setProperties.forEach((fnc) => fnc(instance));
 
         stored_item.afterInitialization.forEach((e) => e(instance));
 
@@ -225,8 +216,6 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a, b, c, d, e, f, g, h, i);
 
-          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
-
           return new_instance;
         };
 
@@ -234,6 +223,7 @@ export const constructorWrapper = <T = unknown>(
 
         stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
+        stored_item.setProperties.forEach((fnc) => fnc(instance));
 
         stored_item.afterInitialization.forEach((e) => e(instance));
 
@@ -248,8 +238,6 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a, b, c, d, e, f, g, h, i, j);
 
-          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
-
           return new_instance;
         };
 
@@ -257,6 +245,7 @@ export const constructorWrapper = <T = unknown>(
 
         stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
+        stored_item.setProperties.forEach((fnc) => fnc(instance));
 
         stored_item.afterInitialization.forEach((e) => e(instance));
 
@@ -271,8 +260,6 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a, b, c, d, e, f, g, h, i, j, k);
 
-          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
-
           return new_instance;
         };
 
@@ -280,6 +267,7 @@ export const constructorWrapper = <T = unknown>(
 
         stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
+        stored_item.setProperties.forEach((fnc) => fnc(instance));
 
         stored_item.afterInitialization.forEach((e) => e(instance));
 
@@ -294,8 +282,6 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a, b, c, d, e, f, g, h, i, j, k, l);
 
-          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
-
           return new_instance;
         };
 
@@ -303,6 +289,7 @@ export const constructorWrapper = <T = unknown>(
 
         stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
+        stored_item.setProperties.forEach((fnc) => fnc(instance));
 
         stored_item.afterInitialization.forEach((e) => e(instance));
 
@@ -317,8 +304,6 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a, b, c, d, e, f, g, h, i, j, k, l, m);
 
-          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
-
           return new_instance;
         };
 
@@ -326,6 +311,7 @@ export const constructorWrapper = <T = unknown>(
 
         stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
+        stored_item.setProperties.forEach((fnc) => fnc(instance));
 
         stored_item.afterInitialization.forEach((e) => e(instance));
 
@@ -340,8 +326,6 @@ export const constructorWrapper = <T = unknown>(
           //@ts-ignore
           const new_instance = new original_constructor(a, b, c, d, e, f, g, h, i, j, k, l, m, n);
 
-          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
-
           return new_instance;
         };
 
@@ -349,6 +333,7 @@ export const constructorWrapper = <T = unknown>(
 
         stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
+        stored_item.setProperties.forEach((fnc) => fnc(instance));
 
         stored_item.afterInitialization.forEach((e) => e(instance));
 
@@ -379,8 +364,6 @@ export const constructorWrapper = <T = unknown>(
             o,
           );
 
-          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
-
           return new_instance;
         };
 
@@ -388,6 +371,7 @@ export const constructorWrapper = <T = unknown>(
 
         stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
+        stored_item.setProperties.forEach((fnc) => fnc(instance));
 
         stored_item.afterInitialization.forEach((e) => e(instance));
 
@@ -419,8 +403,6 @@ export const constructorWrapper = <T = unknown>(
             p,
           );
 
-          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
-
           return new_instance;
         };
 
@@ -428,6 +410,7 @@ export const constructorWrapper = <T = unknown>(
 
         stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
+        stored_item.setProperties.forEach((fnc) => fnc(instance));
 
         stored_item.afterInitialization.forEach((e) => e(instance));
 
@@ -460,8 +443,6 @@ export const constructorWrapper = <T = unknown>(
             q,
           );
 
-          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
-
           return new_instance;
         };
 
@@ -469,6 +450,7 @@ export const constructorWrapper = <T = unknown>(
 
         stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
+        stored_item.setProperties.forEach((fnc) => fnc(instance));
 
         stored_item.afterInitialization.forEach((e) => e(instance));
 
@@ -502,8 +484,6 @@ export const constructorWrapper = <T = unknown>(
             r,
           );
 
-          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
-
           return new_instance;
         };
 
@@ -511,6 +491,7 @@ export const constructorWrapper = <T = unknown>(
 
         stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
+        stored_item.setProperties.forEach((fnc) => fnc(instance));
 
         stored_item.afterInitialization.forEach((e) => e(instance));
 
@@ -564,8 +545,6 @@ export const constructorWrapper = <T = unknown>(
             s,
           );
 
-          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
-
           return new_instance;
         };
 
@@ -573,6 +552,7 @@ export const constructorWrapper = <T = unknown>(
 
         stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
+        stored_item.setProperties.forEach((fnc) => fnc(instance));
 
         stored_item.afterInitialization.forEach((e) => e(instance));
 
@@ -629,8 +609,6 @@ export const constructorWrapper = <T = unknown>(
             t,
           );
 
-          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
-
           return new_instance;
         };
 
@@ -638,6 +616,7 @@ export const constructorWrapper = <T = unknown>(
 
         stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
+        stored_item.setProperties.forEach((fnc) => fnc(instance));
 
         stored_item.afterInitialization.forEach((e) => e(instance));
 
@@ -696,8 +675,6 @@ export const constructorWrapper = <T = unknown>(
             u,
           );
 
-          stored_item.setProperties.forEach((fnc) => fnc(new_instance));
-
           return new_instance;
         };
 
@@ -705,6 +682,7 @@ export const constructorWrapper = <T = unknown>(
 
         stored_item.beforeInitialization.forEach((e) => e(new_constructor));
         const instance = wrapped_constructor();
+        stored_item.setProperties.forEach((fnc) => fnc(instance));
 
         stored_item.afterInitialization.forEach((e) => e(instance));
 

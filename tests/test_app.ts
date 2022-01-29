@@ -1,20 +1,6 @@
-import {
-  Path,
-  ResultWrapper,
-  Host,
-  App,
-  Get,
-  Router,
-  ExpressRequest,
-  UseMiddleware,
-} from '../index';
-
-const port = 4001;
-const host = 'localhost';
-const auto_start = false;
-
-const middleWarefucntion1 = () => {};
-const middleWarefucntion2 = () => {};
+import { Path, ResultWrapper, App, Get, Router, UseMiddleware } from '../index';
+const middleWarefucntion1 = (_: any, __: any, next: any) => next();
+const middleWarefucntion2 = (_: any, __: any, next: any) => next();
 const bodyParser = require('body-parser');
 
 @UseMiddleware(bodyParser.json())

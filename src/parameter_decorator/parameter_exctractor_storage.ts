@@ -79,7 +79,10 @@ export const ParameterExtractorStorage = new (class {
     return this.custom_extractors[extractor_name] || this.built_in_extractors[extractor_name];
   }
 
-  public get_parameter_extractor_safe(extractor_name: string) {
+  /**
+   * @throws {Error}
+   */
+  public get_parameter_extractor_safe(extractor_name: string): ParameterExctractor {
     const result = this.get_parameter_extractor(extractor_name);
 
     if (!result) {

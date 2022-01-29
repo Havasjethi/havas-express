@@ -1,4 +1,3 @@
-import { App, Get, Host } from '../index';
 import { test_app_instance } from './test_app';
 const supertest = require('supertest');
 
@@ -12,11 +11,12 @@ describe('Application with endpoints', () => {
         expect(res.text).toBe('Nice');
       });
   });
+
   test('TestApp Path: /13', async () => {
     await supertest(app)
       .get('/13')
       .expect((res: any) => {
-        expect(res.body.any).toBe(13);
+        expect(res.statusCode).toBe(404);
       });
   });
 

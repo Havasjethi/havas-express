@@ -1,40 +1,48 @@
-import { Routable } from '../classes/routable';
+import { ExpressCoreRoutable } from '../classes/express_core_routable';
 import { extender } from '../util/class_decorator_util';
-import { ParameterExctractor, ParameterExtractorStorage } from './parameter_exctractor_storage';
+import {
+  DynamicParameterExctractorFunction,
+  ParameterExtractorStorage,
+  StaticParameterExctractorFunction,
+} from './parameter_exctractor_storage';
 
-
-export const MethodParameterExtractor = <T = unknown>(
+export const StaticMethodParameterExtractor = <T = unknown>(
   extractor_name: string,
-  method: ParameterExctractor<T>,
-  argument: any = undefined,
+  method: StaticParameterExctractorFunction<T>,
 ) => {
-  ParameterExtractorStorage.register_parameter_extractor(extractor_name, method);
+  ParameterExtractorStorage.register_static_parameter_extractor(extractor_name, method);
 
-  return (target: Routable, method_name: string, parameter_index: number) => {
-    parameter_extractor(
-      target,
-      method_name,
-      parameter_index,
-      extractor_name,
-      argument,
-    );
+  return (target: ExpressCoreRoutable, method_name: string, parameter_index: number) => {
+    parameterExtractor(target, method_name, parameter_index, extractor_name);
   };
-}
+};
 
-export const parameter_extractor = (
-  target: Routable,
+export const DynamicParameterExtractor = <Args = unknown, Result = unknown>(
+  extractor_name: string,
+  method: DynamicParameterExctractorFunction<Result, Args>,
+) => {
+  ParameterExtractorStorage.register_dynamic_parameter_extractor(extractor_name, method);
+
+  return (argument: Args) =>
+    (target: ExpressCoreRoutable, method_name: string, parameter_index: number) => {
+      parameterExtractor(
+        target,
+        method_name,
+        parameter_index,
+        extractor_name,
+        argument as unknown as any[],
+      );
+    };
+};
+
+export const parameterExtractor = (
+  target: ExpressCoreRoutable,
   method_name: string,
   parameter_index: number,
   extractor_name: string,
-  argument: any[]
+  argument?: any[],
 ) => {
-  extender.set_property<Routable>(
-    target.constructor.name,
-    (x) => x.add_parameter_extractor(
-      method_name,
-      parameter_index,
-      extractor_name,
-      argument,
-    )
+  extender.setProperty<ExpressCoreRoutable>(target.constructor.name, (newInstance) =>
+    newInstance.addParameterExtractor(method_name, parameter_index, extractor_name, argument),
   );
 };

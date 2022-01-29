@@ -1,6 +1,8 @@
+import { NextFunction } from "express";
 import { ExpressRequest, ExpressResponse } from "../../index";
 
-export type ErrorHanderParams = {error: Error, request: ExpressRequest, response: ExpressResponse, next: Function};
+export type ErrorHandlerFunction = (error: Error, request: ExpressRequest, response: ExpressResponse, next: NextFunction) => any;
+export type ErrorHanderParams = {error: Error, request: ExpressRequest, response: ExpressResponse, next: NextFunction};
 
 export interface ErrorHandlerClass {
   handle: (object: ErrorHanderParams) => any;

@@ -1,12 +1,10 @@
-import {ExpressRequest, ExpressResponse} from "../../index";
-import {MiddlewareObject} from "../classes/middleware";
-import {ExpressHttpMethod} from "../types/native_http_methods";
+import { PostProcessor } from 'havas-core';
+import { ExpressRequest, ExpressResponse } from '../../index';
+import { MiddlewareObject } from '../classes/middleware';
+import { Middleware } from '../classes/types/middleware';
+import { ExpressHttpMethod } from '../types/native_http_methods';
 
 // export type MiddlewareFunction = IRouterHandler<any>;
-export type MiddlewareFunction = (req: ExpressRequest, res: ExpressResponse, next: any) => any;
-export type AyncMiddlewareFunction<T = unknown> = (req: ExpressRequest, res: ExpressResponse, next: any) => Promise<T>;
-
-export type Middleware = MiddlewareObject | MiddlewareFunction | AyncMiddlewareFunction;
 
 export interface MiddlewareEntry {
   method: ExpressHttpMethod;
@@ -14,20 +12,26 @@ export interface MiddlewareEntry {
 }
 
 export type UnaryMethodParameterType = 'request' | 'response' | 'next';
-export type ComplexMethodParameterType = 'path' | 'query' | 'body' | 'parameter' | 'cookie' | 'session' | 'sessionId';
+export type ComplexMethodParameterType =
+  | 'path'
+  | 'query'
+  | 'body'
+  | 'parameter'
+  | 'cookie'
+  | 'session'
+  | 'sessionId';
 
 export type MethodParameterType = UnaryMethodParameterType | ComplexMethodParameterType;
+
 export type MethodParameterData = {
-  variable_path: string,
+  variable_path: string;
 };
 
 export interface MethodParameterEntry<T extends MethodParameterType> {
-  parameter_type: MethodParameterType,
+  parameter_type: MethodParameterType;
   parameter_index: number;
   extra_data: T extends ComplexMethodParameterType ? MethodParameterData : undefined;
 }
-
-export type PostProcessorType<Input = any, Outout = any> = (value: Input) => Outout;
 
 export type RequestMethodProcessing = {
   parameter_extractors: Array<{
@@ -37,9 +41,9 @@ export type RequestMethodProcessing = {
   }>;
   preprocessor_parameter: MethodParameterEntry<any>[];
   post_processors: {
-    [parameter_index: number]: PostProcessorType<any, any>[]
+    [parameter_index: number]: PostProcessor[];
   };
-}
+};
 
 // export interface MethodEntry<T extends Routable<any> = Routable<any>> {
 export interface MethodEntry extends RequestMethodProcessing {
@@ -50,3 +54,5 @@ export interface MethodEntry extends RequestMethodProcessing {
   middlewares: Middleware[];
   use_wrapper?: boolean;
 }
+
+export type PostProcessorType<T = unknown, F = unknown> = (arg: T) => F;

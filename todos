@@ -3,10 +3,11 @@ Whould be nice:
         - @Session()
         - @Session(<param>)
         - @SessionId
-    [ ] Add change log
+    [X] Add change log
     [ ] Performance tests
     [ ] Documentation for Npm
     [ ] Samples
 
 Features in future:
+    [X] Extendable extractors
     [ ] Decorators for ErrorHandlingMethod, ResultWrapperMethod ( + ResultWrapper on Methods )

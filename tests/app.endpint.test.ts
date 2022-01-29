@@ -1,9 +1,9 @@
-import { App, Get, Host } from "../index";
-import { test_app_instance } from "./test_app";
-const supertest = require("supertest");
+import { App, Get, Host } from '../index';
+import { test_app_instance } from './test_app';
+const supertest = require('supertest');
 
 describe('Application with endpoints', () => {
-  const app = test_app_instance.get_initialized_routable();
+  const app = test_app_instance.getInitializedRoutable();
 
   test('TestApp Path: /', async () => {
     await supertest(app)
@@ -24,7 +24,7 @@ describe('Application with endpoints', () => {
     await supertest(app)
       .get('/router')
       .expect((res: any) => {
-        expect(res.body).toEqual({data: 'Index'});
+        expect(res.body).toEqual({ data: 'Index' });
       });
   });
 
@@ -32,7 +32,7 @@ describe('Application with endpoints', () => {
     await supertest(app)
       .get('/router/13')
       .expect((res: any) => {
-        expect(res.body).toEqual({data: 13})
+        expect(res.body).toEqual({ data: 13 });
       });
   });
 });

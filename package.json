@@ -1,6 +1,6 @@
 {
   "name": "havas-express",
-  "version": "0.2.0",
+  "version": "0.3.1",
   "description": "ExpressJs wrapper for creating class-oriented endpoint handlers",
   "files": [
     "lib/",
@@ -12,12 +12,13 @@
     "build": "tsc",
     "dev-build": "tsc --watch",
     "test": "jest",
-    "prepare": "npm build"
+    "prepare": "npm run build"
   },
   "author": "havasjethi",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "havas-core": "^0.1.0"
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.13.0",
@@ -30,6 +31,7 @@
     "cookie-parser": "^1.4.5",
     "get-port": "^5.1.1",
     "jest": "^26.6.3",
+    "prettier": "^2.4.1",
     "reflect-metadata": "^0.1.13",
     "supertest": "^6.1.3",
     "ts-jest": "^26.5.6",

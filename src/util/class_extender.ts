@@ -119,13 +119,19 @@ export class ClassExtender {
 
     if (
       Reflect &&
+      // @ts-ignore
       Reflect.getMetadataKeys !== undefined &&
+      // @ts-ignore
       Reflect.defineMetadata !== undefined &&
+      // @ts-ignore
       Reflect.getMetadata !== undefined
     ) {
+      // @ts-ignore
       Reflect.getMetadataKeys(original_constructor).forEach((key) => {
+      // @ts-ignore
         Reflect.defineMetadata(
           key,
+      // @ts-ignore
           Reflect.getMetadata(key, original_constructor),
           new_constructor,
         );

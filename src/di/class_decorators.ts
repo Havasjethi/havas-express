@@ -1,5 +1,3 @@
-import 'reflect-metadata';
-
 import { decorate, injectable } from 'inversify';
 import { ExpressCoreRoutable } from '../classes';
 import { Constructor, OnlyWrap } from '../util';

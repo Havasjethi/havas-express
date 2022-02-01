@@ -14,7 +14,7 @@ export interface ClassExtenderStoredItem<T> extends CreationLifecycleMethodHolde
 }
 
 export class ClassExtender {
-  private decorations: { [class_name: string]: ClassExtenderStoredItem<any> };
+  private readonly decorations: { [class_name: string]: ClassExtenderStoredItem<any> };
 
   public constructor() {
     this.decorations = {};
@@ -24,7 +24,7 @@ export class ClassExtender {
     class_name: string,
     method_to_run: CreationLifecycleMethodHolder<T>['beforeInitialization'][0],
   ) {
-    this.before_initialization(class_name, method_to_run);
+    this.beforeInitialization(class_name, method_to_run);
   }
 
   public wrapClass<T>(classTarget: Constructor<T>): Constructor<T> {

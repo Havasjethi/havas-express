@@ -57,7 +57,7 @@ describe('Testing auto building & Creation', () => {
     expect(mainNode?.children?.length).toBe(3);
   });
 
-  test('Correct childrend', () => {
+  test('Correct children', () => {
     expect(mainNode).not.toBeUndefined();
 
     const mainsChildren = mainNode.children;

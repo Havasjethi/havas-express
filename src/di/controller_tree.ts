@@ -11,7 +11,7 @@ export const getWrapper = (target: Constructor<any>) =>
   target.name !== wrapperConstructorName ? target : target.prototype.constructor.name;
 
 class ComposableTreeNode<T> {
-  childrend: ComposableTreeNode<T>[] = [];
+  children: ComposableTreeNode<T>[] = [];
   constructor(public value: T) {}
 
   isPresent(): boolean {
@@ -19,12 +19,12 @@ class ComposableTreeNode<T> {
   }
 
   addChild(x: ComposableTreeNode<T>): this {
-    this.childrend.push(x);
+    this.children.push(x);
     return this;
   }
 
-  addChildrend(x: ComposableTreeNode<T>[]): this {
-    this.childrend.push(...x);
+  addChildren(x: ComposableTreeNode<T>[]): this {
+    this.children.push(...x);
     return this;
   }
 }
@@ -82,7 +82,7 @@ export class ComposableTreeCreator<T> {
     }
 
     let currentIteration = missingParents;
-    let maxItarations = 100;
+    let maxIterations = 100;
 
     do {
       for (const [node, parent] of currentIteration.splice(0)) {
@@ -97,7 +97,7 @@ export class ComposableTreeCreator<T> {
           currentIteration.push([node, parent]);
         }
       }
-    } while (currentIteration.length !== 0 && maxItarations-- > 0);
+    } while (currentIteration.length !== 0 && maxIterations-- > 0);
 
     if (currentIteration.length !== 0) {
       throw new Error('Cannot insert elements, missing parents!');
@@ -146,17 +146,17 @@ export class ControllerTreeCreator extends ComposableTreeCreator<Constructor<Exp
   }
 
   public initialize(container: Container): ExpressCoreRoutable[] {
-    return this.getTrees().map((e) => this.initalizeNode(e, container));
+    return this.getTrees().map((e) => this.initializeNode(e, container));
   }
 
-  public initalizeNode(
+  public initializeNode(
     node: ComposableTreeNode<Constructor<ExpressCoreRoutable>>,
     container: Container,
   ): ExpressCoreRoutable {
     const initializedController = container.get(node.value);
 
-    node.childrend.forEach((child) =>
-      initializedController.addChild(this.initalizeNode(child, container)),
+    node.children.forEach((child) =>
+      initializedController.addChild(this.initializeNode(child, container)),
     );
 
     return initializedController;

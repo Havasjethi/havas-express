@@ -14,7 +14,7 @@
   "scripts": {
     "build": "tsc",
     "dev-build": "tsc --watch",
-    "test": "jest",
+    "test": "mocha",
     "prepare": "npm run build"
   },
   "author": "havasjethi",
@@ -22,25 +22,29 @@
   "dependencies": {
     "express": "^4.17.1",
     "havas-core": "^0.1.0",
-    "inversify": "^6.0.1"
+    "inversify": "^6.0.1",
+    "recursive-readdir": "^2.2.2"
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.13.0",
+    "@types/chai": "^4.3.0",
     "@types/express": "^4.17.11",
     "@types/express-session": "^1.17.3",
-    "@types/jest": "^26.0.23",
+    "@types/mocha": "^9.1.0",
     "@types/node": "^15.12.1",
+    "@types/recursive-readdir": "^2.2.0",
     "@types/supertest": "^2.0.11",
     "body-parser": "^1.19.0",
+    "chai": "^4.3.6",
     "cookie-parser": "^1.4.5",
     "get-port": "^5.1.1",
-    "jest": "^26.6.3",
+    "mocha": "^9.2.0",
     "prettier": "^2.4.1",
     "reflect-metadata": "^0.1.13",
     "supertest": "^6.1.3",
     "ts-jest": "^26.5.6",
     "ts-node": "^9.1.1",
-    "typescript": "^4.2.4"
+    "typescript": "^4.5.5"
   },
   "directories": {
     "lib": "lib",

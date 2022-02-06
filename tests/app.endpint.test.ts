@@ -1,38 +1,39 @@
+import { expect } from 'chai';
 import { test_app_instance } from './test_app';
 const supertest = require('supertest');
 
 describe('Application with endpoints', () => {
   const app = test_app_instance.getInitializedRoutable();
 
-  test('TestApp Path: /', async () => {
+  it('TestApp Path: /', async () => {
     await supertest(app)
       .get('/')
       .expect((res: any) => {
-        expect(res.text).toBe('Nice');
+        expect(res.text).equal('Nice');
       });
   });
 
-  test('TestApp Path: /13', async () => {
+  it('TestApp Path: /13', async () => {
     await supertest(app)
       .get('/13')
       .expect((res: any) => {
-        expect(res.statusCode).toBe(404);
+        expect(res.statusCode).equal(404);
       });
   });
 
-  test('TestApp Path: /router', async () => {
+  it('TestApp Path: /router', async () => {
     await supertest(app)
       .get('/router')
       .expect((res: any) => {
-        expect(res.body).toEqual({ data: 'Index' });
+        expect(res.body).deep.equal({ data: 'Index' });
       });
   });
 
-  test('TestApp Path: /router/13', async () => {
+  it('TestApp Path: /router/13', async () => {
     await supertest(app)
       .get('/router/13')
       .expect((res: any) => {
-        expect(res.body).toEqual({ data: 13 });
+        expect(res.body).deep.equal({ data: 13 });
       });
   });
 });

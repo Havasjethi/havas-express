@@ -1,3 +1,4 @@
+import { expect } from 'chai';
 import request from 'supertest';
 import {
   App,
@@ -73,34 +74,34 @@ describe('PostProcessor tests', () => {
   const test_app = new TestApp().getInitializedRoutable();
   const get_ = (path: string): request.Test => request(test_app).get(path);
 
-  // test('test - return_13', async () => {
-  //   await get_('/get_number').expect((response) => expect(response.text).toBe('13'));
+  //it('test - return_13', async () => {
+  //   await get_('/get_number').expect((response) => expect(response.text).equal('13'));
   // });
 
-  test('test - square', async () => {
+  it('test - square', async () => {
     const input = 13;
-    await get_('/number-' + input).expect((response) => expect(response.text).toBe('169'));
+    await get_('/number-' + input).expect((response) => expect(response.text).equal('169'));
   });
 
-  test('test - string_manipultaion', async () => {
+  it('test - string_manipultaion', async () => {
     const input = '13';
-    await get_('/string-' + input).expect((response) => expect(response.text).toBe('13__'));
+    await get_('/string-' + input).expect((response) => expect(response.text).equal('13__'));
   });
 
-  test('test - void_manipultaion', async () => {
+  it('test - void_manipultaion', async () => {
     const input = '13';
-    await get_('/void-' + input).expect((response) => expect(response.text).toBe('13'));
+    await get_('/void-' + input).expect((response) => expect(response.text).equal('13'));
   });
 
-  test('test - Str as string', async () => {
+  it('test - Str as string', async () => {
     const input = '13';
     const expected = input + 1;
-    await get_('/as-string-' + input).expect((response) => expect(response.text).toBe(expected));
+    await get_('/as-string-' + input).expect((response) => expect(response.text).equal(expected));
   });
 
-  test('test - Str as Number', async () => {
+  it('test - Str as Number', async () => {
     const input = '13';
     const expected = `${parseInt(input) + 1}`;
-    await get_('/as-number-' + input).expect((response) => expect(response.text).toBe(expected));
+    await get_('/as-number-' + input).expect((response) => expect(response.text).equal(expected));
   });
 });

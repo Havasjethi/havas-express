@@ -1,3 +1,4 @@
+import { expect } from 'chai';
 import { App, Host } from '../index';
 
 describe('Application test', () => {
@@ -14,15 +15,15 @@ describe('Application test', () => {
 
   const test_app = new EmptyTestApp();
 
-  test('Port setting is correct', () => {
-    expect(test_app.options.port).toEqual(port);
+  it('Port setting is correct', () => {
+    expect(test_app.options.port).equal(port);
   });
 
-  test('Host setting is correct', () => {
-    expect(test_app.options.host).toEqual(host);
+  it('Host setting is correct', () => {
+    expect(test_app.options.host).equal(host);
   });
 
-  test('Path is the default', () => {
-    expect(test_app.path).toEqual('/');
+  it('Path is the default', () => {
+    expect(test_app.path).equal('/');
   });
 });

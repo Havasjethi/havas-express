@@ -1,3 +1,4 @@
+import { expect } from 'chai';
 import {
   App,
   Body,
@@ -130,41 +131,41 @@ describe('Parameter Extractor tests', () => {
   });
 
   describe('Built in', () => {
-    test('Raw', async () => {
+    it('Raw', async () => {
       await request(test_app)
         .get(Paths.Raw)
-        .expect((req) => expect(req.text).toBe(expressPlainTypes));
+        .expect((req) => expect(req.text).equal(expressPlainTypes));
     });
 
-    test('Raw decorators', async () => {
+    it('Raw decorators', async () => {
       await request(test_app)
         .get(Paths.RawDecorated)
-        .expect((req) => expect(req.text).toBe(expressPlainTypes));
+        .expect((req) => expect(req.text).equal(expressPlainTypes));
     });
 
-    test('Check Body', async () => {
+    it('Check Body', async () => {
       const data = { part: 13 };
       const expected = JSON.stringify(Methods.BodyMethod(data, data['part']));
 
       await request(test_app)
         .post(Paths.BodyMethod)
         .send(data)
-        .expect((res) => expect(res.text).toBe(expected));
+        .expect((res) => expect(res.text).equal(expected));
     });
 
     describe('Coockie', () => {
       const agent = request.agent(test_app);
 
-      test('Should save cookie', async () => {
+      it('Should save cookie', async () => {
         await agent.get(Paths.CookieSetMethod).expect('set-cookie', 'cookie=hey; Path=/');
       });
 
-      test('should save cookies', async () => {
-        await agent.get(Paths.CookieMethod).expect(({ text }) => expect(text).toBe('hey'));
+      it('should save cookies', async () => {
+        await agent.get(Paths.CookieMethod).expect(({ text }) => expect(text).equal('hey'));
       });
     });
 
-    test('PathVariable', async () => {
+    it('PathVariable', async () => {
       const obj = {
         id: '123',
         name: 'asdsa',
@@ -172,33 +173,33 @@ describe('Parameter Extractor tests', () => {
       const path = Paths.PathVariable.replace(':id', obj.id).replace(':name', obj.name);
       await request(test_app)
         .get(path)
-        .expect(({ text }) => expect(text).toBe(JSON.stringify(obj)));
+        .expect(({ text }) => expect(text).equal(JSON.stringify(obj)));
     });
 
-    test('testQuery', async () => {
+    it('testQuery', async () => {
       const query = '?x=13&name=Jhon';
       await request(test_app)
         .get(Paths.Query + query)
         .expect(({ text }) =>
-          expect(text).toBe(JSON.stringify({ query: { x: '13', name: 'Jhon' }, name: 'Jhon' })),
+          expect(text).equal(JSON.stringify({ query: { x: '13', name: 'Jhon' }, name: 'Jhon' })),
         );
     });
   });
 
   describe('Custom', () => {
-    test('Static typed', async () => {
+    it('Static typed', async () => {
       const expected = JSON.stringify({ x: 'C1', y: 'C2' });
       await request(test_app)
         .get(Paths.CustomStatic)
-        .expect(({ text }) => expect(text).toBe(expected));
+        .expect(({ text }) => expect(text).equal(expected));
     });
 
-    test('Dynamic typed', async () => {
+    it('Dynamic typed', async () => {
       const expected = JSON.stringify({ x: 'C1', y: 'C2' });
 
       await request(test_app)
         .get(Paths.CustomStatic)
-        .expect(({ text }) => expect(text).toBe(expected));
+        .expect(({ text }) => expect(text).equal(expected));
     });
   });
 });

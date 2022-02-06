@@ -1,3 +1,4 @@
+import { expect } from 'chai';
 import { App, Get, Host, Path, PathVariable, ResultWrapper } from '../../index';
 import { ResultWrapperFunctionParameters } from '../../src/classes/types/result_wrapper';
 import { get_request_creator } from '../util';
@@ -29,19 +30,19 @@ describe('Method Wrapper', () => {
   const app = new AAA();
   const get_creator = get_request_creator(app);
 
-  test('endpoint_1', async () => {
-    await get_creator('/endpoint_111').expect((res) => expect(res.text).toBe('111'));
+  it('endpoint_1', async () => {
+    await get_creator('/endpoint_111').expect((res) => expect(res.text).equal('111'));
   });
 
-  test('endpoint_2', async () => {
-    await get_creator('/endpoint_222').expect((res) => expect(res.text).toBe('222'));
+  it('endpoint_2', async () => {
+    await get_creator('/endpoint_222').expect((res) => expect(res.text).equal('222'));
   });
 
-  test('async endpoint_1', async () => {
-    await get_creator('/async_endpoint_111').expect((res) => expect(res.text).toBe('111'));
+  it('async endpoint_1', async () => {
+    await get_creator('/async_endpoint_111').expect((res) => expect(res.text).equal('111'));
   });
 
-  test('async  endpoint_2', async () => {
-    await get_creator('/async_endpoint_222').expect((res) => expect(res.text).toBe('222'));
+  it('async  endpoint_2', async () => {
+    await get_creator('/async_endpoint_222').expect((res) => expect(res.text).equal('222'));
   });
 });

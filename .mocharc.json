@@ -1,0 +1,8 @@
+{
+  "extension": ["ts"],
+  "spec": "tests/**/*.{test,spec}.{t,j}s",
+  "require": "ts-node/register",
+  "async-only": false,
+  "timeout": 15000,
+  "ui": "bdd"
+}

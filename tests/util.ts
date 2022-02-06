@@ -3,7 +3,7 @@ import request from "supertest";
 import { App } from "../index";
 
 
-export const get_free_port = async () => {
+export const get_free_port = async (): Promise<number> => {
   return await get_port();
 };
 

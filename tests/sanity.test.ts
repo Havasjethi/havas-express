@@ -1,13 +1,13 @@
+import { expect } from 'chai';
 
-test('Sanity Tests', () => {
-  expect('undefined').toBe('undefined');
-  expect(13).toBe(13);
-  expect(1 + 1).toBe(2);
+it('Sanity Tests', () => {
+  expect('undefined').eq('undefined');
+  expect(13).eq(13);
+  expect(1 + 1).eq(2);
 
-  expect(undefined).toBe(undefined);
-  expect(undefined).toBeUndefined();
-  expect(null).toBe(null);
-  expect(null).toBeNull();
-  expect({}).toBeDefined();
-  expect(0.1+0.2).toBeCloseTo(0.3);
+  expect(undefined).eq(undefined);
+  expect(undefined).undefined;
+  expect(null).eq(null);
+
+  expect(0.1 + 0.2, 'Adding').approximately(0.3, 0.01);
 });

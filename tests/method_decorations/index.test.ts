@@ -1,55 +1,57 @@
-import { __testAppWithMethodDecorators } from "./testapp_with_method_decorators";
-import supertest from "supertest";
+import { expect } from 'chai';
+import { __testAppWithMethodDecorators } from './testapp_with_method_decorators';
+import supertest from 'supertest';
 
 describe('testAppWithMethodDecorators', () => {
-
-
-  test('Index GET call', async () => {
+  it('Index GET call', async () => {
     await supertest(__testAppWithMethodDecorators.get_initialized_routable())
-      .get('/a').expect(e => expect(e.text).toBe('index'));
+      .get('/a')
+      .expect((e) => expect(e.text).equal('index'));
   });
 
-  test('Index POST call', async () => {
+  it('Index POST call', async () => {
     await supertest(__testAppWithMethodDecorators.get_initialized_routable())
-      .post('/a').expect(e => expect(e.text).toBe('post_index'));
+      .post('/a')
+      .expect((e) => expect(e.text).equal('post_index'));
   });
 
-  test('Index DELETE call', async () => {
+  it('Index DELETE call', async () => {
     await supertest(__testAppWithMethodDecorators.get_initialized_routable())
-      .delete('/a').expect(e => expect(e.text).toBe('delete_index'));
+      .delete('/a')
+      .expect((e) => expect(e.text).equal('delete_index'));
   });
 
-  test('@BODY check', async () => {
+  it('@BODY check', async () => {
     await supertest(__testAppWithMethodDecorators.get_initialized_routable())
       .post('/a/user')
-      .send({user: {name: 'Laci', sex: 'Male'}})
+      .send({ user: { name: 'Laci', sex: 'Male' } })
       .expect((response) => {
-        expect(response.text).toBe('Laci')
-      })
+        expect(response.text).equal('Laci');
+      });
   });
 
-  test('@QUERY check', async () => {
+  it('@QUERY check', async () => {
     await supertest(__testAppWithMethodDecorators.get_initialized_routable())
       .post('/a/param_extract?p1=13')
       .expect((response) => {
-        expect(response.text).toBe('13')
-      })
+        expect(response.text).equal('13');
+      });
   });
 
-  test('@COOKIE check ', async () => {
+  it('@COOKIE check ', async () => {
     await supertest(__testAppWithMethodDecorators.get_initialized_routable())
       .post('/a/cookie_extract')
       .set('Cookie', ['user_name=Peti'])
       .expect((response) => {
-        expect(response.text).toBe('Peti')
-      })
+        expect(response.text).equal('Peti');
+      });
   });
 
-  test('@PathVariable, @Param extract_from_path check ', async () => {
+  it('@PathVariable, @Param extract_from_path check ', async () => {
     await supertest(__testAppWithMethodDecorators.get_initialized_routable())
       .post('/a/some/abcde')
       .expect((response) => {
-        expect(response.body).toEqual({path: 'abcde', param: 'abcde'});
+        expect(response.body).equal({ path: 'abcde', param: 'abcde' });
       });
   });
 });

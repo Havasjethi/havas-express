@@ -1,4 +1,5 @@
-import { BeforeCreate, Constructor } from "../../src/util/class_decorator_util";
+import { expect } from 'chai';
+import { BeforeCreate, Constructor } from '../../src/util/class_decorator_util';
 
 let value_to_reset = 13;
 
@@ -13,11 +14,10 @@ class ClassA {
 }
 
 describe('@BeforeCreate tests', () => {
-
-  test ('@BeforeCreate works', () => {
+  it('@BeforeCreate works', () => {
     const before = ClassA.static_property;
     new ClassA();
 
-    expect(before + 1).toBe(ClassA.static_property)
+    expect(before + 1).equal(ClassA.static_property);
   });
 });

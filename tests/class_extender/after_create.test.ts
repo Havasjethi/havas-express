@@ -1,4 +1,5 @@
-import { AfterCreate } from '../../src/util/class_decorator_util';
+import { expect } from 'chai';
+import { AfterCreate } from '../../src/util';
 
 describe('@AfterCreate tests', () => {
   @AfterCreate<ClassA>((instance) => {
@@ -33,23 +34,23 @@ describe('@AfterCreate tests', () => {
 
   const random_string = 'random_string';
 
-  test('ClassA works', () => {
+  it('ClassA works', () => {
     const a_instance = new ClassA(random_string);
 
-    expect(a_instance.some_name).toBe(random_string.toUpperCase());
+    expect(a_instance.some_name).equal(random_string.toUpperCase());
   });
 
-  test('ClassB works', () => {
+  it('ClassB works', () => {
     const b_instance_1 = new ClassB(3);
     const b_instance_2 = new ClassB(5);
 
-    expect(b_instance_1.x).toBe(3 + 2);
-    expect(b_instance_2.x).toBe(5 + 2);
+    expect(b_instance_1.x).equal(3 + 2);
+    expect(b_instance_2.x).equal(5 + 2);
   });
 
-  test('ClassC works', () => {
+  it('ClassC works', () => {
     const c_instance = new ClassC(-1);
 
-    expect(c_instance.x).toBe(-1 + (2 + 10));
+    expect(c_instance.x).equal(-1 + (2 + 10));
   });
 });

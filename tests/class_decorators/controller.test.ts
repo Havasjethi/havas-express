@@ -37,17 +37,27 @@ class SubController_2_1 extends Router {}
 @Controller()
 class SubController_Indirect_1 extends Router {}
 
-const expectIndexExists = () => {};
-describe('Testing auto building & Creation', () => {
-  const initializedItems = initializeControllerTree(ReadType.None, true);
-  const findIndex = (list: ExpressCoreRoutable[], cls: Constructor<ExpressCoreRoutable>) =>
-    list.findIndex(
-      (e) =>
-        e.constructor.name === cls.name || e.constructor.name === cls?.prototype?.constructor?.name,
-    );
+const findIndex = (list: ExpressCoreRoutable[], cls: Constructor<ExpressCoreRoutable>) =>
+  list.findIndex(
+    (e) =>
+      e.constructor.name === cls.name || e.constructor.name === cls?.prototype?.constructor?.name,
+  );
 
-  const mainNodeIndex = findIndex(initializedItems, AMainController);
-  const mainNode = initializedItems[mainNodeIndex];
+describe('Testing auto building & Creation', () => {
+  const initializedItems: ExpressCoreRoutable[] = [];
+  let mainNodeIndex: number;
+  let mainNode: ExpressCoreRoutable;
+
+  beforeAll(async () => {
+    const result = await initializeControllerTree({kind: 'none'}, true);
+    initializedItems.push(...result);
+
+    mainNodeIndex = findIndex(initializedItems, AMainController);
+    mainNode = initializedItems[mainNodeIndex];
+  });
+
+
+
   test('Main node found', () => {
     expect(mainNodeIndex).toBeGreaterThan(-1);
   });

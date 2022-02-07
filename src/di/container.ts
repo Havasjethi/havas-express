@@ -1,52 +1,86 @@
 import { Container } from 'inversify';
-import { ExpressCoreRoutable } from '../classes/express_core_routable';
-import { ComposableTreeCreator, ControllerTreeCreator } from './controller_tree';
+import readDir from 'recursive-readdir';
+import { ExpressCoreRoutable } from '../classes';
+import { ControllerTreeCreator } from './controller_tree';
+
 
 export const mainContainer = new Container({
   skipBaseClassChecks: true,
 });
 
 /**
- * @deprecated
+ * @deprecated - Use `mainContainer` instead
  */
 export const main_container = mainContainer;
 export const MainControllerTree = new ControllerTreeCreator(); //;new ComposableTreeCreator(ControllerTreeNode);
 
-export enum ReadType {
-  None,
-  Folder,
-  NameMatch,
+/**
+ * Recursively reads files from the given folder
+ */
+export type FolderRead = {
+  kind: 'folder',
+  folder: string,
+  ignoredFiles?: string | string[],
+};
+
+export type Custom = {
+  kind: 'custom',
+  getFiles: () => Promise<string[]>,
+};
+
+export type None = { kind: 'none' };
+
+/**
+ * TODO :: Add pattern matching for files
+ */
+export type ReadType = 'none' | 'folder' | 'custom';
+
+type ReadTypeObject = FolderRead | Custom | None;
+
+
+export async function initializeControllers (readType: ReadTypeObject): Promise<ExpressCoreRoutable[]> {
+  const filesToImport: string[] = await (getReaderMethod(readType)());
+  await Promise.all(filesToImport.map(async (file) => import(file)));
+
+  return MainControllerTree.initialize(mainContainer);
 }
 
-export const initializeControllerTree = (
-  readType: ReadType,
-  initializeControllers: boolean,
-): ExpressCoreRoutable[] => {
-  const fileImporter = getReaderMethod(readType);
-
-  const filesToImport: string[] = fileImporter();
-
-  filesToImport.forEach((file) => import(file));
-
-  const initializedRouters = [];
-  if (initializeControllers) {
-    initializedRouters.push(...MainControllerTree.initialize(mainContainer));
-  }
-
-  return initializedRouters;
+/**
+ * @deprecated -- The usage of`initializeControllers`
+ */
+export const initializeControllerTree = async (
+  readType: ReadTypeObject,
+  uselessValue: boolean,
+): Promise<ExpressCoreRoutable[]> => {
+  const result = await initializeControllers(readType);
+  return uselessValue ? result : [];
 };
 
-const getReaderMethod = (y: ReadType): (() => string[]) => {
+const getReaderMethod = (readType: ReadTypeObject): (() => Promise<string[]>) => {
   // TODO :: Add Folder  find logic
-  switch (y) {
-    case ReadType.Folder:
-      return recursiveRead;
-    case ReadType.None:
+  switch (readType.kind) {
+    case 'folder':
+      return () => syncFileReader(readType);
+    case 'custom':
+      return readType.getFiles;
+    case 'none':
     default:
-      return () => [];
+      return () => Promise.resolve([]);
   }
 };
 
-const recursiveRead = (): string[] => {
-  return [];
+/**
+ * @throws Error
+ */
+const syncFileReader = async ({
+  folder,
+  ignoredFiles: rawIgnoredFiles,
+}: FolderRead): Promise<string[]> => {
+  const ignoredFiles = rawIgnoredFiles === undefined
+    ? []
+    : typeof rawIgnoredFiles === 'string'
+      ? [rawIgnoredFiles]
+      : rawIgnoredFiles;
+
+  return readDir(folder, ignoredFiles);
 };

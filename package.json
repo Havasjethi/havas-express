@@ -20,9 +20,11 @@
   "author": "havasjethi",
   "license": "ISC",
   "dependencies": {
+    "@types/recursive-readdir": "^2.2.0",
     "express": "^4.17.1",
     "havas-core": "^0.1.0",
-    "inversify": "^6.0.1"
+    "inversify": "^6.0.1",
+    "recursive-readdir": "^2.2.2"
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.13.0",

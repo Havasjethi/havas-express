@@ -155,9 +155,9 @@ export class ControllerTreeCreator extends ComposableTreeCreator<Constructor<Exp
   ): ExpressCoreRoutable {
     const initializedController = container.get(node.value);
 
-    node.children.forEach((child) =>
-      initializedController.addChild(this.initializeNode(child, container)),
-    );
+    for (const child of node.children) {
+      initializedController.addChild(this.initializeNode(child, container));
+    }
 
     return initializedController;
   }

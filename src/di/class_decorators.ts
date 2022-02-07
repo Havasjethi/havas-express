@@ -25,5 +25,8 @@ export const Controller = (parent?: Constructor<ExpressCoreRoutable>): any => {
 
 export const Component = (identifier?: string | symbol) => (target: Constructor<any>) => {
   decorate(injectable(), target);
-  mainContainer.bind(identifier ?? target).toSelf();
+
+  if (target.length === 0) {
+    mainContainer.bind(identifier ?? target).toSelf();
+  }
 };

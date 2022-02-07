@@ -1,4 +1,4 @@
-import { Container } from 'inversify';
+import { Container, AsyncContainerModule, ContainerModule } from 'inversify';
 import readDir from 'recursive-readdir';
 import { ExpressCoreRoutable } from '../classes';
 import { ControllerTreeCreator } from './controller_tree';
@@ -37,10 +37,23 @@ export type ReadType = 'none' | 'folder' | 'custom';
 
 type ReadTypeObject = FolderRead | Custom | None;
 
+function isArrayType<T>(value: T | Array<T>): value is Array<T> {
+    return Array.isArray(value);
+}
 
-export async function initializeControllers (readType: ReadTypeObject): Promise<ExpressCoreRoutable[]> {
+type moduleType = { asyncModule?: AsyncContainerModule | AsyncContainerModule[], module?: ContainerModule | ContainerModule[] };
+
+export async function initializeControllers (readType: ReadTypeObject, {asyncModule, module}: moduleType = {}): Promise<ExpressCoreRoutable[]> {
   const filesToImport: string[] = await (getReaderMethod(readType)());
   await Promise.all(filesToImport.map(async (file) => import(file)));
+
+  if (asyncModule) {
+    await mainContainer.loadAsync(...isArrayType(asyncModule) ? asyncModule : [asyncModule]);
+  }
+
+  if (module) {
+    mainContainer.load(...isArrayType(module) ? module : [module]);
+  }
 
   return MainControllerTree.initialize(mainContainer);
 }

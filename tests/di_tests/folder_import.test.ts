@@ -1,20 +1,26 @@
 import { IRouter } from 'express';
+import { AsyncContainerModule, interfaces as inversifyInterfaces } from 'inversify';
 import supertest from 'supertest';
-import { ExpressCoreRoutable, initializeControllerTree } from '../../index';
+import { initializeControllers } from '../../index';
+import { DummyService } from './folder_importing/sub_ctrl_folder/service';
+
+const SERVICE_STATUS_CODE = 205;
 
 describe('Folder DI import', () => {
-  const classes: ExpressCoreRoutable[] = [];
   let router: IRouter;
 
   beforeAll(async () => {
-    const result = await initializeControllerTree(
-      { kind: 'folder', folder: `${__dirname}/folder_importing` },
-      true,
+    let asyncModule = new AsyncContainerModule(async (bind: inversifyInterfaces.Bind) => {
+      bind<DummyService>(DummyService).toConstantValue(new DummyService(SERVICE_STATUS_CODE));
+    });
+
+    const result = await initializeControllers(
+      { kind: 'folder', folder: `${ __dirname }/folder_importing` },
+      { asyncModule },
     );
 
-    classes.push(...result);
-    expect(classes).not.toHaveLength(0);
-    router = classes[0].getInitializedRoutable();
+    expect(result).not.toHaveLength(0);
+    router = result[0].getInitializedRoutable();
   });
 
 
@@ -23,6 +29,10 @@ describe('Folder DI import', () => {
   });
 
   it('Sub Controller found', (done) => {
-    supertest(router).get('/sub-endpoint/').expect(200, done);
+    supertest(router).get('/sub-endpoint').expect(200, done);
+  });
+
+  it('Sub Controller found', (done) => {
+    supertest(router).get('/sub-endpoint-service').expect(SERVICE_STATUS_CODE, done);
   });
 });

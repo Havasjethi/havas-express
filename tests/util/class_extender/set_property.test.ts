@@ -1,19 +1,18 @@
-import { AfterCreate } from '../../src/util/class_decorator_util';
+import { SetProperty } from '../../../src/util';
 
-describe('@AfterCreate tests', () => {
-  @AfterCreate<ClassA>((instance) => {
+describe('@SetProperty tests', () => {
+  @SetProperty<ClassA>((instance) => {
     instance.some_name = instance.some_name.toUpperCase();
   })
   class ClassA {
-    static y: number = 13;
-
-    constructor(public some_name: string) {}
+    public static x: number = 13;
+    constructor(public some_name: string = '') {}
   }
 
-  @AfterCreate<ClassB>((instance) => {
+  @SetProperty<ClassB>((instance) => {
     instance.x += 1;
   })
-  @AfterCreate<ClassB>((instance) => {
+  @SetProperty<ClassB>((instance) => {
     instance.x += 1;
   })
   class ClassB {
@@ -21,7 +20,7 @@ describe('@AfterCreate tests', () => {
   }
 
   function Add_To_X(value: number) {
-    return AfterCreate((instance) => (instance.x += value));
+    return SetProperty((instance) => (instance.x += value));
   }
 
   @Add_To_X(10)
@@ -36,7 +35,7 @@ describe('@AfterCreate tests', () => {
   test('ClassA works', () => {
     const a_instance = new ClassA(random_string);
 
-    expect(a_instance.some_name).toBe(random_string.toUpperCase());
+    expect(a_instance.some_name).toEqual(random_string.toUpperCase());
   });
 
   test('ClassB works', () => {

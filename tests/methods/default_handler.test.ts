@@ -1,5 +1,5 @@
-import { App, Router, DefaultHandler, Path } from '../index';
-import { get_request_creator, init_app } from './util';
+import { App, Router, DefaultHandler, Path } from '../../index';
+import { get_request_creator, init_app } from '../util';
 
 const default_text_app = '--default_text_app--';
 const default_text_router = '--default_text_router--';

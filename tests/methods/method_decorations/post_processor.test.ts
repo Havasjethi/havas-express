@@ -7,7 +7,7 @@ import {
   PostProcessor,
   ResponseObj,
   ResultWrapper,
-} from '../../index';
+} from '../../../index';
 
 const Convert = (type: NumberConstructor | StringConstructor) =>
   PostProcessor((x: string) => {

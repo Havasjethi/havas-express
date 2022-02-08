@@ -7,7 +7,7 @@ import {
   ExpressRequest,
   ExpressResponse,
   Controller,
-} from '../../../index';
+} from '../../../../index';
 
 @MainController
 export class TheMainController extends App {

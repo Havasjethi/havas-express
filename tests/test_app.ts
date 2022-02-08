@@ -1,11 +1,11 @@
 import { Path, ResultWrapper, App, Get, Router, UseMiddleware } from '../index';
-const middleWarefucntion1 = (_: any, __: any, next: any) => next();
-const middleWarefucntion2 = (_: any, __: any, next: any) => next();
-const bodyParser = require('body-parser');
+import bodyParser from 'body-parser';
+const middlewareFunction1 = (_: any, __: any, next: any) => next();
+const middlewareFunction2 = (_: any, __: any, next: any) => next();
 
 @UseMiddleware(bodyParser.json())
 class TestApp extends App {
-  @Get('/', middleWarefucntion1, middleWarefucntion2)
+  @Get('/', middlewareFunction1, middlewareFunction2)
   index(req: any, res: any) {
     res.send('Nice');
   }

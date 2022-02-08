@@ -14,7 +14,7 @@ import {
   ResultWrapper,
   Router,
   UseMiddleware,
-} from '../../index';
+} from '../../../index';
 
 const body_parser = require('body-parser');
 const cookie_parser = require('cookie-parser');

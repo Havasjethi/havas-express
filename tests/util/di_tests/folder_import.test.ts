@@ -1,7 +1,7 @@
 import { IRouter } from 'express';
 import { AsyncContainerModule, interfaces as inversifyInterfaces } from 'inversify';
 import supertest from 'supertest';
-import { initializeControllers } from '../../index';
+import { initializeControllers } from '../../../index';
 import { DummyService } from './folder_importing/sub_ctrl_folder/service';
 
 const SERVICE_STATUS_CODE = 205;

@@ -1,4 +1,4 @@
-import { Controller, ExpressRequest, ExpressResponse, Get, Path, Router } from '../../../../index';
+import { Controller, ExpressRequest, ExpressResponse, Get, Path, Router } from '../../../../../index';
 import { DummyService } from './service';
 
 

@@ -1,5 +1,5 @@
 import { App, Get, Host, Path, PathVariable, ResultWrapper } from '../../index';
-import { ResultWrapperFunctionParameters } from '../../src/classes/types/result_wrapper';
+import { ResultWrapperFunctionParameters } from '../../src/classes';
 import { get_request_creator } from '../util';
 
 @Path('/')
@@ -20,7 +20,7 @@ class AAA extends App {
   }
 
   @Get('/async_endpoint_:num')
-  async asnyc_response(@PathVariable('num') num: string) {
+  async async_response(@PathVariable('num') num: string) {
     return num;
   }
 }

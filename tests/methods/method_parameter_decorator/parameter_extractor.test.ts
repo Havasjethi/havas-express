@@ -18,12 +18,12 @@ import {
   UseMiddleware,
   WholeBody,
   WholeQuery,
-} from '../../index';
+} from '../../../index';
 import request from 'supertest';
 import bodyParser from 'body-parser';
 // @ts-ignore
 import cookieParser from 'cookie-parser';
-import { Next } from '../../src/parameter_decorator';
+import { Next } from '../../../src/parameter_decorator';
 
 const Paths = {
   BodyMethod: '/body',

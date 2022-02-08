@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Component } from '../../../../index';
+import { Component } from '../../../../../index';
 
 @Component()
 export class DummyService {

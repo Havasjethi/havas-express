@@ -1,6 +1,6 @@
-import { App, Host, Path, Router, ErrorHandler, Get } from "../index";
-import { PipeErrorHandler } from "../src/classes/error_handler";
-import { get_request_creator } from "./util";
+import { App, Host, Path, Router, ErrorHandler, Get } from "../../index";
+import { PipeErrorHandler } from "../../src/classes/error_handler";
+import { get_request_creator } from "../util";
 
 const error_handler_message_main_app = 'TestApp - Error handled!';
 const error_handler_message_router = 'TestApp - Error handled!';

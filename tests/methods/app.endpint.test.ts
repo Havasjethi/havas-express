@@ -1,4 +1,4 @@
-import { test_app_instance } from './test_app';
+import { test_app_instance } from '../test_app';
 const supertest = require('supertest');
 
 describe('Application with endpoints', () => {

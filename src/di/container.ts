@@ -70,7 +70,6 @@ export const initializeControllerTree = async (
 };
 
 const getReaderMethod = (readType: ReadTypeObject): (() => Promise<string[]>) => {
-  // TODO :: Add Folder  find logic
   switch (readType.kind) {
     case 'folder':
       return () => syncFileReader(readType);

@@ -10,6 +10,9 @@ export class Router extends ExpressCoreRoutable<ExpressRouter> {
     this.getRoutable().stack.splice(0);
   }
 
+  /**
+   * @deprecated - Use `Router.removeLayers`
+   */
   remove_layers(): void {
     this.removeLayers();
   }

@@ -14,17 +14,14 @@ import {
   ParameterExtractorStorage,
   StaticParameterExctractorFunction,
 } from '../../index';
-// import { isPromise } from 'util/types';
 
 const isPromise = (v: any) => v.constructor.name === 'Promise';
 
 import { ExpressHttpMethod } from '../types/native_http_methods';
 import { ErrorHandlerClass, ErrorHandlerFunction } from './error_handler';
 import { MiddlewareObject } from './middleware';
-import { ExpressEndpoint } from './types/endpoint';
-import { ErrorHandlerEntry, RegistreableErrorHandler } from './types/error';
+import { ExpressEndpoint, ResultWrapperType, RegistrableErrorHandler, ErrorHandlerEntry } from './types';
 import { ExpressFunction, Middleware, RegistrableMiddleware } from './types/middleware';
-import { ResultWrapperType } from './types/result_wrapper';
 
 export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends BaseCoreRouter<
   ExpressEndpoint,
@@ -35,7 +32,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
   public routable: T;
   public layersInitialized: boolean = false;
 
-  public errorHandlersMethods: { [name: string]: RegistreableErrorHandler } = {};
+  public errorHandlersMethods: { [name: string]: RegistrableErrorHandler } = {};
 
   public children: ExpressCoreRoutable[] = [];
 
@@ -82,12 +79,12 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
     return this.endpoints[name];
   }
 
-  // private getErrorHandler(name: string): RegistreableErrorHandler {
+  // private getErrorHandler(name: string): RegistrableErrorHandler {
   //   if (this.errorHandlersMethods[name] === undefined) {
   //     this.errorHandlersMethods[name] = {
   //       parameters: [],
   //       // TODO :: Should MethodName be added ?
-  //     } as unknown as RegistreableErrorHandler;
+  //     } as unknown as RegistrableErrorHandler;
   //   }
   //   return this.errorHandlersMethods[name];
   // }

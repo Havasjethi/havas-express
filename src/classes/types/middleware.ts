@@ -8,7 +8,7 @@ export type ExpressFunction = (
   next: NextFunction,
 ) => any;
 
-export type AyncMiddlewareFunction<T = unknown> = (
+export type AsyncMiddlewareFunction<T = unknown> = (
   req: ExpressRequest,
   res: ExpressResponse,
   next: any,
@@ -17,7 +17,7 @@ export type AyncMiddlewareFunction<T = unknown> = (
 /**
  * TODO :: Impreve MiddlewareObject to handle Decorators, also move to common
  */
-export type Middleware = MiddlewareObject | ExpressFunction | AyncMiddlewareFunction;
+export type Middleware = MiddlewareObject | ExpressFunction | AsyncMiddlewareFunction;
 
 export interface RegistrableMiddleware {
   path: string;

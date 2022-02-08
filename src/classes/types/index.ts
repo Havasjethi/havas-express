@@ -1,5 +1,5 @@
 import { ExpressEndpoint } from './endpoint';
-import { RegistreableErrorHandler } from './error';
+import { RegistrableErrorHandler, ErrorHandlerEntry } from './error';
 import { RegistrableMiddleware } from './middleware';
 import {
   ResultWrapperFunctionParameters,
@@ -9,9 +9,10 @@ import {
 
 export {
   ExpressEndpoint,
-  RegistreableErrorHandler,
+  RegistrableErrorHandler,
   RegistrableMiddleware,
   ResultWrapperFunctionParameters,
   ResultWrapperType,
   ResultWrapperFunction,
+  ErrorHandlerEntry,
 };

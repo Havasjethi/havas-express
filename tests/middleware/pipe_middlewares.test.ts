@@ -36,12 +36,12 @@ describe('Pipe Middlewares', () => {
   const app = new A();
   const get_creator = get_request_creator(app);
 
-  test('endpoint_1', async () => {
+  test('Sync middleware test', async () => {
     await get_creator('/endpoint_1')
       .expect(res => expect(res.text).toBe('OK'));
   });
 
-  test('endpoint_2', async () => {
+  test('Async Middleware test', async () => {
     await get_creator('/endpoint_2')
       .expect(res => expect(res.text).toBe('OK'));
   });

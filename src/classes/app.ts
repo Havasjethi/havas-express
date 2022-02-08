@@ -99,7 +99,7 @@ export abstract class App extends ExpressCoreRoutable<Application> {
           (https && used_port === 443) || (!https && used_port === 80) ? '' : `:${used_port}`;
 
         const path = `${protocol}://${host}${port}/`;
-        console.log(`App started to listend on: ${path}`, server.address());
+        console.log(`App listening on: ${path}`, server.address());
       }
     });
 
@@ -118,8 +118,8 @@ export abstract class App extends ExpressCoreRoutable<Application> {
     server.close(error_hander);
   }
 
-  public stop_all(error_hander?: (err: Error | undefined) => void) {
-    this.started_servers.splice(0).map(({ server }) => server.close(error_hander));
+  public stop_all(errorHandler?: (err: Error | undefined) => void) {
+    this.started_servers.splice(0).map(({ server }) => server.close(errorHandler));
     stop();
     console.log('App stopped listening!');
   }
@@ -135,7 +135,7 @@ export abstract class App extends ExpressCoreRoutable<Application> {
     this.default_server.close(() => {
       delete this.default_server;
       if (this._start_stop_logging) {
-        console.log(`Server stopped listening to http://${this.options.host}:${this.options.port}`);
+        console.log(`Server stopped listening on: http://${this.options.host}:${this.options.port}`);
       }
       on_stop_callback();
     });

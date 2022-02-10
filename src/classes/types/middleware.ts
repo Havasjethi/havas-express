@@ -15,7 +15,7 @@ export type AsyncMiddlewareFunction<T = unknown> = (
 ) => Promise<T>;
 
 /**
- * TODO :: Impreve MiddlewareObject to handle Decorators, also move to common
+ * TODO :: Improve MiddlewareObject to handle Decorators, also move to common
  */
 export type Middleware = MiddlewareObject | ExpressFunction | AsyncMiddlewareFunction;
 

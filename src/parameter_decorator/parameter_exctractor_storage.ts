@@ -1,25 +1,25 @@
 import { NextFunction } from 'express';
 import { Request, Response } from '../../index';
 
-export type ParameterExctractor = StaticParameterExctractor | DynamicParameterExctractor;
+export type ParameterExtractor = StaticParameterExtractor | DynamicParameterExtractor;
 
-export interface StaticParameterExctractor {
+export interface StaticParameterExtractor {
   type: 'Static';
-  extractor: StaticParameterExctractorFunction;
+  extractor: StaticParameterExtractorFunction;
 }
-export interface DynamicParameterExctractor {
+export interface DynamicParameterExtractor {
   type: 'Dynamic';
-  extractor: DynamicParameterExctractorFunction;
+  extractor: DynamicParameterExtractorFunction;
 }
 
-export type StaticParameterExctractorFunction<T = unknown> = (
+export type StaticParameterExtractorFunction<T = unknown> = (
   req: Request,
   res: Response,
   next: NextFunction,
   error?: any,
 ) => T;
 
-export type DynamicParameterExctractorFunction<Result = unknown, Arg = unknown> = (
+export type DynamicParameterExtractorFunction<Result = unknown, Arg = unknown> = (
   args: Arg,
   req: Request,
   res: Response,
@@ -28,31 +28,31 @@ export type DynamicParameterExctractorFunction<Result = unknown, Arg = unknown> 
 ) => Result;
 
 /**
- * TODO:: Add Static Parameter extractors for flexig
+ * TODO:: Add Static Parameter extractors for flexing
  */
 export const ParameterExtractorStorage = new (class {
   constructor(
-    public _predefined_extractors: { [key: string]: ParameterExctractor } = {},
+    public _predefined_extractors: { [key: string]: ParameterExtractor } = {},
     public _custom_extractors: {
-      [key: string]: ParameterExctractor;
+      [key: string]: ParameterExtractor;
     } = {},
   ) {}
 
-  get custom_extractors(): { [key: string]: ParameterExctractor } {
+  get custom_extractors(): { [key: string]: ParameterExtractor } {
     return this._custom_extractors;
   }
 
-  get built_in_extractors(): { [key: string]: ParameterExctractor } {
+  get built_in_extractors(): { [key: string]: ParameterExtractor } {
     return this._predefined_extractors;
   }
 
   /**
-   * @param {string} extractorName This value should be uniqe
-   * @param {ParameterExctractor} method
+   * @param {string} extractorName This value should be unique
+   * @param {ParameterExtractor} method
    */
   public register_static_parameter_extractor(
     extractorName: string,
-    method: StaticParameterExctractorFunction,
+    method: StaticParameterExtractorFunction,
   ) {
     this._custom_extractors[extractorName] = {
       extractor: method,
@@ -62,12 +62,12 @@ export const ParameterExtractorStorage = new (class {
 
   public register_dynamic_parameter_extractor<Args, Result>(
     extractor_name: string,
-    method: DynamicParameterExctractorFunction<Result, Args>,
+    method: DynamicParameterExtractorFunction<Result, Args>,
   ) {
     // Type removed
     this._custom_extractors[extractor_name] = {
       type: 'Dynamic',
-      extractor: method as DynamicParameterExctractorFunction,
+      extractor: method as DynamicParameterExtractorFunction,
     };
   }
 
@@ -75,14 +75,14 @@ export const ParameterExtractorStorage = new (class {
     return this.custom_extractors[extractor_name] !== undefined;
   }
 
-  public get_parameter_extractor(extractor_name: string): ParameterExctractor {
+  public get_parameter_extractor(extractor_name: string): ParameterExtractor {
     return this.custom_extractors[extractor_name] || this.built_in_extractors[extractor_name];
   }
 
   /**
    * @throws {Error}
    */
-  public get_parameter_extractor_safe(extractor_name: string): ParameterExctractor {
+  public get_parameter_extractor_safe(extractor_name: string): ParameterExtractor {
     const result = this.get_parameter_extractor(extractor_name);
 
     if (!result) {
@@ -92,28 +92,28 @@ export const ParameterExtractorStorage = new (class {
     return result;
   }
 
-  // public get_as_entry<T = unknown>(extractor_name: string): ParameterExctractorEntry<T> {
+  // public get_as_entry<T = unknown>(extractor_name: string): ParameterExtractorEntry<T> {
   //   if (Object.keys(this.custom_extractors).includes(extractor_name)) {
   //     return {
   //       name: extractor_name,
   //       built_in: false,
-  //       method: this.custom_extractors[extractor_name] as ParameterExctractor<T>,
+  //       method: this.custom_extractors[extractor_name] as ParameterExtractor<T>,
   //     };
   //   } else {
   //     return {
   //       name: extractor_name,
   //       built_in: true,
-  //       method: this.built_in_extractors[extractor_name] as ParameterExctractor<T>,
+  //       method: this.built_in_extractors[extractor_name] as ParameterExtractor<T>,
   //     };
   //   }
   // }
 })();
 
-// Note :: All parameter extractors are registered into a single Array, 'a' overrites 'a'
+// Note :: All parameter extractors are registered into a single Array, 'a' overrides 'a'
 //
-// export const createCustumExtractor = (
+// export const createCustomExtractor = (
 //   name: string,
-//   method: DynamicParameterExctractorFunction | StaticParameterExctractorFunction,
+//   method: DynamicParameterExtractorFunction | StaticParameterExtractorFunction,
 // ) => {
 //   // ParameterExtractorStorage.register_static_parameter_extractor(name, method);
 //   //
@@ -122,9 +122,9 @@ export const ParameterExtractorStorage = new (class {
 //   // };
 // };
 //
-// export const createCustumParameteredExtractor = <Arguments extends []>(
+// export const createCustomParameterExtractor = <Arguments extends []>(
 //   name: string,
-//   method: DynamicParameterExctractorFunction,
+//   method: DynamicParameterExtractorFunction,
 // ) => {
 //   // ParameterExtractorStorage.register_dynamic_parameter_extractor(name, method);
 //   //

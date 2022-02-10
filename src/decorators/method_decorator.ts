@@ -1,14 +1,14 @@
 import { Middleware } from '../classes/types/middleware';
 import { ExpressHttpMethod } from '../types/native_http_methods';
-import { ExpressCoreRoutable } from '../classes/express_core_routable';
-import { extender } from '../util/class_decorator_util';
+import { ExpressCoreRoutable } from '../classes';
+import { extender } from '../util';
 
 // function add_function(
 //   target: Routable<any>,
 //   method_name: string,
 //   method_type: ExpressHttpMethod,
 //   path: string,
-//   middlewares: Middlewareeware[],
+//   middlewares: Middleware[],
 // ) {
 //   extender.set_property<Routable>(target.constructor.name, (x) => {
 //     x.add_method(method_name, method_type, path, middlewares);

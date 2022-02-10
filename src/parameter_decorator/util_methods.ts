@@ -1,9 +1,9 @@
-import { ExpressCoreRoutable } from '../classes/express_core_routable';
-import { extender } from '../util/class_decorator_util';
+import { ExpressCoreRoutable } from '../classes';
+import { extender } from '../util';
 import {
-  DynamicParameterExctractorFunction,
+  DynamicParameterExtractorFunction,
   ParameterExtractorStorage,
-  StaticParameterExctractorFunction,
+  StaticParameterExtractorFunction,
 } from './parameter_exctractor_storage';
 
 /**
@@ -12,7 +12,7 @@ import {
  */
 export const CreateStaticParameterExtractor = <T = unknown>(
   extractor_name: string,
-  method: StaticParameterExctractorFunction<T>,
+  method: StaticParameterExtractorFunction<T>,
 ) => {
   ParameterExtractorStorage.register_static_parameter_extractor(extractor_name, method);
 
@@ -27,7 +27,7 @@ export const CreateStaticParameterExtractor = <T = unknown>(
  */
 export const CreateDynamicParameterExtractor = <Args = unknown, Result = unknown>(
   extractor_name: string,
-  method: DynamicParameterExctractorFunction<Result, Args>,
+  method: DynamicParameterExtractorFunction<Result, Args>,
 ) => {
   ParameterExtractorStorage.register_dynamic_parameter_extractor(extractor_name, method);
 

@@ -8,11 +8,11 @@ import {
   RegistrableMethod,
 } from 'havas-core';
 import {
-  DynamicParameterExctractorFunction,
+  DynamicParameterExtractorFunction,
   ExpressRequest,
   ExpressResponse,
   ParameterExtractorStorage,
-  StaticParameterExctractorFunction,
+  StaticParameterExtractorFunction,
 } from '../../index';
 
 const isPromise = (v: any) => v.constructor.name === 'Promise';
@@ -250,7 +250,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
   }
 
   /**
-   * Deafult handler method is more important than registered functions
+   * Default handler method is more important than registered functions
    */
   protected setupDefaultHandler(): void {
     if (this.defaultHandlerMethod) {
@@ -268,8 +268,8 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
   protected setupErrorHandlers(errorHandlers: ErrorHandlerEntry[]): void {
     const routable = this.getRoutable();
 
-    Object.values(this.errorHandlerMethods).forEach((errorHandlermethod) => {
-      const method = this.errorHandlerCreator(errorHandlermethod).bind(this);
+    Object.values(this.errorHandlerMethods).forEach((errorHandlerMethod) => {
+      const method = this.errorHandlerCreator(errorHandlerMethod).bind(this);
       routable.use(method);
     });
 
@@ -323,7 +323,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
    * @protected
    */
   protected methodCreator(endpoint: ExpressEndpoint): ExpressFunction {
-    const methodFuntion: ExpressFunction =
+    const methodFunction: ExpressFunction =
       endpoint.parameters === undefined || endpoint.parameters.length === 0
         ? //@ts-ignore
           this[endpoint.methodName] // TODO :: ??Bind this??
@@ -334,7 +334,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
             return this[endpoint.methodName].bind(this)(...parameters);
           };
 
-    return this.mightWrapFunction(methodFuntion);
+    return this.mightWrapFunction(methodFunction);
   }
 
   protected getParameters(
@@ -363,12 +363,12 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
 
       if (type === 'Static') {
         addParameter(
-          (extractor as StaticParameterExctractorFunction)(request, response, next),
+          (extractor as StaticParameterExtractorFunction)(request, response, next),
           index,
         );
       } else if (type === 'Dynamic') {
         addParameter(
-          (extractor as DynamicParameterExctractorFunction)(
+          (extractor as DynamicParameterExtractorFunction)(
             value.arguments,
             request,
             response,
@@ -383,10 +383,10 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
   }
 
   protected errorHandlerCreator(endpoint: ErrorHandlerEntry): ErrorHandlerFunction {
-    const callback = () => {};
+    // const callback = () => {};
 
     // Todo :: Post Processors
-    return endpoint.parameters.length === 0
+    return !endpoint.parameters || endpoint.parameters.length === 0
       ? (error: Error, request: ExpressRequest, response: ExpressResponse, next: NextFunction) =>
           //@ts-ignore
           this[endpoint.methodName](error, request, response, next)
@@ -414,12 +414,12 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
             if (type === 'Static') {
               addParameter(
                 // TODO :: Add error handler @Error
-                (extractor as StaticParameterExctractorFunction)(request, response, next),
+                (extractor as StaticParameterExtractorFunction)(request, response, next),
                 index,
               );
             } else if (type === 'Dynamic') {
               addParameter(
-                (extractor as DynamicParameterExctractorFunction)(
+                (extractor as DynamicParameterExtractorFunction)(
                   value.arguments,
                   request,
                   response,

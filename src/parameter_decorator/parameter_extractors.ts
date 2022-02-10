@@ -1,3 +1,4 @@
+import { ExpressCoreRoutable } from '../classes';
 import { CreateDynamicParameterExtractor, CreateStaticParameterExtractor } from './util_methods';
 
 export const Request = CreateStaticParameterExtractor('Request', (req) => req);
@@ -39,3 +40,13 @@ export const Header = CreateDynamicParameterExtractor<string>(
   'Header',
   (headerName, req) => req.headers[headerName],
 );
+
+export const SomeError = (target: ExpressCoreRoutable, method_name: string, parameter_index: number) => {
+
+}
+
+/**
+ *
+ * @constructor
+ */
+export const Result = (target: ExpressCoreRoutable, method_name: string, parameter_index: number) => {}

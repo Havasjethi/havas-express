@@ -1,10 +1,11 @@
 import { ExpressCoreRoutable } from '../classes';
-import { CreateDynamicParameterExtractor, CreateStaticParameterExtractor } from './util_methods';
+import { CreateDynamicParameterExtractor, CreateStaticParameterExtractor } from './parameter_decorator_storage/util_methods';
 
 export const Request = CreateStaticParameterExtractor('Request', (req) => req);
 export const RequestObj = Request;
 
 export const Response = CreateStaticParameterExtractor('Response', (_, res) => res);
+export const Res = Response;
 export const ResponseObj = Response;
 
 export const Next = CreateStaticParameterExtractor('Next', (_, __, next) => next);
@@ -41,12 +42,6 @@ export const Header = CreateDynamicParameterExtractor<string>(
   (headerName, req) => req.headers[headerName],
 );
 
-export const SomeError = (target: ExpressCoreRoutable, method_name: string, parameter_index: number) => {
+export const Err = CreateStaticParameterExtractor('Err', (_req, _res, _next, error) => error);
+export const Result = CreateStaticParameterExtractor('Result', (_req, _res, _next, _error, result) => result);
 
-}
-
-/**
- *
- * @constructor
- */
-export const Result = (target: ExpressCoreRoutable, method_name: string, parameter_index: number) => {}

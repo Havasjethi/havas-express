@@ -56,8 +56,6 @@ describe('Testing auto building & Creation', () => {
     mainNode = initializedItems[mainNodeIndex];
   });
 
-
-
   test('Main node found', () => {
     expect(mainNodeIndex).toBeGreaterThan(-1);
   });

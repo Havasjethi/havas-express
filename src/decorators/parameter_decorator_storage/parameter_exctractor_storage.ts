@@ -1,5 +1,5 @@
 import { NextFunction } from 'express';
-import { Request, Response } from '../../index';
+import { Request, Response } from '../../../index';
 
 export type ParameterExtractor = StaticParameterExtractor | DynamicParameterExtractor;
 
@@ -12,20 +12,21 @@ export interface DynamicParameterExtractor {
   extractor: DynamicParameterExtractorFunction;
 }
 
-export type StaticParameterExtractorFunction<T = unknown> = (
+export type StaticParameterExtractorFunction<T = unknown, R = unknown> = (
   req: Request,
   res: Response,
   next: NextFunction,
   error?: any,
+  result?: R,
 ) => T;
 
-export type DynamicParameterExtractorFunction<Result = unknown, Arg = unknown> = (
+export type DynamicParameterExtractorFunction<T = unknown, Arg = unknown> = (
   args: Arg,
   req: Request,
   res: Response,
   next: NextFunction,
   error?: any,
-) => Result;
+) => T;
 
 /**
  * TODO:: Add Static Parameter extractors for flexing

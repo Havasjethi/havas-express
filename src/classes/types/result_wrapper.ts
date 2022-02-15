@@ -1,4 +1,3 @@
-import { response } from 'express';
 import { RegistrableMethod } from 'havas-core';
 import { ExpressRequest, ExpressResponse, Next } from '../../../index';
 

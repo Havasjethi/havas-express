@@ -11,7 +11,7 @@ import {
   DynamicParameterExtractorFunction,
   ExpressRequest,
   ExpressResponse,
-  ParameterExtractorStorage,
+  ParameterExtractorStorage, Result,
   StaticParameterExtractorFunction,
 } from '../../index';
 
@@ -414,7 +414,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
             if (type === 'Static') {
               addParameter(
                 // TODO :: Add error handler @Error
-                (extractor as StaticParameterExtractorFunction)(request, response, next),
+                (extractor as StaticParameterExtractorFunction)(request, response, next, error),
                 index,
               );
             } else if (type === 'Dynamic') {
@@ -439,7 +439,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
    * @protected
    */
   protected getResultWrapperFunction(): CallableFunction | undefined {
-    // Todo ?? Debug this if actual: `getResultWrapper`
+    // Todo :: This should be changed later to: `getResultWrapper`
     const wrapper: ResultWrapperType = this.getResultWrapper() as ResultWrapperType;
 
     if (!wrapper) {

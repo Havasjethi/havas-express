@@ -1,4 +1,14 @@
-import { App, Get, Host, Path, PathVariable, ResultWrapper } from '../../index';
+import {
+  App,
+  Get,
+  Host,
+  Path,
+  PathVariable, Res,
+  Response,
+  Result,
+  ResultWrapper,
+  Router,
+} from '../../index';
 import { ResultWrapperFunctionParameters } from '../../src/classes';
 import { get_request_creator } from '../util';
 

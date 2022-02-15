@@ -1,6 +1,6 @@
 export * from './src/decorators/method_decorator';
-export * from './src/decorators/method_paramter_decorators';
-export * from './src/parameter_decorator';
+export * from './src/decorators/parameter_post_processors';
+export * from './src/decorators/parameter_decorator_storage';
 export * from './src/classes';
 export * from './src/decorators/default_handler';
 export { extender, BeforeCreate, SetProperty, AfterCreate } from './src/util/class_decorator_util';
@@ -13,7 +13,6 @@ import {
   Request as Req,
   NextFunction,
   ParamsDictionary,
-  Router as ExpressRouter,
 } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
 

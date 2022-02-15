@@ -41,7 +41,7 @@ class TestApp extends App {
   }
 
   @Get('/string-:str')
-  string_manipultaion(
+  string_manipulation(
     @PostProcessor((str: string) => str + '__')
     @PathVariable('str')
     doubled_id: number,
@@ -50,7 +50,7 @@ class TestApp extends App {
   }
 
   @Get('/void-:str')
-  void_manipultaion(
+  void_manipulation(
     @PostProcessor((x: string) => {})
     @PathVariable('str')
     parameter: any,
@@ -64,7 +64,7 @@ class TestApp extends App {
   }
 
   @Get('/as-number-:num')
-  asNumber(@Convert(Number) @PathVariable('num') variable: any, @ResponseObj respone: any) {
+  asNumber(@Convert(Number) @PathVariable('num') variable: any) {
     return `${variable + 1}`;
   }
 }
@@ -73,21 +73,21 @@ describe('PostProcessor tests', () => {
   const test_app = new TestApp().getInitializedRoutable();
   const get_ = (path: string): request.Test => request(test_app).get(path);
 
-  // test('test - return_13', async () => {
-  //   await get_('/get_number').expect((response) => expect(response.text).toBe('13'));
-  // });
+  test('test - return_13', async () => {
+    await get_('/get_number').expect((response) => expect(response.text).toBe('13'));
+  });
 
   test('test - square', async () => {
     const input = 13;
     await get_('/number-' + input).expect((response) => expect(response.text).toBe('169'));
   });
 
-  test('test - string_manipultaion', async () => {
+  test('test - string_manipulation', async () => {
     const input = '13';
     await get_('/string-' + input).expect((response) => expect(response.text).toBe('13__'));
   });
 
-  test('test - void_manipultaion', async () => {
+  test('test - void_manipulation', async () => {
     const input = '13';
     await get_('/void-' + input).expect((response) => expect(response.text).toBe('13'));
   });

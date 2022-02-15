@@ -1,14 +1,34 @@
-import { App, Host, Path, Router, ErrorHandler, Get } from "../../index";
-import { PipeErrorHandler } from "../../src/classes/error_handler";
+import 'reflect-metadata';
+import request from 'supertest';
+import {
+  App,
+  Path,
+  Router,
+  ErrorHandler,
+  Get,
+  ErrorHandlerMethod,
+  initializeControllers,
+  MainController,
+  Controller,
+  ExpressCoreRoutable,
+  PipeErrorHandler,
+  ExpressResponse,
+  Response,
+  ResponseObj,
+  Err,
+} from '../../index';
 import { get_request_creator } from "../util";
 
-const error_handler_message_main_app = 'TestApp - Error handled!';
-const error_handler_message_router = 'TestApp - Error handled!';
+const ERROR_MESSAGES = {
+  main_app: 'TestApp - main_app',
+  router: 'TestApp - router',
+  method_error: 'TestApp - method',
+  decorated_error: 'TestApp - decorated_error',
+};
 
-@Host({port: 42342})
+@MainController
 @ErrorHandler(((err, req, res, next) => {
-  console.log('Error: err');
-  res.send(error_handler_message_main_app);
+  res.send(ERROR_MESSAGES.main_app);
 }))
 class TestApp extends App {
 
@@ -18,55 +38,95 @@ class TestApp extends App {
   }
 }
 
+@Controller()
 @Path('/router')
 @ErrorHandler((err, req, res, next) => {
-  console.log('Error in TestRouter:  err');
-  res.send(error_handler_message_router);
+  res.send(ERROR_MESSAGES.router);
 })
-class TestRotuer extends Router {
+class TestRouter extends Router {
 
   @Get('/')
   index () {
-    throw new Error('TestRotuer MEH');
+    throw new Error('TestRouter MEH');
   }
 }
 
+@Controller()
 @Path('/router-2')
 @ErrorHandler(new PipeErrorHandler(parameters => {
   console.log('Some logging')
 }))
-class TestRotuerWithPipeErrorHandler extends Router {
+class TestRouterWithPipeErrorHandler extends Router {
 
   @Get('/')
   index () {
-    throw new Error('TestRotuerWithPipeErrorHandler MEH');
+    throw new Error('TestRouterWithPipeErrorHandler MEH');
   }
 }
 
+@Controller()
+@Path('/method-related')
+class SomeRouter extends Router {
+
+  @ErrorHandlerMethod
+  error_handler_method(err: Error, req: Request, res: Response) {
+    res.send(ERROR_MESSAGES.method_error);
+  }
+
+  @Get('/')
+  index() {
+    throw new Error('');
+  }
+}
+
+@Controller()
+class SomeRouterR extends Router {
+
+  @ErrorHandlerMethod
+  error_handler_method(
+    @ResponseObj res: ExpressResponse,
+    @Err error: Error,
+  ): any {
+    res.send(error.message);
+  }
+
+  @Get('/method-related-plus')
+  index() {
+    throw new Error(ERROR_MESSAGES.decorated_error);
+  }
+}
 
 describe('Test error handlers', () => {
+  let controllers: ExpressCoreRoutable[];
+  let get: (path: string) => request.Test;
 
-  const app = new TestApp();
-  const rotuer_1 = new TestRotuer();
-  const rotuer_2 = new TestRotuerWithPipeErrorHandler();
-  app
-    .append(rotuer_1)
-    .append(rotuer_2);
+  beforeAll(async () => {
+    controllers = await initializeControllers({kind: 'none'});
+    get = get_request_creator(controllers[0]);
+  });
 
-  const get = get_request_creator(app);
-
-  test('Test 1', async () =>
+  test('Application attached error handler works', async () =>
     await get('/')
-      .expect((res) => expect(res.text).toBe(error_handler_message_main_app))
+      .expect((res) => expect(res.text).toBe(ERROR_MESSAGES.main_app))
   );
 
-  test('Test 2', async () =>
+  test('Router specific error handler called before MainApplication', async () =>
     await get('/router')
-      .expect((res) => expect(res.text).toBe(error_handler_message_router))
+      .expect((res) => expect(res.text).toBe(ERROR_MESSAGES.router))
   );
 
-  test('Test 3', async () =>
+  test('Router error falls back to if not handled', async () =>
     await get('/router-2')
-      .expect((res) => expect(res.text).toBe(error_handler_message_main_app))
+      .expect((res) => expect(res.text).toBe(ERROR_MESSAGES.main_app))
+  );
+
+  test('<TODO>', async () =>
+    await get('/method-related')
+      .expect((res) => expect(res.text).toBe(ERROR_MESSAGES.method_error))
+  );
+
+  test('<TODO 2>', async () =>
+    await get('/method-related-plus')
+      .expect((res) => expect(res.text).toBe(ERROR_MESSAGES.decorated_error))
   );
 });

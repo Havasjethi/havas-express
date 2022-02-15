@@ -1,6 +1,6 @@
-import { ExpressCoreRoutable } from '../classes/express_core_routable';
+import { ExpressCoreRoutable } from '../classes';
 import { PostProcessorType } from '../interfaces/method_entry';
-import { extender } from '../util/class_decorator_util';
+import { extender } from '../util';
 
 const requestPostprocessor = (
   target: ExpressCoreRoutable,

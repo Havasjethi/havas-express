@@ -18,8 +18,8 @@ export function DefaultHandler<T extends ExpressCoreRoutable = ExpressCoreRoutab
 }
 
 /**
- * The decorated method will be called with ErrorHanderParams
- * @see {ErrorHanderParams}
+ * The decorated method will be called with ErrorHandlerParams
+ * @see {ErrorHandlerParams}
  */
 export function ErrorHandlerMethod<T extends ExpressCoreRoutable = ExpressCoreRoutable>(
   target: T,

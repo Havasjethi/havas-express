@@ -23,7 +23,7 @@ import request from 'supertest';
 import bodyParser from 'body-parser';
 // @ts-ignore
 import cookieParser from 'cookie-parser';
-import { Next } from '../../../src/parameter_decorator';
+import { Next } from '../../../src/decorators/parameter_decorator_storage';
 
 const Paths = {
   BodyMethod: '/body',

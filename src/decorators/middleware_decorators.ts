@@ -1,8 +1,9 @@
-import { ExpressCoreRoutable } from '../classes/express_core_routable';
+import { ExpressCoreRoutable } from '../classes';
 import { Middleware } from '../classes/types/middleware';
 import { ExpressHttpMethod } from '../types/native_http_methods';
 import { MiddlewareEntry } from '../interfaces/method_entry';
-import { SetProperty } from '../util/class_decorator_util';
+import { SetProperty } from '../util';
+
 
 export function UseMiddleware(...middlewares: Middleware[]) {
   return SetProperty<ExpressCoreRoutable<any>>((created_element) => {
@@ -16,6 +17,9 @@ export function MethodSpecificMiddlewares(method: ExpressHttpMethod, ...middlewa
   });
 }
 
+/**
+ * @deprecated
+ */
 export function ComplexMiddleware({ method, path }: MiddlewareEntry, ...middlewares: Middleware[]) {
   return SetProperty<ExpressCoreRoutable<any>>((created_element) => {
     created_element.add_constructor_middleware({ method, path, middlewares });

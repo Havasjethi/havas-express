@@ -1,5 +1,5 @@
-import { ExpressCoreRoutable } from '../classes';
-import { extender } from '../util';
+import { ExpressCoreRoutable } from '../../classes';
+import { extender } from '../../util';
 import {
   DynamicParameterExtractorFunction,
   ParameterExtractorStorage,

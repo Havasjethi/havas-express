@@ -27,6 +27,8 @@ export abstract class App extends ExpressCoreRoutable<Application> {
 
   constructor() {
     super(express(), 'app');
+    // TODO :: Update ExpressCoreRoutable<T>
+    this.setPath('/');
     this.default_server = undefined;
     this.started_servers = [];
   }
@@ -134,7 +136,9 @@ export abstract class App extends ExpressCoreRoutable<Application> {
     this.default_server.close(() => {
       delete this.default_server;
       if (this._start_stop_logging) {
-        console.log(`Server stopped listening on: http://${this.options.host}:${this.options.port}`);
+        console.log(
+          `Server stopped listening on: http://${this.options.host}:${this.options.port}`,
+        );
       }
       on_stop_callback();
     });

@@ -1,4 +1,4 @@
-import { App, Router, DefaultHandler, Path } from '../../index';
+import { App, DefaultHandler, Path, Router } from '../../index';
 import { get_request_creator, init_app } from '../util';
 
 const default_text_app = '--default_text_app--';
@@ -21,9 +21,7 @@ class TestRouter extends Router {
 }
 
 describe('DefaultHandler tests', () => {
-  const app = init_app(new TestApp()
-    .append(new TestRouter())
-    );
+  const app = init_app(new TestApp().append(new TestRouter()));
   const get_ = app.then((application) => get_request_creator(application));
 
   test('TestApp - /', async () => {

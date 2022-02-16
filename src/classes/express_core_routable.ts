@@ -12,10 +12,11 @@ import {
   ExpressRequest,
   ExpressResponse,
   ParameterExtractorStorage,
+  ResultWrapperFunction,
   StaticParameterExtractorFunction,
 } from '../../index';
 
-const isPromise = (v: any) => v.constructor.name === 'Promise';
+const isPromise = (value: any) => value?.constructor?.name === 'Promise';
 
 import { ExpressHttpMethod } from '../types/native_http_methods';
 import { ErrorHandlerClass, ErrorHandlerFunction } from './error_handler';
@@ -40,6 +41,11 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
   public errorHandlersMethods: { [name: string]: RegistrableErrorHandler } = {};
 
   public children: ExpressCoreRoutable[] = [];
+
+  protected parameterExtractors: { [endpoint_name: string]: DecoratedParameters[] } = {};
+  protected parameterPostProcessors: {
+    [endpoint_name: string]: { [parameter_index: number]: PostProcessor[] };
+  } = {};
 
   protected constructor(routable: T, protected type: 'router' | 'app') {
     super();
@@ -79,8 +85,6 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
     return this.endpoints[name];
   }
 
-  parameterExtractors: { [name: string]: DecoratedParameters[] } = {};
-
   public addParameterExtractor(
     methodName: string,
     parameterIndex: number,
@@ -95,8 +99,6 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
       arguments: argument,
     });
   }
-
-  parameterPostProcessors: { [name: string]: { [index: number]: PostProcessor[] } } = {};
 
   public addRequestPostprocessor<T extends PostProcessor = PostProcessor>(
     methodName: string,
@@ -150,7 +152,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
     } else if (typeof errorHandler === 'function') {
       this.errorHandlerFunctions.push(errorHandler);
     } else {
-      console.error('Unable to register function: ', typeof errorHandler);
+      console.error(`Unable to register function with given type: ${typeof errorHandler}`);
       throw new Error('Unable to register function');
     }
   }
@@ -285,15 +287,19 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
       : (request: ExpressRequest, response: ExpressResponse, next: NextFunction) => {
           const result = functionToWrap(request, response, next);
 
-          if (!response.headersSent) {
-            // What happens if they call the next function
-            if (isPromise(result)) {
-              result
-                .then((result: any) => wrapper({ result, request, response, next }))
-                .catch((e: any) => next(e));
-            } else {
-              wrapper({ result, request, response, next });
-            }
+          if (response.headersSent) {
+            return;
+          }
+          // What happens if they call the next function
+          if (isPromise(result)) {
+            result
+              .then((result: any) => {
+                // TODO :: check `response.headersSent` again
+                (wrapper as ResultWrapperFunction)({ result, request, response, next });
+              })
+              .catch((e: any) => next(e));
+          } else {
+            (wrapper as ResultWrapperFunction)({ result, request, response, next });
           }
         };
   }
@@ -374,7 +380,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
       : (error: Error, request: ExpressRequest, response: ExpressResponse, next: NextFunction) => {
           const parameters: any[] = [];
 
-          endpoint.parameters.sort((a, b) => (a.index! > b.index! ? 1 : -1));
+          endpoint.parameters.sort((a, b) => a.index! - b.index!);
 
           const addParameter = (value: any, index: number) => {
             if (endpoint.postProcessors) {
@@ -419,7 +425,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
   /**
    * @protected
    */
-  protected getResultWrapperFunction(): CallableFunction | undefined {
+  protected getResultWrapperFunction(): ExpressFunction | ResultWrapperFunction<any> | undefined {
     // Todo :: This should be changed later to: `getResultWrapper`
     const wrapper: ResultWrapperType = this.getResultWrapper() as ResultWrapperType;
 
@@ -430,7 +436,38 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
       return wrapper as unknown as ExpressFunction;
     }
 
-    //@ts-ignore
-    return this[wrapper.methodName].bind(this);
+    return !wrapper.parameters || wrapper.parameters.length === 0
+      ? //@ts-ignore
+        this[wrapper.methodName].bind(this)
+      : ((({ result, request, response, next }) => {
+          // TODO :: Update decorated parameters!!
+          const parameters = (wrapper as RegistrableMethod).parameters
+            .sort((a, b) => a.index! - b.index!)
+            .map((e) => {
+              const { extractor, type } = ParameterExtractorStorage.get_parameter_extractor(e.name);
+
+              switch (type) {
+                case 'Static':
+                  return (extractor as StaticParameterExtractorFunction)(
+                    request,
+                    response,
+                    next,
+                    undefined,
+                    result,
+                  );
+                case 'Dynamic':
+                  return (extractor as DynamicParameterExtractorFunction)(
+                    e.arguments,
+                    request,
+                    response,
+                    next,
+                    undefined,
+                  );
+              }
+            });
+
+          // @ts-ignore
+          this[wrapper.methodName].bind(this)(...parameters);
+        }) as ResultWrapperFunction<any>);
   }
 }

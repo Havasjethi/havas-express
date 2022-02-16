@@ -8,9 +8,6 @@ export interface ResultWrapperFunctionParameters<T = any> {
   next: Next;
 }
 
-/**
- * Todo :: Add ResultWrapperMethod
- */
 export type ResultWrapperType<T = unknown> = ResultWrapperFunction<T> | RegistrableMethod;
 export type ResultWrapperFunction<T = unknown> = ({
   result,

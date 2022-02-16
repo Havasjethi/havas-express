@@ -13,6 +13,7 @@ import {
   ExpressCoreRoutable,
   PipeErrorHandler,
   ExpressResponse,
+  Request,
   Response,
   ResponseObj,
   Err,

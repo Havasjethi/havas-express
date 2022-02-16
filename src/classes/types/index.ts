@@ -1,6 +1,6 @@
 import { ExpressEndpoint } from './endpoint';
 import { RegistrableErrorHandler, ErrorHandlerEntry } from './error';
-import { RegistrableMiddleware } from './middleware';
+import { AsyncMiddlewareFunction, ExpressFunction, RegistrableMiddleware } from './middleware';
 import {
   ResultWrapperFunctionParameters,
   ResultWrapperType,
@@ -8,6 +8,8 @@ import {
 } from './result_wrapper';
 
 export {
+  AsyncMiddlewareFunction,
+  ExpressFunction,
   ExpressEndpoint,
   RegistrableErrorHandler,
   RegistrableMiddleware,

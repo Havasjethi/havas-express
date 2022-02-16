@@ -73,9 +73,9 @@ describe('PostProcessor tests', () => {
   const test_app = new TestApp().getInitializedRoutable();
   const get_ = (path: string): request.Test => request(test_app).get(path);
 
-  test('test - return_13', async () => {
-    await get_('/get_number').expect((response) => expect(response.text).toBe('13'));
-  });
+  // test('test - return_13', async () => {
+  //   await get_('/get_number').expect((response) => expect(response.text).toBe('13'));
+  // });
 
   test('test - square', async () => {
     const input = 13;

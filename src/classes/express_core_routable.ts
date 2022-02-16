@@ -11,7 +11,7 @@ import {
   DynamicParameterExtractorFunction,
   ExpressRequest,
   ExpressResponse,
-  ParameterExtractorStorage, Result,
+  ParameterExtractorStorage,
   StaticParameterExtractorFunction,
 } from '../../index';
 
@@ -20,7 +20,12 @@ const isPromise = (v: any) => v.constructor.name === 'Promise';
 import { ExpressHttpMethod } from '../types/native_http_methods';
 import { ErrorHandlerClass, ErrorHandlerFunction } from './error_handler';
 import { MiddlewareObject } from './middleware';
-import { ExpressEndpoint, ResultWrapperType, RegistrableErrorHandler, ErrorHandlerEntry } from './types';
+import {
+  ExpressEndpoint,
+  ResultWrapperType,
+  RegistrableErrorHandler,
+  ErrorHandlerEntry,
+} from './types';
 import { ExpressFunction, Middleware, RegistrableMiddleware } from './types/middleware';
 
 export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends BaseCoreRouter<
@@ -61,8 +66,6 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
     return this.routable;
   }
 
-  // Registration methods
-
   private getEndpoint(name: string): ExpressEndpoint {
     if (this.endpoints[name] === undefined) {
       this.endpoints[name] = {
@@ -70,24 +73,11 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
         methodName: name,
         middlewares: [],
         parameters: [],
-        // methodType
-        // methodName
-        // path
       } as unknown as ExpressEndpoint;
     }
 
     return this.endpoints[name];
   }
-
-  // private getErrorHandler(name: string): RegistrableErrorHandler {
-  //   if (this.errorHandlersMethods[name] === undefined) {
-  //     this.errorHandlersMethods[name] = {
-  //       parameters: [],
-  //       // TODO :: Should MethodName be added ?
-  //     } as unknown as RegistrableErrorHandler;
-  //   }
-  //   return this.errorHandlersMethods[name];
-  // }
 
   parameterExtractors: { [name: string]: DecoratedParameters[] } = {};
 
@@ -119,7 +109,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
   }
 
   /**
-   * Register endpoint method -- @Get, @Post...
+   * Register request handler methods -- @Get, @Post...
    */
   public registerEndpoint(
     methodName: string,
@@ -212,8 +202,9 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
     this.setupMiddlewares(this.middlewares);
     this.setupMethods(Object.values(this.endpoints));
 
-    // TODO :: Add this pls: Initialize Result Wrapper Function for each nodes (Router)
-    // this.setupDefaultHandler(this.get_added_methods() as Required<MethodEntry>[]);
+    // TODO ::
+    //  Add this pls: Initialize Result Wrapper Function for each nodes (Router)
+    //  this.setupDefaultHandler(this.get_added_methods() as Required<MethodEntry>[]);
 
     this.children.forEach((child: ExpressCoreRoutable) => {
       if (!child.layersInitialized) {
@@ -224,7 +215,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
     });
 
     this.setupDefaultHandler();
-    this.setupErrorHandlers(this.errorHandlers);
+    this.setupErrorHandlers();
 
     this.layersInitialized = true;
   }
@@ -232,17 +223,13 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
   protected setupMiddlewares(middlewares: RegistrableMiddleware[]): void {
     const routable = this.getRoutable();
 
-    const middlewareMapper = (middlewares: Middleware[]): ExpressFunction[] =>
-      middlewares.map((e) => {
-        if (typeof e === 'function') {
-          return e;
-        } else {
-          return (e as MiddlewareObject).handle.bind(e);
-        }
-      });
-
     middlewares.forEach((e: RegistrableMiddleware) => {
-      const functions: ExpressFunction[] = middlewareMapper(e.middlewares);
+      const functions = e.middlewares.map((middleware: Middleware) =>
+        typeof middleware === 'function'
+          ? middleware
+          : (middleware as MiddlewareObject).handle.bind(middleware),
+      );
+
       e.method !== undefined
         ? routable[e.method](e.path, ...functions)
         : routable.use(e.path, ...functions);
@@ -254,18 +241,14 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
    */
   protected setupDefaultHandler(): void {
     if (this.defaultHandlerMethod) {
-      // TODO :: Create method instead
-      // @ts-ignore
+      // TODO :: Create method instead // Note :: This comment might be outdated
       this.getRoutable().use(this.methodCreator(this.defaultHandlerMethod).bind(this));
     } else if (this.defaultHandlerFunction) {
       this.getRoutable().use(this.defaultHandlerFunction.bind(this));
     }
-
-    // Todo :: Bind item
-    // this.getRoutable().use(this.defaultHandler.bind(this));
   }
 
-  protected setupErrorHandlers(errorHandlers: ErrorHandlerEntry[]): void {
+  protected setupErrorHandlers(): void {
     const routable = this.getRoutable();
 
     Object.values(this.errorHandlerMethods).forEach((errorHandlerMethod) => {
@@ -317,7 +300,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
 
   /**
    * Creates callable method for the endpoint
-   * TODO :: Minimize overhead
+   * TODO :: Minimize overhead // Note: Performance tests are prerequisite
    *
    * @param endpoint
    * @protected
@@ -383,9 +366,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
   }
 
   protected errorHandlerCreator(endpoint: ErrorHandlerEntry): ErrorHandlerFunction {
-    // const callback = () => {};
-
-    // Todo :: Post Processors
+    // Todo :: Post Processors // Will be implemented in the PostProcessor update
     return !endpoint.parameters || endpoint.parameters.length === 0
       ? (error: Error, request: ExpressRequest, response: ExpressResponse, next: NextFunction) =>
           //@ts-ignore

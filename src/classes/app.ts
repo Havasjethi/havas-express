@@ -20,7 +20,6 @@ export interface ServerListenOptions {
 }
 
 export abstract class App extends ExpressCoreRoutable<Application> {
-  // Routable<Application> {
   public options: ListenOptions = {};
   protected default_server: Server | undefined;
   protected started_servers: { id: number; server: Server }[];

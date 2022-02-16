@@ -1,12 +1,8 @@
-export * from './src/decorators/method_decorator';
-export * from './src/decorators/parameter_post_processors';
-export * from './src/decorators/parameter_decorator_storage';
 export * from './src/classes';
-export * from './src/decorators/default_handler';
 export { extender, BeforeCreate, SetProperty, AfterCreate } from './src/util/class_decorator_util';
 export * from './src/di/';
-export * from './src/decorators/class_decorator';
-export * from './src/decorators/middleware_decorators';
+export * from './src/decorators/parameter_decorator_storage';
+export * from './src/decorators/index';
 
 import {
   Response as Res,

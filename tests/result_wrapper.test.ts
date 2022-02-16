@@ -12,7 +12,7 @@ import {
   ResultWrapper,
   Router,
 } from '../index';
-import { Res, Result } from '../src/decorators/parameter_decorators';
+import { Res, Result } from '../src/decorators';
 
 
 const MESSAGES = {

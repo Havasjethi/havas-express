@@ -1,29 +1,31 @@
 import {
   App,
-  Body,
-  Cookie,
-  CreateDynamicParameterExtractor,
   ExpressNext,
   ExpressRequest,
   ExpressResponse,
-  Get,
-  Host,
-  PathVariable,
-  Post,
-  Query,
-  RequestObj,
-  ResponseObj,
-  ResultWrapper,
+  CreateDynamicParameterExtractor,
   CreateStaticParameterExtractor,
-  UseMiddleware,
-  WholeBody,
-  WholeQuery,
 } from '../../../index';
 import request from 'supertest';
 import bodyParser from 'body-parser';
 // @ts-ignore
 import cookieParser from 'cookie-parser';
-import { Next } from '../../../src/decorators/parameter_decorator_storage';
+import {
+  Next,
+  Body,
+  Cookie,
+  Host,
+  PathVariable,
+  Query,
+  RequestObj,
+  ResponseObj,
+  ResultWrapper,
+  UseMiddleware,
+  WholeBody,
+  WholeQuery,
+  Get,
+  Post,
+} from '../../../src/decorators';
 
 const Paths = {
   BodyMethod: '/body',

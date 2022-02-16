@@ -1,6 +1,5 @@
-import { ExpressCoreRoutable } from '../classes/express_core_routable';
-import { ExpressFunction } from '../classes/types/middleware';
-import { extender, SetProperty } from '../util/class_decorator_util';
+import { ExpressCoreRoutable, ExpressFunction } from '../classes';
+import { extender, SetProperty } from '../util';
 
 // const MethodClassDecorator = (a, b) => { }
 // TODO :: Mixed Constructor branches :: MethodClassDecorator(func, fnc) => FactoryOrNot<Method | ClassDecorator>

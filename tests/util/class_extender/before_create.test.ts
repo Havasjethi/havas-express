@@ -1,4 +1,4 @@
-import { BeforeCreate, Constructor } from "../../src/util/class_decorator_util";
+import { BeforeCreate, Constructor } from "../../../src/util/class_decorator_util";
 
 let value_to_reset = 13;
 

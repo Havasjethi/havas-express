@@ -1,12 +1,13 @@
-Whould be nice:
+Would be nice:
     [ ] Write tests for
         - @Session()
         - @Session(<param>)
         - @SessionId
-    [ ] Add change log
+    [X] Add change log
     [ ] Performance tests
     [ ] Documentation for Npm
     [ ] Samples
 
 Features in future:
+    [X] Extendable extractors
     [ ] Decorators for ErrorHandlingMethod, ResultWrapperMethod ( + ResultWrapper on Methods )

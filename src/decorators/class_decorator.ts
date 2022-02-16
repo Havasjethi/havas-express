@@ -1,28 +1,52 @@
-import { Routable } from "../classes/routable";
-import { Constructor, extender, SetProperty } from "../util/class_decorator_util";
-import { App } from "../classes/app";
-import { ErrorRequestHandler } from "express";
-import { ErrorHandlerClass } from "../classes/error_handler";
-import { ListenOptions } from "net";
+import { ErrorRequestHandler } from 'express';
+import { ListenOptions } from 'net';
+import { App, ErrorHandlerClass, ExpressCoreRoutable, ResultWrapperFunction } from '../classes';
+import { Constructor, extender, SetProperty } from '../util';
 
-export function Path<T extends Routable<any>>(path: string) {
-  return SetProperty(object => object.set_path(path));
-}
 
-export function ResultWrapper(result_wrapper_method: Routable<any>["result_wrapper"]) {
-  return SetProperty<Routable<any>>(element => {
-    element.set_result_wrapper(result_wrapper_method);
+export function Path<T extends ExpressCoreRoutable<any>> (path: string) {
+  return SetProperty((object) => {
+    object.setPath(path);
   });
 }
+
+export function ResultWrapper (result_wrapper_method: ResultWrapperFunction): any;
+export function ResultWrapper (
+  target: ExpressCoreRoutable<any>,
+  propertyKey: string,
+  descriptor: PropertyDescriptor,
+): void;
+
+/*
+ * Methods and classes could be annotated with this
+ */
+export function ResultWrapper (
+  target: ResultWrapperFunction | ExpressCoreRoutable<any>,
+  methodName?: string,
+  propertyDescriptor?: PropertyDescriptor,
+) {
+  if (methodName === undefined && propertyDescriptor === undefined) {
+    return SetProperty<ExpressCoreRoutable<any>>((element) => {
+      element.registerResultWrapper(target as ResultWrapperFunction);
+    });
+  } else {
+    extender.set_property<ExpressCoreRoutable>(target.constructor.name, (x) => {
+      x.registerResultWrapperMethod(methodName!);
+    });
+  }
+}
+
 
 interface HostParams extends ListenOptions {
   auto_start?: boolean;
 }
 
-
-export function Host(options: (HostParams & { port?: number | string })) {
+/**
+ * Note: Auto Starting should be removed.
+ */
+export function Host (options: HostParams & { port?: number | string }) {
   options.auto_start = options.auto_start ?? false;
-  options.port = typeof (options.port) === 'string' ? parseInt(options.port, 10) : options.port;
+  options.port = typeof options.port! === 'string' ? parseInt(options.port, 10) : options.port;
 
   return (class_definition: Constructor<App>): Constructor<App> | any => {
     const constructor = extender.add_set_property(class_definition, (app) => {
@@ -36,9 +60,11 @@ export function Host(options: (HostParams & { port?: number | string })) {
     }
 
     return constructor;
-  }
+  };
 }
 
-export function ErrorHandler(error_handler: ErrorRequestHandler | ErrorHandlerClass) {
-  return SetProperty<Routable>((instance) => instance.add_error_handler(error_handler));
+export function ErrorHandler (errorHandler: ErrorRequestHandler | ErrorHandlerClass) {
+  return SetProperty<ExpressCoreRoutable>((instance) =>
+    instance.registerErrorHandlerFunction(errorHandler),
+  );
 }

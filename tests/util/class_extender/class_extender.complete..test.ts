@@ -1,4 +1,4 @@
-import { BeforeCreate, SetProperty, AfterCreate } from "../../src/util/class_decorator_util";
+import { BeforeCreate, SetProperty, AfterCreate } from "../../../src/util/class_decorator_util";
 
 @BeforeCreate((class_decl) => {class_decl.default_x = 100})
 @SetProperty<A>((instance) => {instance.x += 3})

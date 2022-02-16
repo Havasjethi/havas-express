@@ -1,6 +1,16 @@
 import {
-  App, Host, Get, Router, Path, PathVariable, ResultWrapper, Post, Body, UseMiddleware
-} from "../index";
+  App,
+  Body,
+  Get,
+  Host,
+  Path,
+  PathVariable,
+  Post,
+  ResultWrapper,
+  Router,
+  UseMiddleware,
+} from '../index';
+import { ExpressFunction } from '../src/classes/types/middleware';
 
 @Host({
   auto_start: false,
@@ -10,26 +20,24 @@ import {
 @UseMiddleware(((req, res, next) => {
   console.log('Got a new request');
   next();
-}))
+}) as ExpressFunction)
 class MainApp extends App {
-
   @Get('/')
-  index (req: any, res: any) {
+  index(req: any, res: any) {
     res.send('Index page message.');
   }
 }
 
 @Path('/user')
-@ResultWrapper(({result, response}) =>
+@ResultWrapper(({ result, response }) =>
   response.send({
     success: true,
     data: result,
-  })
+  }),
 )
 class UserController extends Router {
-
   @Get('/:id')
-  index (@PathVariable('id') id: number) {
+  index(@PathVariable('id') id: number) {
     return {
       id: id,
       controller: UserController.name,
@@ -38,18 +46,14 @@ class UserController extends Router {
   }
 
   @Post('/login')
-  login (@Body('user') user: any) {
-
+  login(@Body('user') user: any) {
     // Business logic
 
     return {};
   }
-
 }
 
 const app = new MainApp();
 const user_controller = new UserController();
 
-app
-  .append(user_controller)
-  .start_app();
+app.append(user_controller).start_app();

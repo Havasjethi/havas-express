@@ -1,38 +1,26 @@
-import { Path, ResultWrapper, Host, App, Get, Router, ExpressRequest } from "../index";
+import { Path, ResultWrapper, App, Get, Router, UseMiddleware } from '../index';
+import bodyParser from 'body-parser';
+const middlewareFunction1 = (_: any, __: any, next: any) => next();
+const middlewareFunction2 = (_: any, __: any, next: any) => next();
 
-const port = 4001;
-const host = 'localhost';
-const auto_start = false;
-
-@Host({
-  port,
-  host: host,
-  auto_start: auto_start,
-})
+@UseMiddleware(bodyParser.json())
 class TestApp extends App {
-
-  @Get('/')
-  index (req: any, res: any) {
+  @Get('/', middlewareFunction1, middlewareFunction2)
+  index(req: any, res: any) {
     res.send('Nice');
-  }
-
-  @Get('/13')
-  index2 (req: ExpressRequest, res: any) {
-    res.send({any: 13});
   }
 }
 
 @Path('/router')
-@ResultWrapper(({response, result}) => response.send({data: result}))
+@ResultWrapper(({ response, result }) => response.send({ data: result }))
 class TestRouter extends Router {
-
   @Get('/')
-  index () {
+  index() {
     return 'Index';
   }
 
   @Get('/:asd')
-  any_path () {
+  any_path() {
     return 13;
   }
 }

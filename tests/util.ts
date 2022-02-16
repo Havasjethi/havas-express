@@ -1,6 +1,6 @@
 import get_port from "get-port";
 import request from "supertest";
-import { App } from "../index";
+import { App, ExpressCoreRoutable } from '../index';
 
 
 export const get_free_port = async () => {
@@ -12,5 +12,5 @@ export const init_app = async (app: App): Promise<App> => {
   return app;
 };
 
-export const get_request_creator = (app: App) => (path: string): request.Test =>
-  request(app.get_initialized_routable()).get(path);
+export const get_request_creator = (app: ExpressCoreRoutable) => (path: string): request.Test =>
+  request(app.getInitializedRoutable()).get(path);

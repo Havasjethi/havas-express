@@ -1,6 +1,6 @@
 import { NextFunction } from 'express';
 import { ExpressRequest, ExpressResponse, MiddlewareObject } from '../../../index';
-import { ExpressHttpMethod } from '../../types/native_http_methods';
+import { ExpressHttpMethod } from '../native_http_methods';
 
 export type ExpressFunction = (
   req: ExpressRequest,

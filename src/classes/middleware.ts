@@ -1,5 +1,5 @@
 import { ExpressRequest, ExpressResponse } from '../../index';
-import { Middleware, ExpressFunction } from './types/middleware';
+import { Middleware, ExpressFunction } from '../types/classes/middleware';
 
 export interface MiddlewareObject {
   handle: (req: ExpressRequest, res: ExpressResponse, next: Function) => any;

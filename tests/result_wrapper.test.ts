@@ -43,7 +43,7 @@ class MainApp extends App {
 @Path('/result-test')
 class ResultTestController extends Router {
   @ResultWrapper
-  wrapper_method(@Res response: Response, @Result result: any) {
+  wrapper_method(@Res() response: Response, @Result() result: any) {
     response.send(result);
   }
 
@@ -62,7 +62,7 @@ class ResultTestController extends Router {
 @Path('/sub-1')
 class SubController_1 extends Router {
   @ResultWrapper
-  wrapper_method(@Res response: Response) {
+  wrapper_method(@Res() response: Response) {
     response.send(MESSAGES.SUB_1_WRAPPER);
   }
 
@@ -76,7 +76,7 @@ class SubController_1 extends Router {
 @Path('/sub-2')
 class SubController_2 extends Router {
   @ResultWrapper
-  wrapper_method(@Res response: Response) {
+  wrapper_method(@Res() response: Response) {
     response.send(MESSAGES.SUB_2_METHOD);
   }
 
@@ -88,7 +88,7 @@ class SubController_2 extends Router {
 @Path('/sub-sub')
 class SubSubController extends Router {
   @ResultWrapper
-  wrapper_method(@Res response: Response) {
+  wrapper_method(@Res() response: Response) {
     response.send(MESSAGES.SUB_2_CHILD_METHOD);
   }
 

@@ -1,5 +1,8 @@
 import { ExpressCoreRoutable } from '../classes';
-import { CreateDynamicParameterExtractor, CreateStaticParameterExtractor } from './parameter_decorator_storage/util_methods';
+import {
+  CreateDynamicParameterExtractor,
+  CreateStaticParameterExtractor,
+} from './parameter_decorator_storage/util_methods';
 
 export const Request = CreateStaticParameterExtractor('Request', (req) => req);
 export const RequestObj = Request;
@@ -43,5 +46,8 @@ export const Header = CreateDynamicParameterExtractor<string>(
 );
 
 export const Err = CreateStaticParameterExtractor('Err', (_req, _res, _next, error) => error);
-export const Result = CreateStaticParameterExtractor('Result', (_req, _res, _next, _error, result) => result);
 
+export const Result = CreateStaticParameterExtractor(
+  'Result',
+  (_req, _res, _next, _error, result) => result,
+);

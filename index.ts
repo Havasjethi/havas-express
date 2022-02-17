@@ -3,6 +3,7 @@ export { extender, BeforeCreate, SetProperty, AfterCreate } from './src/util/cla
 export * from './src/di/';
 export * from './src/decorators/parameter_decorator_storage';
 export * from './src/decorators/index';
+export * from './src/types';
 
 import {
   Response as Res,

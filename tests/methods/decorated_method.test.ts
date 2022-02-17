@@ -3,13 +3,14 @@ import {
   Get,
   Host,
   Path,
-  PathVariable, Res,
+  PathVariable,
+  Res,
   Response,
   Result,
   ResultWrapper,
   Router,
 } from '../../index';
-import { ResultWrapperFunctionParameters } from '../../src/classes';
+import { ResultWrapperFunctionParameters } from '../../src/types';
 import { get_request_creator } from '../util';
 
 @Path('/')

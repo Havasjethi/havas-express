@@ -1,4 +1,4 @@
-import { Middleware } from '../classes/types/middleware';
+import { Middleware } from '../types/classes/middleware';
 import { ExpressHttpMethod } from '../types/native_http_methods';
 import { ExpressCoreRoutable } from '../classes';
 import { extender } from '../util';

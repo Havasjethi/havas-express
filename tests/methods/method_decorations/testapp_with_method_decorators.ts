@@ -32,22 +32,22 @@ class TestAppWithMethodDecorators extends App {}
 @ResultWrapper(({ result, response }) => response.send(result))
 class TestRouter extends Router {
   @Get('/')
-  index(@ResponseObj res: any) {
+  index(@ResponseObj() res: any) {
     res.send('index');
   }
 
   @Post('/')
-  post_index(@ResponseObj res: any) {
+  post_index(@ResponseObj() res: any) {
     res.send('post_index');
   }
 
   @Delete('/')
-  delete_index(@ResponseObj res: any) {
+  delete_index(@ResponseObj() res: any) {
     res.send('delete_index');
   }
 
   @Post('/user')
-  user(@ResponseObj res: any, @Body('user') user: any) {
+  user(@ResponseObj() res: any, @Body('user') user: any) {
     return user.name;
   }
 

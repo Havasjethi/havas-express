@@ -1,17 +1,17 @@
 import { ErrorRequestHandler } from 'express';
 import { ListenOptions } from 'net';
-import { App, ErrorHandlerClass, ExpressCoreRoutable, ResultWrapperFunction } from '../classes';
+import { App, ErrorHandlerClass, ExpressCoreRoutable } from '../classes';
+import { ResultWrapperFunction } from '../types';
 import { Constructor, extender, SetProperty } from '../util';
 
-
-export function Path<T extends ExpressCoreRoutable<any>> (path: string) {
+export function Path<T extends ExpressCoreRoutable<any>>(path: string) {
   return SetProperty((object) => {
     object.setPath(path);
   });
 }
 
-export function ResultWrapper (result_wrapper_method: ResultWrapperFunction): any;
-export function ResultWrapper (
+export function ResultWrapper(result_wrapper_method: ResultWrapperFunction): any;
+export function ResultWrapper(
   target: ExpressCoreRoutable<any>,
   propertyKey: string,
   descriptor: PropertyDescriptor,
@@ -20,7 +20,7 @@ export function ResultWrapper (
 /*
  * Methods and classes could be annotated with this
  */
-export function ResultWrapper (
+export function ResultWrapper(
   target: ResultWrapperFunction | ExpressCoreRoutable<any>,
   methodName?: string,
   propertyDescriptor?: PropertyDescriptor,
@@ -36,7 +36,6 @@ export function ResultWrapper (
   }
 }
 
-
 interface HostParams extends ListenOptions {
   auto_start?: boolean;
 }
@@ -44,7 +43,7 @@ interface HostParams extends ListenOptions {
 /**
  * Note: Auto Starting should be removed.
  */
-export function Host (options: HostParams & { port?: number | string }) {
+export function Host(options: HostParams & { port?: number | string }) {
   options.auto_start = options.auto_start ?? false;
   options.port = typeof options.port! === 'string' ? parseInt(options.port, 10) : options.port;
 
@@ -63,7 +62,7 @@ export function Host (options: HostParams & { port?: number | string }) {
   };
 }
 
-export function ErrorHandler (errorHandler: ErrorRequestHandler | ErrorHandlerClass) {
+export function ErrorHandler(errorHandler: ErrorRequestHandler | ErrorHandlerClass) {
   return SetProperty<ExpressCoreRoutable>((instance) =>
     instance.registerErrorHandlerFunction(errorHandler),
   );

@@ -10,7 +10,7 @@ import {
   Router,
   UseMiddleware,
 } from '../index';
-import { ExpressFunction } from '../src/classes/types/middleware';
+import { ExpressFunction } from '../src/types/classes/middleware';
 
 @Host({
   auto_start: false,

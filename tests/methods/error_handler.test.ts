@@ -18,7 +18,7 @@ import {
   ResponseObj,
   Err,
 } from '../../index';
-import { get_request_creator } from "../util";
+import { get_request_creator } from '../util';
 
 const ERROR_MESSAGES = {
   main_app: 'TestApp - main_app',
@@ -28,13 +28,12 @@ const ERROR_MESSAGES = {
 };
 
 @MainController
-@ErrorHandler(((err, req, res, next) => {
+@ErrorHandler((err, req, res, next) => {
   res.send(ERROR_MESSAGES.main_app);
-}))
+})
 class TestApp extends App {
-
   @Get('/')
-  index () {
+  index() {
     throw new Error('TestApp MEH');
   }
 }
@@ -45,22 +44,22 @@ class TestApp extends App {
   res.send(ERROR_MESSAGES.router);
 })
 class TestRouter extends Router {
-
   @Get('/')
-  index () {
+  index() {
     throw new Error('TestRouter MEH');
   }
 }
 
 @Controller()
 @Path('/router-2')
-@ErrorHandler(new PipeErrorHandler(parameters => {
-  console.log('Some logging')
-}))
+@ErrorHandler(
+  new PipeErrorHandler((parameters) => {
+    console.log('Some logging');
+  }),
+)
 class TestRouterWithPipeErrorHandler extends Router {
-
   @Get('/')
-  index () {
+  index() {
     throw new Error('TestRouterWithPipeErrorHandler MEH');
   }
 }
@@ -68,7 +67,6 @@ class TestRouterWithPipeErrorHandler extends Router {
 @Controller()
 @Path('/method-related')
 class SomeRouter extends Router {
-
   @ErrorHandlerMethod
   error_handler_method(err: Error, req: Request, res: Response) {
     res.send(ERROR_MESSAGES.method_error);
@@ -82,12 +80,8 @@ class SomeRouter extends Router {
 
 @Controller()
 class SomeRouterR extends Router {
-
   @ErrorHandlerMethod
-  error_handler_method(
-    @ResponseObj res: ExpressResponse,
-    @Err error: Error,
-  ): any {
+  error_handler_method(@ResponseObj() res: ExpressResponse, @Err() error: Error): any {
     res.send(error.message);
   }
 
@@ -102,32 +96,26 @@ describe('Test error handlers', () => {
   let get: (path: string) => request.Test;
 
   beforeAll(async () => {
-    controllers = await initializeControllers({kind: 'none'});
+    controllers = await initializeControllers({ kind: 'none' });
     get = get_request_creator(controllers[0]);
   });
 
   test('Application attached error handler works', async () =>
-    await get('/')
-      .expect((res) => expect(res.text).toBe(ERROR_MESSAGES.main_app))
-  );
+    await get('/').expect((res) => expect(res.text).toBe(ERROR_MESSAGES.main_app)));
 
   test('Router specific error handler called before MainApplication', async () =>
-    await get('/router')
-      .expect((res) => expect(res.text).toBe(ERROR_MESSAGES.router))
-  );
+    await get('/router').expect((res) => expect(res.text).toBe(ERROR_MESSAGES.router)));
 
   test('Router error falls back to if not handled', async () =>
-    await get('/router-2')
-      .expect((res) => expect(res.text).toBe(ERROR_MESSAGES.main_app))
-  );
+    await get('/router-2').expect((res) => expect(res.text).toBe(ERROR_MESSAGES.main_app)));
 
   test('<TODO>', async () =>
-    await get('/method-related')
-      .expect((res) => expect(res.text).toBe(ERROR_MESSAGES.method_error))
-  );
+    await get('/method-related').expect((res) =>
+      expect(res.text).toBe(ERROR_MESSAGES.method_error),
+    ));
 
   test('<TODO 2>', async () =>
-    await get('/method-related-plus')
-      .expect((res) => expect(res.text).toBe(ERROR_MESSAGES.decorated_error))
-  );
+    await get('/method-related-plus').expect((res) =>
+      expect(res.text).toBe(ERROR_MESSAGES.decorated_error),
+    ));
 });

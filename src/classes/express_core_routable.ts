@@ -1,33 +1,31 @@
-import { IRouter } from 'express';
+import { IRouter, ErrorRequestHandler } from 'express';
 import { NextFunction } from 'express-serve-static-core';
+import { BaseCoreRouter, Objectified, RegistrableMethod } from 'havas-core';
 import {
-  BaseCoreRouter,
-  DecoratedParameters,
-  Objectified,
-  PostProcessor,
-  RegistrableMethod,
-} from 'havas-core';
-import {
-  DynamicParameterExtractorFunction,
   ExpressRequest,
   ExpressResponse,
   ParameterExtractorStorage,
   ResultWrapperFunction,
-  StaticParameterExtractorFunction,
 } from '../../index';
-
-const isPromise = (value: any) => value?.constructor?.name === 'Promise';
-
-import { ExpressHttpMethod } from '../types/native_http_methods';
+import {
+  DynamicParameterExtractorFunction,
+  ExpressHttpMethod,
+  isProcessorFactory,
+  UniversalPostProcessor,
+  StaticParameterExtractorFunction,
+} from '../types';
 import { ErrorHandlerClass, ErrorHandlerFunction } from './error_handler';
 import { MiddlewareObject } from './middleware';
+import { postProcessorStorage } from './post_processor_storage';
 import {
   ExpressEndpoint,
   ResultWrapperType,
   RegistrableErrorHandler,
   ErrorHandlerEntry,
-} from './types';
-import { ExpressFunction, Middleware, RegistrableMiddleware } from './types/middleware';
+} from '../types/classes';
+import { ExpressFunction, Middleware, RegistrableMiddleware } from '../types/classes/middleware';
+
+const isPromise = (value: any) => value?.constructor?.name === 'Promise';
 
 export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends BaseCoreRouter<
   ExpressEndpoint,
@@ -42,10 +40,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
 
   public children: ExpressCoreRoutable[] = [];
 
-  protected parameterExtractors: { [endpoint_name: string]: DecoratedParameters[] } = {};
-  protected parameterPostProcessors: {
-    [endpoint_name: string]: { [parameter_index: number]: PostProcessor[] };
-  } = {};
+  protected parameterExtractors: { [endpoint_name: string]: ExpressEndpoint['parameters'] } = {};
 
   protected constructor(routable: T, protected type: 'router' | 'app') {
     super();
@@ -90,6 +85,8 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
     parameterIndex: number,
     extractorName: string,
     argument?: any[],
+    postProcessors?: (((processable: any) => any) | { token: string; args?: any[] })[],
+    // postProcessors?: PostProcessorType[],
   ) {
     const extractor = (this.parameterExtractors[methodName] ??= []);
 
@@ -97,17 +94,10 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
       name: extractorName,
       index: parameterIndex,
       arguments: argument,
+      postProcessors: postProcessors,
+      // : undefined,
+      // postProcessors: postProcessors ?? [],
     });
-  }
-
-  public addRequestPostprocessor<T extends PostProcessor = PostProcessor>(
-    methodName: string,
-    index: number,
-    post_processor: T,
-  ) {
-    const postProcessor = ((this.parameterPostProcessors[methodName] ??= {})[index] ??= []);
-
-    postProcessor.push(post_processor);
   }
 
   /**
@@ -124,7 +114,6 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
     endpoint.path = path;
     endpoint.middlewares.push(...middlewares);
     endpoint.parameters = this.parameterExtractors[methodName];
-    endpoint.postProcessors = this.parameterPostProcessors[methodName];
   }
 
   public add_constructor_middleware(middleware: RegistrableMiddleware) {
@@ -135,12 +124,12 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
     this.registerResultWrapper({
       methodName: resultWrapperName,
       parameters: this.parameterExtractors[resultWrapperName],
-      postProcessors: {},
-    } as RegistrableMethod);
+      // postProcessors: {},
+    } as RegistrableMethod<UniversalPostProcessor>);
   }
 
   errorHandlerFunctions: ErrorHandlerFunction[] = [];
-  errorHandlerMethods: Objectified<RegistrableMethod> = {};
+  errorHandlerMethods: Objectified<RegistrableMethod<UniversalPostProcessor>> = {};
 
   public registerErrorHandlerFunction(
     errorHandler: ErrorHandlerFunction | ErrorHandlerClass,
@@ -178,7 +167,6 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
       methodType: 'all',
       path: '*',
       middlewares: [],
-      postProcessors: [],
     };
   }
 
@@ -316,110 +304,144 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
       endpoint.parameters === undefined || endpoint.parameters.length === 0
         ? //@ts-ignore
           this[endpoint.methodName] // TODO :: ??Bind this??
-        : (request, response, next): ExpressFunction => {
-            const parameters = this.getParameters(endpoint, request, response, next);
+        : async (request, response, next): Promise<ExpressFunction> => {
+            const parameters = await this.get_endpoint_parameters(
+              endpoint,
+              request,
+              response,
+              next,
+            );
 
             //@ts-ignore
-            return this[endpoint.methodName].bind(this)(...parameters);
+            return (this[endpoint.methodName] as CallableFunction).apply(this, parameters);
           };
 
     return this.mightWrapFunction(methodFunction);
   }
 
-  protected getParameters(
+  protected async get_endpoint_parameters(
     endpoint: ExpressEndpoint,
     request: ExpressRequest,
     response: ExpressResponse,
     next: NextFunction,
-  ) {
+  ): Promise<any[]> {
     const parameters: any[] = [];
 
-    endpoint.parameters.sort((a, b) => (a.index! > b.index! ? 1 : -1));
-
-    const addParameter = (value: any, index: number) => {
-      parameters.push(
-        endpoint.postProcessors && (endpoint.postProcessors[index] || []).length > 0
-          ? endpoint.postProcessors[index].reduce(
-              (v, postProcessor) => postProcessor(v) ?? v,
-              value,
-            )
-          : value,
-      );
-    };
-
-    endpoint.parameters.forEach((value, index) => {
-      const { extractor, type } = ParameterExtractorStorage.get_parameter_extractor(value.name);
+    for (const parameter of endpoint.parameters.sort((a, b) => a.index! - b.index!)) {
+      const { extractor, type } = ParameterExtractorStorage.get_parameter_extractor(parameter.name);
+      let preprocessed_value;
 
       if (type === 'Static') {
-        addParameter(
-          (extractor as StaticParameterExtractorFunction)(request, response, next),
-          index,
+        preprocessed_value = (extractor as StaticParameterExtractorFunction)(
+          request,
+          response,
+          next,
         );
       } else if (type === 'Dynamic') {
-        addParameter(
-          (extractor as DynamicParameterExtractorFunction)(
-            value.arguments,
-            request,
-            response,
-            next,
-          ),
-          index,
+        preprocessed_value = (extractor as DynamicParameterExtractorFunction)(
+          parameter.arguments,
+          request,
+          response,
+          next,
         );
       }
-    });
+
+      const final_value = parameter.postProcessors
+        ? await this.post_process_parameter(parameter.postProcessors, preprocessed_value)
+        : preprocessed_value;
+
+      parameters.push(final_value);
+    }
 
     return parameters;
+  }
+
+  protected async post_process_parameter<Result = any>(
+    post_processors: UniversalPostProcessor[],
+    processable: any,
+  ): Promise<Result> {
+    let processed_value = processable;
+
+    for (const processor of post_processors) {
+      let intermediate_value;
+
+      if (typeof processor === 'function') {
+        intermediate_value = processor(processable);
+      } else if (isProcessorFactory(processor)) {
+        const processorFunction = postProcessorStorage.getPostProcessorFactoryDangerous(
+          processor.token,
+        );
+        intermediate_value = processorFunction(processable, processor.args);
+      } else {
+        const processorFunction = postProcessorStorage.getPostProcessorDangerous(processor.token);
+        intermediate_value = processorFunction(processable);
+      }
+
+      processed_value = isPromise(intermediate_value)
+        ? await intermediate_value
+        : intermediate_value;
+    }
+
+    return processed_value;
   }
 
   protected errorHandlerCreator(endpoint: ErrorHandlerEntry): ErrorHandlerFunction {
     // Todo :: Post Processors // Will be implemented in the PostProcessor update
     return !endpoint.parameters || endpoint.parameters.length === 0
-      ? (error: Error, request: ExpressRequest, response: ExpressResponse, next: NextFunction) =>
+      ? (error, request, response, next): ErrorRequestHandler =>
           //@ts-ignore
           this[endpoint.methodName](error, request, response, next)
-      : (error: Error, request: ExpressRequest, response: ExpressResponse, next: NextFunction) => {
-          const parameters: any[] = [];
+      : async (error, request, response, next): Promise<ErrorRequestHandler> => {
+          const parameters = await this.get_error_handler_parameters(
+            endpoint,
+            error,
+            request,
+            response,
+            next,
+          );
 
-          endpoint.parameters.sort((a, b) => a.index! - b.index!);
-
-          const addParameter = (value: any, index: number) => {
-            if (endpoint.postProcessors) {
-              endpoint.postProcessors[index]?.forEach((postProcessor: any) => {
-                const rv = postProcessor(value);
-                value = rv != undefined ? rv : value;
-              });
-            }
-
-            parameters.push(value);
-          };
-
-          endpoint.parameters.forEach((value, index) => {
-            const { extractor, type } = ParameterExtractorStorage.get_parameter_extractor(
-              value.name,
-            );
-
-            if (type === 'Static') {
-              addParameter(
-                // TODO :: Add error handler @Error
-                (extractor as StaticParameterExtractorFunction)(request, response, next, error),
-                index,
-              );
-            } else if (type === 'Dynamic') {
-              addParameter(
-                (extractor as DynamicParameterExtractorFunction)(
-                  value.arguments,
-                  request,
-                  response,
-                  next,
-                ),
-                index,
-              );
-            }
-          });
-
-          //@ts-ignore
-          this[endpoint.methodName](...parameters);
+          // @ts-ignore
+          return (this[endpoint.methodName] as CallableFunction).apply(this, parameters);
         };
+  }
+
+  protected async get_error_handler_parameters(
+    endpoint: ErrorHandlerEntry,
+    error: Error,
+    request: ExpressRequest,
+    response: ExpressResponse,
+    next: NextFunction,
+  ): Promise<any[]> {
+    const parameters: any[] = [];
+
+    for (const parameter of endpoint.parameters.sort((a, b) => a.index! - b.index!)) {
+      const { extractor, type } = ParameterExtractorStorage.get_parameter_extractor(parameter.name);
+      let preprocessed_value;
+
+      if (type === 'Static') {
+        preprocessed_value = (extractor as StaticParameterExtractorFunction)(
+          request,
+          response,
+          next,
+          error,
+        );
+      } else if (type === 'Dynamic') {
+        preprocessed_value = (extractor as DynamicParameterExtractorFunction)(
+          parameter.arguments,
+          request,
+          response,
+          next,
+        );
+      }
+
+      const final_value = parameter.postProcessors
+        ? await this.post_process_parameter(parameter.postProcessors, preprocessed_value)
+        : preprocessed_value;
+
+      parameters.push(final_value);
+    }
+
+    return parameters;
   }
 
   /**
@@ -441,7 +463,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
         this[wrapper.methodName].bind(this)
       : ((({ result, request, response, next }) => {
           // TODO :: Update decorated parameters!!
-          const parameters = (wrapper as RegistrableMethod).parameters
+          const parameters = (wrapper as ExpressEndpoint).parameters
             .sort((a, b) => a.index! - b.index!)
             .map((e) => {
               const { extractor, type } = ParameterExtractorStorage.get_parameter_extractor(e.name);

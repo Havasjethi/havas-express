@@ -1,7 +1,7 @@
 import { PostProcessor } from 'havas-core';
 import { ExpressRequest, ExpressResponse } from '../../index';
 import { MiddlewareObject } from '../classes/middleware';
-import { Middleware } from '../classes/types/middleware';
+import { Middleware } from '../types/classes/middleware';
 import { ExpressHttpMethod } from '../types/native_http_methods';
 
 // export type MiddlewareFunction = IRouterHandler<any>;
@@ -55,4 +55,4 @@ export interface MethodEntry extends RequestMethodProcessing {
   use_wrapper?: boolean;
 }
 
-export type PostProcessorType<T = unknown, F = unknown> = (arg: T) => F;
+export type PostProcessorType<From = unknown, To = unknown> = (arg: From) => To;

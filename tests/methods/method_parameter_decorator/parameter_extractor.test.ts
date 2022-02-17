@@ -74,9 +74,9 @@ class TestApp extends App {
 
   @Get(Paths.RawDecorated)
   testDecorated(
-    @RequestObj req: ExpressRequest,
-    @ResponseObj res: ExpressResponse,
-    @Next next: ExpressNext,
+    @RequestObj() req: ExpressRequest,
+    @ResponseObj() res: ExpressResponse,
+    @Next() next: ExpressNext,
   ) {
     return {
       req: req.constructor.name,
@@ -86,12 +86,12 @@ class TestApp extends App {
   }
 
   @Post(Paths.BodyMethod)
-  body(@WholeBody body: any, @Body('part') part: any) {
+  body(@WholeBody() body: any, @Body('part') part: any) {
     return Methods.BodyMethod(body, part);
   }
 
   @Get(Paths.CookieSetMethod)
-  setCookie(@ResponseObj res: ExpressResponse) {
+  setCookie(@ResponseObj() res: ExpressResponse) {
     res.cookie('cookie', 'hey');
     res.send();
   }
@@ -107,17 +107,17 @@ class TestApp extends App {
   }
 
   @Get(Paths.Query)
-  testQuery(@WholeQuery query: any, @Query('name') name: any, @RequestObj req: any) {
+  testQuery(@WholeQuery() query: any, @Query('name') name: any, @RequestObj() req: any) {
     return { query, name };
   }
 
   @Get(Paths.CustomStatic)
-  custom1(@StaticFunctionBased() x: any, @StaticConstantBased y: any) {
+  custom1(@(StaticFunctionBased()()) x: any, @StaticConstantBased() y: any) {
     return { x, y };
   }
 
   @Get(Paths.CustomStatic)
-  custom2(@Dyn('C1') x: any, @DynStatic('C2') y: any) {
+  custom2(@Dyn('C1') x: any, @(DynStatic('C2')()) y: any) {
     return { x, y };
   }
 }
@@ -154,7 +154,7 @@ describe('Parameter Extractor tests', () => {
         .expect((res) => expect(res.text).toBe(expected));
     });
 
-    describe('Coockie', () => {
+    describe('Cookie', () => {
       const agent = request.agent(test_app);
 
       test('Should save cookie', async () => {

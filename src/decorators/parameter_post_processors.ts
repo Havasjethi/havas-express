@@ -1,22 +1,23 @@
-import { ExpressCoreRoutable } from '../classes';
-import { PostProcessorType } from '../interfaces/method_entry';
-import { extender } from '../util';
+import { postProcessorStorage } from '../classes/post_processor_storage';
+import {
+  DynamicProcessorFunction,
+  ProcessorFactoryToken,
+  ProcessorFunction,
+  ProcessorToken,
+} from '../types';
 
-const requestPostprocessor = (
-  target: ExpressCoreRoutable,
-  method_name: string,
-  parameter_index: number,
-  post_processor: PostProcessorType<any, any>,
-) => {
-  extender.set_property<ExpressCoreRoutable>(target.constructor.name, (x) =>
-    x.addRequestPostprocessor(method_name, parameter_index, post_processor),
-  );
-};
-
-export const PostProcessor = <Input = any, Output = any>(
-  process_function: PostProcessorType<Input, Output>,
-) => {
-  return (target: ExpressCoreRoutable, method_name: string, parameter_index: number) => {
-    requestPostprocessor(target, method_name, parameter_index, process_function);
+export function createPostProcessor(processorFunction: ProcessorFunction): ProcessorToken {
+  return {
+    token: postProcessorStorage.registerPostProcessor(processorFunction),
   };
-};
+}
+
+export function createPostProcessorFactory<FactoryArgs = unknown>(
+  processorFactoryFunction: DynamicProcessorFunction<FactoryArgs>,
+): (args: FactoryArgs) => ProcessorFactoryToken {
+  const token = postProcessorStorage.registerPostProcessorFactory(processorFactoryFunction);
+
+  return (args: FactoryArgs) => {
+    return { token, args };
+  };
+}

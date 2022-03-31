@@ -1,15 +1,5 @@
 import request from 'supertest';
-import {
-  App,
-  createPostProcessor,
-  createPostProcessorFactory,
-  Get,
-  Host,
-  PathVariable,
-  ResponseObj,
-  ResultWrapper,
-} from '../../../index';
-import { UniversalPostProcessor } from '../../../src/types/post_processor_types';
+import { App, createPostProcessorFactory, Get, PathVariable, ResultWrapper } from '../../../index';
 
 const Convert = createPostProcessorFactory<NumberConstructor | StringConstructor>(
   (x: string, type) => {
@@ -17,7 +7,6 @@ const Convert = createPostProcessorFactory<NumberConstructor | StringConstructor
   },
 );
 
-@Host({ port: 33123 })
 @ResultWrapper(({ response, result }) => response.set('Content-Type', 'text/plain').send(result))
 class TestApp extends App {
   @Get('/number-:id')

@@ -37,9 +37,9 @@ class ComposableTreeNode<T> {
 export class ComposableTreeCreator<T> {
   cachedTree?: Constructor<ComposableTreeNode<T>>;
   constructor(
-    private nodeConstructor: Constructor<ComposableTreeNode<T>>,
-    private mainNode?: T,
-    private subNodes: [node: T, parnet: T | undefined][] = [],
+    protected nodeConstructor: Constructor<ComposableTreeNode<T>>,
+    protected mainNode?: T,
+    protected subNodes: [node: T, parnet: T | undefined][] = [],
   ) {}
 
   public registerMainNode(node: T) {
@@ -51,9 +51,10 @@ export class ComposableTreeCreator<T> {
   }
 
   public registerNode(node: T, parentNode?: T) {
-    if (this.mainNode === undefined) {
-      throw new Error('Main value not registered');
-    }
+    // Note :: The subcontroller might be registered first
+    // if (this.mainNode === undefined) {
+    //   throw new Error('Main value not registered');
+    // }
 
     this.subNodes.push([node, parentNode]);
   }
@@ -160,5 +161,16 @@ export class ControllerTreeCreator extends ComposableTreeCreator<Constructor<Exp
     }
 
     return initializedController;
+  }
+
+  public getRegisteredNodes(): Constructor<ExpressCoreRoutable>[] {
+    const items: Constructor<ExpressCoreRoutable>[] = [];
+    if (this.mainNode) {
+      items.push(this.mainNode);
+    }
+
+    items.push(...this.subNodes.map((e) => e[0]));
+
+    return items;
   }
 }

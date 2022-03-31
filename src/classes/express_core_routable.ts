@@ -264,6 +264,33 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
   }
 
   /**
+   * Creates callable method for the endpoint
+   * TODO :: Minimize overhead // Note: Performance tests are prerequisite
+   *
+   * @param endpoint
+   * @protected
+   */
+  protected methodCreator(endpoint: ExpressEndpoint): ExpressFunction {
+    const methodFunction: ExpressFunction =
+      endpoint.parameters === undefined || endpoint.parameters.length === 0
+        ? //@ts-ignore
+          this[endpoint.methodName] // TODO :: ??Bind this??
+        : async (request, response, next): Promise<ExpressFunction> => {
+            const parameters = await this.get_endpoint_parameters(
+              endpoint,
+              request,
+              response,
+              next,
+            );
+
+            //@ts-ignore
+            return (this[endpoint.methodName] as CallableFunction).apply(this, parameters);
+          };
+
+    return this.mightWrapFunction(methodFunction);
+  }
+
+  /**
    * Wrap function if wrapper defined
    * @private
    */
@@ -290,33 +317,6 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
             (wrapper as ResultWrapperFunction)({ result, request, response, next });
           }
         };
-  }
-
-  /**
-   * Creates callable method for the endpoint
-   * TODO :: Minimize overhead // Note: Performance tests are prerequisite
-   *
-   * @param endpoint
-   * @protected
-   */
-  protected methodCreator(endpoint: ExpressEndpoint): ExpressFunction {
-    const methodFunction: ExpressFunction =
-      endpoint.parameters === undefined || endpoint.parameters.length === 0
-        ? //@ts-ignore
-          this[endpoint.methodName] // TODO :: ??Bind this??
-        : async (request, response, next): Promise<ExpressFunction> => {
-            const parameters = await this.get_endpoint_parameters(
-              endpoint,
-              request,
-              response,
-              next,
-            );
-
-            //@ts-ignore
-            return (this[endpoint.methodName] as CallableFunction).apply(this, parameters);
-          };
-
-    return this.mightWrapFunction(methodFunction);
   }
 
   protected async get_endpoint_parameters(
@@ -448,12 +448,14 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
    * @protected
    */
   protected getResultWrapperFunction(): ExpressFunction | ResultWrapperFunction<any> | undefined {
-    // Todo :: This should be changed later to: `getResultWrapper`
-    const wrapper: ResultWrapperType = this.getResultWrapper() as ResultWrapperType;
+    const wrapperWithClass = this.getResultWrapper();
 
-    if (!wrapper) {
+    if (!wrapperWithClass) {
       return undefined;
     }
+
+    const [wrapper, wrapperClass] = wrapperWithClass;
+
     if (typeof wrapper === 'function') {
       return wrapper as unknown as ExpressFunction;
     }
@@ -489,7 +491,7 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
             });
 
           // @ts-ignore
-          this[wrapper.methodName].bind(this)(...parameters);
+          wrapperClass[wrapper.methodName].bind(wrapperClass)(...parameters);
         }) as ResultWrapperFunction<any>);
   }
 }

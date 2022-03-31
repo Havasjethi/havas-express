@@ -15,7 +15,7 @@ export const Next = CreateStaticParameterExtractor('Next', (_, __, next) => next
 
 export const WholeBody = CreateStaticParameterExtractor('WholeBody', (req) => req.body);
 
-export const Body = CreateDynamicParameterExtractor<string>('Body', (name, req) =>
+export const Body = CreateDynamicParameterExtractor<string | undefined>('Body', (name, req) =>
   name ? req.body[name as string] : req.body,
 );
 

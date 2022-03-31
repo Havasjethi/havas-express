@@ -26,6 +26,8 @@ const MESSAGES = {
   SUB_1_WRAPPER: 'SUB_1_METHOD',
   SUB_2_METHOD: 'SUB_2_METHOD',
   SUB_2_CHILD_METHOD: 'SUB_2_CHILD_METHOD',
+  SUB_WITHOUT_CHILD_RW_FUNCTION: 'SUB_WITHOUT_CHILD_RW_FUNCTION',
+  SUB_WITHOUT_CHILD_RW_METHOD: 'SUB_WITHOUT_CHILD_RW_METHOD',
 };
 
 @MainController
@@ -62,13 +64,22 @@ class ResultTestController extends Router {
 @Path('/sub-1')
 class SubController_1 extends Router {
   @ResultWrapper
-  wrapper_method(@Res() response: Response) {
-    response.send(MESSAGES.SUB_1_WRAPPER);
+  wrapper_method(@Res() response: Response, @Result() res: any) {
+    response.send(res);
   }
 
   @Get('')
   sub_method() {
-    return null;
+    return MESSAGES.SUB_1_WRAPPER;
+  }
+}
+
+@Controller(SubController_1)
+@Path('/child')
+class SubController_1_Child extends Router {
+  @Get('/')
+  sub_method() {
+    return MESSAGES.SUB_WITHOUT_CHILD_RW_METHOD;
   }
 }
 
@@ -94,6 +105,15 @@ class SubSubController extends Router {
 
   @Get('')
   empty_method() {}
+}
+
+@Controller()
+@Path('/sub-without')
+class SubControllerWithoutWrapper extends Router {
+  @Get('/')
+  index(): string {
+    return MESSAGES.SUB_WITHOUT_CHILD_RW_FUNCTION;
+  }
 }
 
 describe('Result Wrapper Tests ', () => {
@@ -143,6 +163,18 @@ describe('Result Wrapper Tests ', () => {
           .get('/sub-2/sub-sub/')
           .expect((res) => expect(res.text).toBe(MESSAGES.SUB_2_CHILD_METHOD));
       });
+    });
+
+    test('Sub without result Wrapper', async () => {
+      await supertest(app)
+        .get('/sub-without/')
+        .expect((e) => expect(e.text).toBe(MESSAGES.SUB_WITHOUT_CHILD_RW_FUNCTION));
+    });
+
+    test('Sub without result Wrapper', async () => {
+      await supertest(app)
+        .get('/sub-1/child/')
+        .expect((e) => expect(e.text).toBe(MESSAGES.SUB_WITHOUT_CHILD_RW_METHOD));
     });
   });
 });

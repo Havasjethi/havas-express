@@ -1,9 +1,11 @@
-import { IRouter, ErrorRequestHandler } from 'express';
+import { ErrorRequestHandler, IRouter } from 'express';
 import { NextFunction } from 'express-serve-static-core';
 import { BaseCoreRouter, Objectified, RegistrableMethod } from 'havas-core';
+import { interfaces } from 'inversify';
 import {
   ExpressRequest,
   ExpressResponse,
+  mainContainer,
   ParameterExtractorStorage,
   ResultWrapperFunction,
 } from '../../index';
@@ -11,19 +13,25 @@ import {
   DynamicParameterExtractorFunction,
   ExpressHttpMethod,
   isProcessorFactory,
-  UniversalPostProcessor,
   StaticParameterExtractorFunction,
+  UniversalPostProcessor,
 } from '../types';
+import {
+  ErrorHandlerEntry,
+  ExpressEndpoint,
+  RegistrableErrorHandler,
+  ResultWrapperType,
+} from '../types/classes';
+import {
+  ExpressFunction,
+  Middleware,
+  MiddleWareFunction,
+  RegistrableMiddleware,
+} from '../types/classes/middleware';
 import { ErrorHandlerClass, ErrorHandlerFunction } from './error_handler';
 import { MiddlewareObject } from './middleware';
 import { postProcessorStorage } from './post_processor_storage';
-import {
-  ExpressEndpoint,
-  ResultWrapperType,
-  RegistrableErrorHandler,
-  ErrorHandlerEntry,
-} from '../types/classes';
-import { ExpressFunction, Middleware, RegistrableMiddleware } from '../types/classes/middleware';
+import ServiceIdentifier = interfaces.ServiceIdentifier;
 
 const isPromise = (value: any) => value?.constructor?.name === 'Promise';
 
@@ -213,17 +221,48 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
   protected setupMiddlewares(middlewares: RegistrableMiddleware[]): void {
     const routable = this.getRoutable();
 
-    middlewares.forEach((e: RegistrableMiddleware) => {
-      const functions = e.middlewares.map((middleware: Middleware) =>
-        typeof middleware === 'function'
-          ? middleware
-          : (middleware as MiddlewareObject).handle.bind(middleware),
+    for (const middlewareEntry of middlewares) {
+      const functions: MiddleWareFunction[] = middlewareEntry.middlewares.map((e) =>
+        this._middleWareHandlerConverter(e),
       );
 
-      e.method !== undefined
-        ? routable[e.method](e.path, ...functions)
-        : routable.use(e.path, ...functions);
-    });
+      // Adding Converted middleware Function to Express
+      middlewareEntry.method !== undefined
+        ? routable[middlewareEntry.method](middlewareEntry.path, ...functions)
+        : routable.use(middlewareEntry.path, ...functions);
+    }
+  }
+
+  protected _middleWareHandlerConverter(middleware: Middleware): MiddleWareFunction {
+    const middlewareHandler =
+      // @ts-ignore
+      middleware?.prototype?.getHandler ||
+      // @ts-ignore
+      middleware?.prototype?.prototype?.getHandler ||
+      // @ts-ignore
+      middleware?.prototype?.prototype?.prototype?.getHandler ||
+      // @ts-ignore
+      middleware?.prototype?.prototype?.prototype?.prototype?.getHandler;
+    const isMiddlewareClass = !!middlewareHandler;
+
+    if (isMiddlewareClass) {
+      const obj = mainContainer.get(middleware as ServiceIdentifier<MiddlewareObject>);
+      return obj.getHandler.bind(obj);
+    }
+
+    if (typeof middleware === 'function') {
+      return middleware as MiddleWareFunction;
+    }
+
+    if (typeof middleware === 'object' && !!middleware.getHandler) {
+      return (middleware as MiddlewareObject).getHandler.bind(middleware);
+    }
+
+    console.error('Error :: Middleware called with invalid value', middlewareHandler);
+    // @ts-ignore
+    return (req, res, next) => {
+      next();
+    };
   }
 
   /**
@@ -256,8 +295,8 @@ export abstract class ExpressCoreRoutable<T extends IRouter = IRouter> extends B
       routable[e.methodType](
         e.path,
         ...e.middlewares.map((middleware: Middleware) =>
-          typeof middleware === 'function' ? middleware : middleware.handle.bind(middleware),
-        ), // VS  (req: any, res: any, next: any) => middleware.handle(req, res, next))),
+          this._middleWareHandlerConverter(middleware),
+        ),
         this.methodCreator(e).bind(this),
       );
     });

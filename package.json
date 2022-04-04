@@ -1,6 +1,6 @@
 {
   "name": "@havas-web/havas-express",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "ExpressJs wrapper for creating class-oriented endpoint handlers",
   "files": [
     "lib/",
@@ -15,7 +15,8 @@
     "build": "tsc",
     "dev-build": "tsc --watch",
     "test": "jest",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "publish:gitlab": "npm run publish"
   },
   "author": "havasjethi",
   "license": "ISC",
